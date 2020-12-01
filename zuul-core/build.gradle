@@ -1,5 +1,42 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'edu.ucr.cs.riple:NullAwayAutoFixer:1.0-SNAPSHOT'
+    }
+}
+
+
+plugins {
+    id 'java'
+    id("net.ltgt.errorprone") version "0.6"
+}
+
 apply plugin: "com.google.osdetector"
 apply plugin: "java-library"
+
+apply plugin: 'edu.ucr.cs.riple.plugin'
+
+
+autoFixMode {
+    fixPath = "/tmp/NullAwayFix"
+    maximumRound = 20
+}
+
+annotationEditor {
+    remove = ["org.checkerframework.checker.nullness.qual.Nullable", "org.checkerframework.checker.nullness.qual.NonNull"]
+    subProjects = ["caffeine"]
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+
 
 dependencies {
 
@@ -46,6 +83,12 @@ dependencies {
 
     jmh 'org.openjdk.jmh:jmh-core:1.+'
     jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.+'
+
+    annotationProcessor "edu.ucr.cs.riple:nullaway:0.7.12-SNAPSHOT"
+
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+    errorprone "com.google.errorprone:error_prone_core:2.3.2"
+    errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
 }
 
 // Silences log statements during tests.   This still allows normal failures to be printed.
@@ -65,4 +108,19 @@ jmh {
     iterations 5
     // Not sure why duplicate classes are aon the path.  Something Nebula related I think.
     duplicateClassesStrategy = 'EXCLUDE'
+}
+
+
+tasks.withType(JavaCompile) {
+    // remove the if condition if you want to run NullAway on test code
+    if (!name.toLowerCase().contains("test")) {
+        //options.errorprone.disableWarningsInGeneratedCode = true
+        options.errorprone.errorproneArgs += ["-XepDisableAllChecks",
+                                              "-Xep:NullAway:ERROR",
+                                              "-XepOpt:NullAway:AnnotatedPackages=com.netflix",
+                                              "-XepOpt:NullAway:AutoFix=true",
+                                              "-XepDisableAllWarnings"]
+//        "-XepOpt:NullAway:FixAnnotations=androidx.annotation.NonNull,androidx.annotation.Nullable",
+        options.compilerArgs << "-Xmaxerrs" << "100000"
+    }
 }
