@@ -63,7 +63,7 @@ public final class RejectionUtils {
      */
     public static void rejectByClosingConnection(
             ChannelHandlerContext ctx, StatusCategory nfStatus, String reason, HttpRequest request,
-            @Nullable Integer injectedLatencyMillis) {
+             Integer injectedLatencyMillis) {
         if (injectedLatencyMillis != null && injectedLatencyMillis > 0) {
             // Delay closing the connection for configured time.
             ctx.executor().schedule(() -> {
@@ -95,7 +95,7 @@ public final class RejectionUtils {
      */
     public static void sendRejectionResponse(
             ChannelHandlerContext ctx, StatusCategory nfStatus, String reason, HttpRequest request,
-            @Nullable Integer injectedLatencyMillis, HttpResponseStatus rejectedCode, String rejectedBody,
+             Integer injectedLatencyMillis, HttpResponseStatus rejectedCode, String rejectedBody,
             Map<String, String> rejectionHeaders) {
         boolean shouldClose = closeConnectionAfterReject(ctx.channel());
         // Write out a rejection response message.
@@ -146,7 +146,7 @@ public final class RejectionUtils {
      */
     public static void handleRejection(
             ChannelHandlerContext ctx, Object msg, RejectionType rejectionType, StatusCategory nfStatus, String reason,
-            @Nullable Integer injectedLatencyMillis, HttpResponseStatus rejectedCode, String rejectedBody,
+             Integer injectedLatencyMillis, HttpResponseStatus rejectedCode, String rejectedBody,
             Map<String, String> rejectionHeaders)
             throws Exception {
 
@@ -194,7 +194,7 @@ public final class RejectionUtils {
      */
     public static void reject(
             ChannelHandlerContext ctx, RejectionType rejectionType, StatusCategory nfStatus, String reason,
-            HttpRequest request, @Nullable Integer injectedLatencyMillis, HttpResponseStatus rejectedCode,
+            HttpRequest request,  Integer injectedLatencyMillis, HttpResponseStatus rejectedCode,
             String rejectedBody) {
         reject(ctx, rejectionType, nfStatus, reason, request, injectedLatencyMillis, rejectedCode, rejectedBody,
                 Collections.emptyMap());
@@ -216,7 +216,7 @@ public final class RejectionUtils {
      */
     public static void reject(
             ChannelHandlerContext ctx, RejectionType rejectionType, StatusCategory nfStatus, String reason,
-            HttpRequest request, @Nullable Integer injectedLatencyMillis, HttpResponseStatus rejectedCode,
+            HttpRequest request,  Integer injectedLatencyMillis, HttpResponseStatus rejectedCode,
             String rejectedBody, Map<String, String> rejectionHeaders) {
         switch (rejectionType) {
             case REJECT:

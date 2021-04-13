@@ -70,7 +70,7 @@ public final class Headers {
      * Get the first value found for this key even if there are multiple. If none, then
      * return {@code null}.
      */
-    @Nullable
+    
     public String getFirst(String headerName) {
         String normalName = HeaderName.normalize(requireNonNull(headerName, "headerName"));
         return getFirstNormal(normalName);
@@ -80,13 +80,13 @@ public final class Headers {
      * Get the first value found for this key even if there are multiple. If none, then
      * return {@code null}.
      */
-    @Nullable
+    
     public String getFirst(HeaderName headerName) {
         String normalName = requireNonNull(headerName, "headerName").getNormalised();
         return getFirstNormal(normalName);
     }
 
-    @Nullable
+    
     private String getFirstNormal(String name) {
         for (int i = 0; i < size(); i++) {
             if (name(i).equals(name)) {
@@ -171,7 +171,7 @@ public final class Headers {
      *
      * If value is {@code null}, then not added, but any existing header of same name is removed.
      */
-    public void set(String headerName, @Nullable String value) {
+    public void set(String headerName,  String value) {
         String normalName = HeaderName.normalize(requireNonNull(headerName, "headerName"));
         setNormal(headerName, normalName, value);
     }
@@ -193,7 +193,7 @@ public final class Headers {
      *
      * @throws ZuulException on invalid name or value
      */
-    public void setAndValidate(String headerName, @Nullable String value) {
+    public void setAndValidate(String headerName,  String value) {
         String normalName = HeaderName.normalize(requireNonNull(headerName, "headerName"));
         setNormal(validateField(headerName), validateField(normalName), validateField(value));
     }
@@ -216,7 +216,7 @@ public final class Headers {
      *
      * If value is {@code null}, then not added, but any existing header of same name is removed.
      */
-    public void setIfValid(String headerName, @Nullable String value) {
+    public void setIfValid(String headerName,  String value) {
         requireNonNull(headerName, "headerName");
         if (isValid(headerName) && isValid(value)) {
             String normalName = HeaderName.normalize(headerName);
@@ -236,7 +236,7 @@ public final class Headers {
         setNormal(validateField(headerName.getName()), validateField(normalName), validateField(value));
     }
 
-    private void setNormal(String originalName, String normalName, @Nullable String value) {
+    private void setNormal(String originalName, String normalName,  String value) {
         int i = findNormal(normalName);
         if (i == ABSENT) {
             if (value != null) {
@@ -267,7 +267,7 @@ public final class Headers {
     /**
      * Removes entries that match the name, starting at the given index.
      */
-    private void clearMatchingStartingAt(int i, String normalName, @Nullable Collection<? super String> removed) {
+    private void clearMatchingStartingAt(int i, String normalName,  Collection<? super String> removed) {
         // This works by having separate read and write indexes, that iterate along the list.
         // Values that don't match are moved to the front, leaving garbage values in place.
         // At the end, all values at and values are garbage and are removed.
@@ -636,7 +636,7 @@ public final class Headers {
     /**
      * Checks if the given value is compliant with our RFC 7230 based check
      */
-    private static boolean isValid(@Nullable String value) {
+    private static boolean isValid( String value) {
         if (value == null || findInvalid(value) == ABSENT) {
             return true;
         }
@@ -648,7 +648,7 @@ public final class Headers {
      * Checks if the input value is compliant with our RFC 7230 based check
      * Returns input value if valid, raises ZuulException otherwise
      */
-    private static String validateField(@Nullable String value) {
+    private static String validateField( String value) {
         if (value != null) {
             int pos = findInvalid(value);
             if (pos != ABSENT) {

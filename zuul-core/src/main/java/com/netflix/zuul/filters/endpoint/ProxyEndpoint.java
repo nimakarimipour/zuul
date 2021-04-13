@@ -1085,7 +1085,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
      * Note: this method gets called in the constructor so if overloading it or any methods called within, you cannot
      * rely on your own constructor parameters.
      */
-    @Nullable
+    
     protected VipPair injectCustomVip(HttpRequestMessage request) {
         // override for custom vip injection
         return null;

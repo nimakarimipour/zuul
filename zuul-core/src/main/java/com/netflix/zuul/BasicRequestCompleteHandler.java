@@ -32,7 +32,7 @@ import javax.inject.Inject;
 public class BasicRequestCompleteHandler implements RequestCompleteHandler
 {
     @Inject
-    @Nullable
+    
     private RequestMetricsPublisher requestMetricsPublisher;
 
     @Override

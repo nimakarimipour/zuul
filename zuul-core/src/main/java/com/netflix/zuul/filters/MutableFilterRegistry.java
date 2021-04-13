@@ -28,14 +28,14 @@ import javax.inject.Singleton;
 public final class MutableFilterRegistry implements FilterRegistry {
     private final ConcurrentHashMap<String, ZuulFilter<?, ?>> filters = new ConcurrentHashMap<>();
 
-    @Nullable
+    
     @Override
     public ZuulFilter<?, ?> remove(String key) {
         return filters.remove(requireNonNull(key, "key"));
     }
 
     @Override
-    @Nullable
+    
     public ZuulFilter<?, ?> get(String key) {
         return filters.get(requireNonNull(key, "key"));
     }

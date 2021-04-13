@@ -62,7 +62,7 @@ public interface ZuulMessage extends Cloneable {
     /**
      * Returns the message body.  If there is no message body, this returns {@code null}.
      */
-    @Nullable
+    
     byte[] getBody();
 
     /**
@@ -74,14 +74,14 @@ public interface ZuulMessage extends Cloneable {
      * Sets the message body.  Note: if the {@code body} is {@code null}, this may not reset the body presence as
      * returned by {@link #hasBody}.  The body is considered complete after calling this method.
      */
-    void setBody(@Nullable byte[] body);
+    void setBody( byte[] body);
 
     /**
      * Sets the message body as UTF-8 encoded text.   Note that this does NOT set any headers related to the
      * Content-Type; callers must set or reset the content type to UTF-8.  The body is considered complete after
      * calling this method.
      */
-    void setBodyAsText(@Nullable String bodyText);
+    void setBodyAsText( String bodyText);
 
     /**
      * Appends an HTTP content chunk to this message.  Callers should be careful not to add multiple chunks that
@@ -123,7 +123,7 @@ public interface ZuulMessage extends Cloneable {
     /**
      * Gets the body of this message as UTF-8 text, or {@code null} if there is no body.
      */
-    @Nullable
+    
     String getBodyAsText();
 
     /**

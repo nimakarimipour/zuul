@@ -38,7 +38,7 @@ public class RouteStatusCodeMonitor implements NamedCount {
 
     private final AtomicLong count = new AtomicLong();
 
-    public RouteStatusCodeMonitor(@Nullable String route, int statusCode) {
+    public RouteStatusCodeMonitor( String route, int statusCode) {
         if (route == null) {
             route = "";
         }

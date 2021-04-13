@@ -323,7 +323,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     @Override
     public Promise<PooledConnection> acquire(
             EventLoop eventLoop,
-            @Nullable Object key,
+             Object key,
             CurrentPassport passport,
             AtomicReference<Server> selectedServer,
             AtomicReference<? super InetAddress> selectedHostAddr) {
@@ -459,7 +459,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     }
 
     @VisibleForTesting
-    static SocketAddress pickAddressInternal(Server chosenServer, @Nullable String connPoolConfigOriginName) {
+    static SocketAddress pickAddressInternal(Server chosenServer,  String connPoolConfigOriginName) {
         String rawHost;
         int port;
         if (chosenServer instanceof DiscoveryEnabledServer) {

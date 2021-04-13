@@ -303,7 +303,7 @@ public abstract class BaseServerStartup
         LOG.info("Configured address: {}", socketAddress);
     }
 
-    protected final void logAddrConfigured(SocketAddress socketAddress, @Nullable ServerSslConfig serverSslConfig) {
+    protected final void logAddrConfigured(SocketAddress socketAddress,  ServerSslConfig serverSslConfig) {
         String msg = "Configured address: " + socketAddress;
         if (serverSslConfig != null) {
             msg = msg + " with SSL config: " + serverSslConfig;
@@ -312,7 +312,7 @@ public abstract class BaseServerStartup
     }
 
     protected final void logAddrConfigured(
-            SocketAddress socketAddress, @Nullable AsyncMapping<String, SslContext> sniMapping) {
+            SocketAddress socketAddress,  AsyncMapping<String, SslContext> sniMapping) {
         String msg = "Configured address: " + socketAddress;
         if (sniMapping != null) {
             msg = msg + " with SNI config: " + sniMapping;
@@ -320,7 +320,7 @@ public abstract class BaseServerStartup
         LOG.info(msg);
     }
 
-    protected final void logSecureAddrConfigured(SocketAddress socketAddress, @Nullable Object securityConfig) {
+    protected final void logSecureAddrConfigured(SocketAddress socketAddress,  Object securityConfig) {
         LOG.info("Configured address: {} with security config {}", socketAddress, securityConfig);
     }
 }

@@ -1,13 +1,3 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'edu.ucr.cs.riple:NullAwayAutoFixer:1.0-SNAPSHOT'
-    }
-}
-
 
 plugins {
     id 'java'
@@ -17,18 +7,6 @@ plugins {
 apply plugin: "com.google.osdetector"
 apply plugin: "java-library"
 
-apply plugin: 'edu.ucr.cs.riple.plugin'
-
-
-autoFixMode {
-    fixPath = "/tmp/NullAwayFix"
-    maximumRound = 20
-}
-
-annotationEditor {
-    remove = ["org.checkerframework.checker.nullness.qual.Nullable", "org.checkerframework.checker.nullness.qual.NonNull"]
-    subProjects = ["caffeine"]
-}
 
 repositories {
     mavenLocal()
@@ -114,13 +92,11 @@ jmh {
 tasks.withType(JavaCompile) {
     // remove the if condition if you want to run NullAway on test code
     if (!name.toLowerCase().contains("test")) {
-        //options.errorprone.disableWarningsInGeneratedCode = true
         options.errorprone.errorproneArgs += ["-XepDisableAllChecks",
                                               "-Xep:NullAway:ERROR",
                                               "-XepOpt:NullAway:AnnotatedPackages=com.netflix",
                                               "-XepOpt:NullAway:AutoFix=true",
                                               "-XepDisableAllWarnings"]
-//        "-XepOpt:NullAway:FixAnnotations=androidx.annotation.NonNull,androidx.annotation.Nullable",
         options.compilerArgs << "-Xmaxerrs" << "100000"
     }
 }

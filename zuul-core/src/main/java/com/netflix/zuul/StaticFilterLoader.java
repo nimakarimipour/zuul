@@ -147,7 +147,7 @@ public final class StaticFilterLoader implements FilterLoader {
     }
 
     @Override
-    @Nullable
+    
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         Map<String, ZuulFilter<?, ?>> filtersByName = filtersByTypeAndName.get(type);
         if (filtersByName == null) {
