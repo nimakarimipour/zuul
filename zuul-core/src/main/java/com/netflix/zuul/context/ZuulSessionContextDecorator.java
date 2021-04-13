@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.context;
 
+import javax.annotation.Nullable;
+
 import com.netflix.netty.common.metrics.HttpBodySizeRecordingChannelHandler;
 import com.netflix.util.UUIDFactory;
 import com.netflix.util.concurrent.ConcurrentUUIDFactory;
@@ -28,12 +30,6 @@ import io.netty.channel.ChannelHandlerContext;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * Base Session Context Decorator
- *
- * Author: Arthur Gonigberg
- * Date: November 21, 2017
- */
 @Singleton
 public class ZuulSessionContextDecorator implements SessionContextDecorator {
 
@@ -46,7 +42,7 @@ public class ZuulSessionContextDecorator implements SessionContextDecorator {
         this.originManager = originManager;
     }
 
-    @Override
+    @Override@Nullable
     public SessionContext decorate(SessionContext ctx) {
         // TODO split out commons parts from BaseSessionContextDecorator
 

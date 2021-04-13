@@ -16,23 +16,19 @@
 
 package com.netflix.zuul.niws;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * User: michaels@netflix.com
- * Date: 6/25/15
- * Time: 1:03 PM
- */
 public class RequestAttempts extends ArrayList<RequestAttempt>
 {
     private static final Logger LOG = LoggerFactory.getLogger(RequestAttempts.class);
@@ -44,6 +40,7 @@ public class RequestAttempts extends ArrayList<RequestAttempt>
     }
 
     
+    @Nullable
     public RequestAttempt getFinalAttempt()
     {
         if (size() > 0) {

@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.filter;
 
+import com.netflix.Initializer;
+
 import com.google.common.base.Preconditions;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.filters.ZuulFilter;
@@ -50,9 +52,6 @@ import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_CLIENT_TI
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_LOCAL;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_LOCAL_IDLE_TIMEOUT;
 
-/**
- * Created by saroskar on 5/18/17.
- */
 public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
 
     private final ZuulFilterChainRunner<HttpRequestMessage> requestFilterChain;
@@ -115,6 +114,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
         super.userEventTriggered(ctx, evt);
     }
 
+    @Initializer
     private void sendResponse(final StatusCategory statusCategory, final int status, ChannelHandlerContext ctx) {
         if (zuulRequest == null) {
             ctx.close();

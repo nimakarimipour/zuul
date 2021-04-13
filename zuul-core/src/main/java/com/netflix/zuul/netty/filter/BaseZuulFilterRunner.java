@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.filter;
 
+import javax.annotation.Nullable;
+
 import com.netflix.config.CachedDynamicIntProperty;
 import com.netflix.spectator.impl.Preconditions;
 import com.netflix.zuul.ExecutionStatus;
@@ -62,10 +64,6 @@ import static io.perfmark.PerfMark.linkIn;
 import static io.perfmark.PerfMark.linkOut;
 import static io.perfmark.PerfMark.traceTask;
 
-/**
- * Subclasses of this class are supposed to be thread safe and hence should not have any non final member variables
- * Created by saroskar on 5/18/17.
- */
 @ThreadSafe
 public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends ZuulMessage> implements FilterRunner<I, O> {
 
@@ -170,6 +168,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         attachTag("uuid", inMesg, m -> m.getContext().getUUID());
     }
 
+    @Nullable
     protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
         final long startTime = System.nanoTime();
         final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
@@ -312,7 +311,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     }
 
     protected void recordFilterCompletion(final ExecutionStatus status, final ZuulFilter<I, O> filter, long startTime,
-                                          final ZuulMessage zuulMesg, final ZuulMessage startSnapshot) {
+                                          final ZuulMessage zuulMesg, @Nullable final ZuulMessage startSnapshot) {
 
         final SessionContext zuulCtx = zuulMesg.getContext();
         final long execTimeNs = System.nanoTime() - startTime;

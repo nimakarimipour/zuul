@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
+
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.ServerStats;
@@ -37,15 +39,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: michaels@netflix.com
- * Date: 7/8/16
- * Time: 1:09 PM
- */
 public class PerServerConnectionPool implements IConnectionPool
 {
     private static final Logger LOG = LoggerFactory.getLogger(PerServerConnectionPool.class);
@@ -176,6 +172,7 @@ public class PerServerConnectionPool implements IConnectionPool
         return promise;
     }
 
+    @Nullable
     public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
     {
         PooledConnection conn;
@@ -398,6 +395,7 @@ public class PerServerConnectionPool implements IConnectionPool
     }
 
     
+    @Nullable
     private static InetAddress getSelectedHostString(SocketAddress addr) {
         if (addr instanceof InetSocketAddress) {
             return ((InetSocketAddress) addr).getAddress();

@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
+
 import static com.netflix.client.config.CommonClientConfigKey.NFLoadBalancerClassName;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -55,15 +57,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: michaels@netflix.com
- * Date: 7/8/16
- * Time: 12:39 PM
- */
 public class DefaultClientChannelManager implements ClientChannelManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultClientChannelManager.class);
 
@@ -323,7 +319,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     @Override
     public Promise<PooledConnection> acquire(
             EventLoop eventLoop,
-             Object key,
+             @Nullable Object key,
             CurrentPassport passport,
             AtomicReference<Server> selectedServer,
             AtomicReference<? super InetAddress> selectedHostAddr) {

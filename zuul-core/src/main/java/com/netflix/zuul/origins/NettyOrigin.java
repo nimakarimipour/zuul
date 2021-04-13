@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.origins;
 
+import javax.annotation.Nullable;
+
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.reactive.ExecutionContext;
@@ -32,12 +34,6 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Netty Origin interface for integrating cleanly with the ProxyEndpoint state management class.
- *
- * Author: Arthur Gonigberg
- * Date: November 29, 2017
- */
 public interface NettyOrigin extends InstrumentedOrigin {
 
     Promise<PooledConnection> connectToOrigin(final HttpRequestMessage zuulReq, EventLoop eventLoop,
@@ -51,22 +47,23 @@ public interface NettyOrigin extends InstrumentedOrigin {
 
     void onRequestStartWithServer(final HttpRequestMessage zuulReq, final Server originServer, int attemptNum);
 
-    void onRequestExceptionWithServer(final HttpRequestMessage zuulReq, final Server originServer,
+    void onRequestExceptionWithServer(final HttpRequestMessage zuulReq, @Nullable final Server originServer,
                                       final int attemptNum, Throwable t);
 
     void onRequestExecutionSuccess(final HttpRequestMessage zuulReq, final HttpResponseMessage zuulResp,
                                    final Server originServer, final int attemptNum);
 
-    void onRequestExecutionFailed(final HttpRequestMessage zuulReq, final Server originServer,
+    void onRequestExecutionFailed(final HttpRequestMessage zuulReq, @Nullable final Server originServer,
                                   final int attemptNum, Throwable t);
 
     void recordFinalError(final HttpRequestMessage requestMsg, final Throwable throwable);
 
     void recordFinalResponse(final HttpResponseMessage resp);
 
-    RequestAttempt newRequestAttempt(final Server server, final SessionContext zuulCtx, int attemptNum);
+    RequestAttempt newRequestAttempt(@Nullable final Server server, final SessionContext zuulCtx, int attemptNum);
 
-    String getIpAddrFromServer(Server server);
+    @Nullable
+    String getIpAddrFromServer(@Nullable Server server);
 
     IClientConfig getClientConfig();
 

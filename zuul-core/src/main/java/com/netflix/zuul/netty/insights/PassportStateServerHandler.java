@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.insights;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -31,15 +33,10 @@ import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * User: Mike Smith
- * Date: 9/24/16
- * Time: 2:41 PM
- */
 public final class PassportStateServerHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PassportStateServerHandler.class);
 
+    @Nullable
     private static Registry registry;
 
     private static CurrentPassport passport(ChannelHandlerContext ctx)

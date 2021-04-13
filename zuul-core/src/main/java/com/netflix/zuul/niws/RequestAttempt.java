@@ -16,6 +16,10 @@
 
 package com.netflix.zuul.niws;
 
+import javax.annotation.Nullable;
+
+import com.netflix.Initializer;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,11 +36,6 @@ import io.netty.handler.timeout.ReadTimeoutException;
 
 import javax.net.ssl.SSLHandshakeException;
 
-/**
- * User: michaels@netflix.com
- * Date: 9/2/14
- * Time: 2:52 PM
- */
 public class RequestAttempt
 {
     private static final ObjectMapper JACKSON_MAPPER = new ObjectMapper();
@@ -44,7 +43,11 @@ public class RequestAttempt
     private int attempt;
     private int status;
     private long duration;
+
+    @Nullable
     private String cause;
+
+    @Nullable
     private String error;
     private String exceptionType;
     private String app;
@@ -54,11 +57,14 @@ public class RequestAttempt
     private int port;
     private String vip;
     private String region;
+
+    @Nullable
     private String availabilityZone;
     private int readTimeout;
     private int connectTimeout;
     private int maxRetries;
 
+    @Initializer
     public RequestAttempt(int attemptNumber, InstanceInfo server, String targetVip, String chosenWarmupLB, int status, String error, String exceptionType,
                           int readTimeout, int connectTimeout, int maxRetries)
     {
@@ -99,7 +105,7 @@ public class RequestAttempt
         this.maxRetries = maxRetries;
     }
 
-    public RequestAttempt(final Server server, final IClientConfig clientConfig, int attemptNumber, int readTimeout) {
+    public RequestAttempt(@Nullable final Server server, final IClientConfig clientConfig, int attemptNumber, int readTimeout) {
         this.status = -1;
         this.attempt = attemptNumber;
         this.readTimeout = readTimeout;
@@ -149,7 +155,7 @@ public class RequestAttempt
     private RequestAttempt() {
     }
 
-    public void complete(int responseStatus, long durationMs, Throwable exception)
+    public void complete(int responseStatus, long durationMs, @Nullable Throwable exception)
     {
         if (responseStatus > -1)
             setStatus(responseStatus);
@@ -178,6 +184,7 @@ public class RequestAttempt
         return this.duration;
     }
 
+    @Nullable
     public String getError() {
         return error;
     }
@@ -208,6 +215,7 @@ public class RequestAttempt
         return region;
     }
 
+    @Nullable
     public String getAvailabilityZone() {
         return availabilityZone;
     }
@@ -247,21 +255,25 @@ public class RequestAttempt
         this.exceptionType = exceptionType;
     }
 
+    @Initializer
     public void setApp(String app)
     {
         this.app = app;
     }
 
+    @Initializer
     public void setAsg(String asg)
     {
         this.asg = asg;
     }
 
+    @Initializer
     public void setInstanceId(String instanceId)
     {
         this.instanceId = instanceId;
     }
 
+    @Initializer
     public void setHost(String host)
     {
         this.host = host;
@@ -277,11 +289,13 @@ public class RequestAttempt
         this.vip = vip;
     }
 
+    @Initializer
     public void setRegion(String region)
     {
         this.region = region;
     }
 
+    @Initializer
     public void setAvailabilityZone(String availabilityZone)
     {
         this.availabilityZone = availabilityZone;
@@ -377,7 +391,7 @@ public class RequestAttempt
         return root;
     }
 
-    private static ObjectNode putNullableAttribute(ObjectNode node, String name, String value)
+    private static ObjectNode putNullableAttribute(ObjectNode node, String name, @Nullable String value)
     {
         if (value != null) {
             node.put(name, value);

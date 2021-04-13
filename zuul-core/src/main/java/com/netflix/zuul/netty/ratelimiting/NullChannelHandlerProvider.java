@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.ratelimiting;
 
+import javax.annotation.Nullable;
+
 import io.netty.channel.ChannelHandler;
 
 import javax.inject.Provider;
@@ -24,7 +26,7 @@ import javax.inject.Singleton;
 @Singleton
 public class NullChannelHandlerProvider implements Provider<ChannelHandler>
 {
-    @Override
+    @Override@Nullable
     public ChannelHandler get() {
         return null;
     }

@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.message;
 
+import javax.annotation.Nullable;
+
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,15 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 
-/**
- * An abstraction over a collection of http headers. Allows multiple headers with same name, and header names are
- * compared case insensitively.
- *
- * There are methods for getting and setting headers by String AND by HeaderName. When possible, use the HeaderName
- * variants and cache the HeaderName instances somewhere, to avoid case-insensitive String comparisons.
- */
 public final class Headers {
     private static final int ABSENT = -1;
 
@@ -267,7 +261,7 @@ public final class Headers {
     /**
      * Removes entries that match the name, starting at the given index.
      */
-    private void clearMatchingStartingAt(int i, String normalName,  Collection<? super String> removed) {
+    private void clearMatchingStartingAt(int i, String normalName,  @Nullable Collection<? super String> removed) {
         // This works by having separate read and write indexes, that iterate along the list.
         // Values that don't match are moved to the front, leaving garbage values in place.
         // At the end, all values at and values are garbage and are removed.

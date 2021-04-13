@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server;
 
+import javax.annotation.Nullable;
+
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.NoopRegistry;
 import com.netflix.spectator.api.Registry;
@@ -60,9 +62,6 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
 
-/**
- * Created by saroskar on 2/26/17.
- */
 public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
 
     private static final Registry NOOP_REGISTRY = new NoopRegistry();
@@ -76,6 +75,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
     private boolean closeConnection;
 
     //data
+    @Nullable
     private HttpResponseMessage zuulResponse;
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientResponseWriter.class);
@@ -280,7 +280,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
         }
     }
 
-    protected void completeMetrics(Channel channel, HttpResponseMessage zuulResponse) {
+    protected void completeMetrics(Channel channel, @Nullable HttpResponseMessage zuulResponse) {
         // override for recording complete metrics
     }
 

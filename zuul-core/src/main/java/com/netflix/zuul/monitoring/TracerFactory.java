@@ -16,13 +16,11 @@
 
 package com.netflix.zuul.monitoring;
 
-/**
- * Abstraction layer to provide time-based monitoring.
- *
- * @author mhawthorne
- */
+import javax.annotation.Nullable;
+
 public abstract class TracerFactory {
 
+    @Nullable
     private static TracerFactory INSTANCE;
 
     /**

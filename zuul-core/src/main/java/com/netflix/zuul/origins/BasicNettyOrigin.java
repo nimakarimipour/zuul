@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.origins;
 
+import javax.annotation.Nullable;
+
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN_THROTTLED;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.SUCCESS;
@@ -51,13 +53,6 @@ import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Netty Origin basic implementation that can be used for most apps, with the more complex methods having no-op
- * implementations.
- *
- * Author: Arthur Gonigberg
- * Date: December 01, 2017
- */
 public class BasicNettyOrigin implements NettyOrigin {
 
     private final String name;
@@ -128,12 +123,12 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public RequestAttempt newRequestAttempt(Server server, SessionContext zuulCtx, int attemptNum) {
+    public RequestAttempt newRequestAttempt(@Nullable Server server, SessionContext zuulCtx, int attemptNum) {
         return new RequestAttempt(server, config, attemptNum, config.get(CommonClientConfigKey.ReadTimeout));
     }
 
-    @Override
-    public String getIpAddrFromServer(Server server) {
+    @Override@Nullable
+    public String getIpAddrFromServer(@Nullable Server server) {
         if (server instanceof DiscoveryEnabledServer) {
             DiscoveryEnabledServer discoveryServer = (DiscoveryEnabledServer) server;
             if (discoveryServer.getInstanceInfo() != null) {
@@ -253,7 +248,7 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public void onRequestExceptionWithServer(HttpRequestMessage zuulReq, Server originServer, int attemptNum, Throwable t) {
+    public void onRequestExceptionWithServer(HttpRequestMessage zuulReq, @Nullable Server originServer, int attemptNum, Throwable t) {
     }
 
     @Override
@@ -261,7 +256,7 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public void onRequestExecutionFailed(HttpRequestMessage zuulReq, Server originServer, int attemptNum, Throwable t) {
+    public void onRequestExecutionFailed(HttpRequestMessage zuulReq, @Nullable Server originServer, int attemptNum, Throwable t) {
     }
 
     @Override

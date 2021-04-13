@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.util;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Strings;
 import com.netflix.zuul.message.Headers;
 import com.netflix.zuul.message.ZuulMessage;
@@ -23,15 +25,9 @@ import com.netflix.zuul.message.http.HttpRequestInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http2.Http2StreamChannel;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: Mike Smith
- * Date: 4/28/15
- * Time: 11:05 PM
- */
 public class HttpUtils
 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
@@ -46,6 +42,7 @@ public class HttpUtils
      * @param request <code>HttpRequestMessage</code>
      * @return <code>String</code> IP address
      */
+    @Nullable
     public static String getClientIP(HttpRequestInfo request)
     {
         final String xForwardedFor = request.getHeaders().getFirst(HttpHeaderNames.X_FORWARDED_FOR);
@@ -64,6 +61,7 @@ public class HttpUtils
      * @param xForwardedFor a <code>String</code> value
      * @return a <code>String</code> value
      */
+    @Nullable
     public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
         if (xForwardedFor == null) {
             return null;
@@ -103,6 +101,7 @@ public class HttpUtils
      * @param input - decoded header string
      * @return - clean header string
      */
+    @Nullable
     public static String stripMaliciousHeaderChars( String input) {
         if (input == null) {
             return null;
@@ -123,6 +122,7 @@ public class HttpUtils
         return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
     }
 
+    @Nullable
     public static Integer getContentLengthIfPresent(ZuulMessage msg)
     {
         final String contentLengthValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
@@ -138,6 +138,7 @@ public class HttpUtils
         return null;
     }
 
+    @Nullable
     public static Integer getBodySizeIfKnown(ZuulMessage msg) {
         final Integer bodySize = getContentLengthIfPresent(msg);
         if (bodySize != null) {

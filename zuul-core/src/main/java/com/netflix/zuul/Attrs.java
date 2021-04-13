@@ -16,6 +16,8 @@
 
 package com.netflix.zuul;
 
+import javax.annotation.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -23,11 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 
-/**
- * A heterogeneous map of attributes.
- */
 public final class Attrs {
 
     final Map<Key<?>, Object> storage = new IdentityHashMap<>();
@@ -44,7 +42,7 @@ public final class Attrs {
          * Returns the value in the attributes, or {@code null} if absent.
          */
         
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked")@Nullable
         public T get(Attrs attrs) {
             Objects.requireNonNull(attrs, "attrs");
             return (T) attrs.storage.get(this);

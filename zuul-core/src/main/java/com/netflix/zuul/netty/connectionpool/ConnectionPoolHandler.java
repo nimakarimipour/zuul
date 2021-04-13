@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
+
 import com.netflix.spectator.api.Counter;
 import com.netflix.zuul.netty.ChannelUtils;
 import com.netflix.zuul.netty.SpectatorUtils;
@@ -33,11 +35,6 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 
-/**
- * User: michaels@netflix.com
- * Date: 6/23/16
- * Time: 1:57 PM
- */
 @ChannelHandler.Sharable
 public class ConnectionPoolHandler extends ChannelDuplexHandler
 {
@@ -145,6 +142,7 @@ public class ConnectionPoolHandler extends ChannelDuplexHandler
         }
     }
 
+    @Nullable
     private static String getConnectionHeader(CompleteEvent completeEvt) {
         HttpResponse response = completeEvt.getResponse();
         if (response != null) {

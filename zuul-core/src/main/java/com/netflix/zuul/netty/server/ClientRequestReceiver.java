@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server;
 
+import javax.annotation.Nullable;
+
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
@@ -70,15 +72,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * Created by saroskar on 1/6/17.
- */
 public class ClientRequestReceiver extends ChannelDuplexHandler {
 
     private final SessionContextDecorator decorator;
 
+    @Nullable
     private HttpRequestMessage zuulRequest;
+
+    @Nullable
     private HttpRequest clientRequest;
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientRequestReceiver.class);

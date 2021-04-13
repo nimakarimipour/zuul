@@ -16,14 +16,12 @@
 
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
+
 import com.netflix.zuul.message.ZuulMessage;
 
-/**
- * User: michaels@netflix.com
- * Date: 11/16/15
- * Time: 2:07 PM
- */
 public interface SyncZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ZuulFilter<I, O>
 {
+    @Nullable
     O apply(I input);
 }

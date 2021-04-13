@@ -16,6 +16,8 @@
 
 package com.netflix.zuul;
 
+import javax.annotation.Nullable;
+
 import com.google.errorprone.annotations.DoNotCall;
 import com.netflix.zuul.filters.FilterType;
 import com.netflix.zuul.filters.ZuulFilter;
@@ -40,14 +42,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * An immutable static collection of filters.
- */
 public final class StaticFilterLoader implements FilterLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(StaticFilterLoader.class);
@@ -141,12 +139,12 @@ public final class StaticFilterLoader implements FilterLoader {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    @Override@Nullable
     public SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType) {
         return filtersByType.get(filterType);
     }
 
-    @Override
+    @Override@Nullable
     
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         Map<String, ZuulFilter<?, ?>> filtersByName = filtersByTypeAndName.get(type);

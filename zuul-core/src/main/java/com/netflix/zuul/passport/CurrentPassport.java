@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.passport;
 
+import javax.annotation.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Ticker;
 import com.google.common.collect.Sets;
@@ -41,7 +43,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class CurrentPassport
 {
@@ -322,6 +323,7 @@ public class CurrentPassport
         return items;
     }
 
+    @Nullable
     public PassportItem findState(PassportState state)
     {
         try (Unlocker ignored = lock()) {
@@ -334,6 +336,7 @@ public class CurrentPassport
         return null;
     }
 
+    @Nullable
     public PassportItem findStateBackwards(PassportState state)
     {
         try (Unlocker ignored = lock()) {
@@ -412,7 +415,7 @@ public class CurrentPassport
         }
     }
 
-    @VisibleForTesting
+    @VisibleForTesting@Nullable
     public static CurrentPassport parseFromToString(String text)
     {
         CurrentPassport passport = null;

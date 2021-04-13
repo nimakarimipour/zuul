@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.filter;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Strings;
 import com.netflix.config.DynamicStringProperty;
 import com.netflix.spectator.impl.Preconditions;
@@ -43,11 +45,6 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
 
-
-/**
- * This class is supposed to be thread safe and hence should not have any non final member variables
- * Created by saroskar on 5/18/17.
- */
 @ThreadSafe
 public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage, HttpResponseMessage> {
 
@@ -64,6 +61,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         this.filterLoader = filterLoader;
     }
 
+    @Nullable
     public static ZuulFilter<HttpRequestMessage, HttpResponseMessage> getEndpoint(final HttpRequestMessage zuulReq) {
         if (zuulReq != null) {
             return (ZuulFilter<HttpRequestMessage, HttpResponseMessage>) zuulReq.getContext().get(ZUUL_ENDPOINT);
@@ -195,6 +193,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         return new ProxyEndpoint(zuulRequest, getChannelHandlerContext(zuulRequest), getNextStage(), MethodBinding.NO_OP_BINDING);
     }
 
+    @Nullable
     protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(String endpointName) {
         return (Endpoint<I, O>) filterLoader.getFilterByNameAndType(endpointName, FilterType.ENDPOINT);
     }

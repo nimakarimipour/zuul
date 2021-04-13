@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
+
 
 import com.netflix.loadbalancer.Server;
 import com.netflix.zuul.passport.CurrentPassport;
@@ -25,11 +27,6 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * User: michaels@netflix.com
- * Date: 7/8/16
- * Time: 12:36 PM
- */
 public interface ClientChannelManager
 {
     void init();
@@ -46,7 +43,7 @@ public interface ClientChannelManager
 
     Promise<PooledConnection> acquire(
             EventLoop eventLoop,
-            Object key,
+            @Nullable Object key,
             CurrentPassport passport,
             AtomicReference<Server> selectedServer,
             AtomicReference<? super InetAddress> selectedHostAddr);

@@ -15,6 +15,10 @@
  */
 package com.netflix.zuul.netty.server.push;
 
+import javax.annotation.Nullable;
+
+import com.netflix.Initializer;
+
 import com.netflix.config.CachedDynamicBooleanProperty;
 import com.netflix.config.CachedDynamicIntProperty;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,10 +32,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Author: Susheel Aroskar
- * Date: 5/14/18
- */
 public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
     protected final PushConnectionRegistry pushConnectionRegistry;
@@ -43,7 +43,11 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     /* state */
     protected final AtomicBoolean destroyed;
     private ChannelHandlerContext ctx;
+
+    @Nullable
     private volatile PushConnection pushConnection;
+
+    @Nullable
     private ScheduledFuture<?> keepAliveTask;
 
 
@@ -63,6 +67,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         this.destroyed = new AtomicBoolean();
     }
 
+    @Initializer
     protected final boolean isAuthenticated() {
         return (authEvent != null && authEvent.isSuccess());
     }
@@ -109,6 +114,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    @Initializer
     private void requestClientToCloseConnection() {
         if (ctx.channel().isActive()) {
             // Application level protocol for asking client to close connection

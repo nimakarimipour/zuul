@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server;
 
+import javax.annotation.Nullable;
+
 import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.exception.ZuulException;
 import com.netflix.zuul.message.Header;
@@ -50,11 +52,9 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 
-/**
- * Created by saroskar on 1/18/17.
- */
 public class OriginResponseReceiver extends ChannelDuplexHandler {
 
+    @Nullable
     private volatile ProxyEndpoint edgeProxy;
 
     private static final Logger LOG = LoggerFactory.getLogger(OriginResponseReceiver.class);

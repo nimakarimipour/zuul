@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul;
 
+import com.netflix.Initializer;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.netflix.config.DynamicIntProperty;
 import java.io.File;
@@ -34,15 +36,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class manages the directory polling for changes and new Groovy filters.
- * Polling interval and directories are specified in the initialization of the class, and a poller will check
- * for changes and additions.
- *
- * @author Mikey Cohen
- *         Date: 12/7/11
- *         Time: 12:09 PM
- */
 @Singleton
 public class FilterFileManager {
 
@@ -94,6 +87,7 @@ public class FilterFileManager {
         bRunning = false;
     }
 
+    @Initializer
     void startPoller() {
         poller = new Thread("GroovyFilterFileManagerPoller") {
             {

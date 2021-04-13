@@ -16,6 +16,8 @@
 
 package com.netflix.netty.common.accesslog;
 
+import javax.annotation.Nullable;
+
 import com.netflix.config.DynamicIntProperty;
 import com.netflix.config.DynamicStringListProperty;
 import io.netty.channel.Channel;
@@ -53,7 +55,7 @@ public class AccessLogPublisher
         this.requestIdProvider = requestIdProvider;
     }
 
-    public void log(Channel channel, HttpRequest request, HttpResponse response, LocalDateTime dateTime, Integer localPort, String remoteIp,
+    public void log(Channel channel, @Nullable HttpRequest request, @Nullable HttpResponse response, LocalDateTime dateTime, Integer localPort, String remoteIp,
                     Long durationNs, Integer requestBodySize, Integer responseBodySize)
     {
         StringBuilder sb = new StringBuilder();

@@ -16,16 +16,12 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
+
 import com.netflix.loadbalancer.Server;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.exception.ErrorType;
 
-/**
- * Request Stat
- *
- * Author: Arthur Gonigberg
- * Date: November 29, 2017
- */
 public interface RequestStat {
 
     String SESSION_CONTEXT_KEY = "niwsRequestStat";
@@ -36,6 +32,7 @@ public interface RequestStat {
         return stat;
     }
 
+    @Nullable
     static RequestStat getFromSessionContext(SessionContext context)
     {
         return (RequestStat) context.get(SESSION_CONTEXT_KEY);

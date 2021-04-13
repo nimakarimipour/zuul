@@ -15,11 +15,13 @@
  */
 package com.netflix.zuul;
 
+import javax.annotation.Nullable;
+
 import com.netflix.zuul.message.http.HttpRequestInfo;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 
 public interface RequestCompleteHandler
 {
-    void handle(HttpRequestInfo inboundRequest, HttpResponseMessage response);
+    void handle(HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response);
 }
 

@@ -16,6 +16,8 @@
 
 package com.netflix.netty.common;
 
+import javax.annotation.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -29,14 +31,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import javax.annotation.Nullable;
 
-/**
- * Stores the source IP address as an attribute of the channel. This has the advantage of allowing us to overwrite it if
- * we have more info (eg. ELB sends a HAProxyMessage with info of REAL source host + port).
- * <p>
- * User: michaels@netflix.com Date: 4/14/16 Time: 4:29 PM
- */
 @ChannelHandler.Sharable
 public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdapter {
 
@@ -127,9 +122,9 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
     /**
      * Returns the String form of a socket address, or {@code null} if there isn't one.
      */
-    @VisibleForTesting
+    @VisibleForTesting@Nullable
     
-    static String getHostAddress(InetSocketAddress socketAddress) {
+    static String getHostAddress(@Nullable InetSocketAddress socketAddress) {
         InetAddress address = socketAddress.getAddress();
         if (address instanceof Inet6Address) {
             // Strip the scope from the address since some other classes choke on it.
@@ -148,6 +143,7 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
         }
     }
 
+    @Nullable
     private InetSocketAddress sourceAddress(Channel channel) {
         SocketAddress remoteSocketAddr = channel.remoteAddress();
         if (null != remoteSocketAddr && InetSocketAddress.class.isAssignableFrom(remoteSocketAddr.getClass())) {
@@ -159,6 +155,7 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
         return null;
     }
 
+    @Nullable
     private InetSocketAddress localAddress(Channel channel) {
         SocketAddress localSocketAddress = channel.localAddress();
         if (null != localSocketAddress && InetSocketAddress.class.isAssignableFrom(localSocketAddress.getClass())) {

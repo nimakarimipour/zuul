@@ -15,13 +15,14 @@
  */
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
+
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 
 @Singleton
@@ -34,7 +35,7 @@ public final class MutableFilterRegistry implements FilterRegistry {
         return filters.remove(requireNonNull(key, "key"));
     }
 
-    @Override
+    @Override@Nullable
     
     public ZuulFilter<?, ?> get(String key) {
         return filters.get(requireNonNull(key, "key"));

@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.netty.server.push;
 
+import javax.annotation.Nullable;
+
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
@@ -43,15 +45,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Serves "/push" URL that is used by the backend to POST push messages to a given Zuul instance. This URL handler
- * MUST BE accessible ONLY from RFC 1918 private internal network space (10.0.0.0 or 172.16.0.0) to guarantee that
- * external applications/agents cannot push messages to your client. In AWS this can typically be achieved using
- * correctly configured security groups.
- *
- * Author: Susheel Aroskar
- * Date: 5/14/18
- */
 @Singleton
 @ChannelHandler.Sharable
 public abstract class PushMessageSender  extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -69,7 +62,7 @@ public abstract class PushMessageSender  extends SimpleChannelInboundHandler<Ful
 
 
     private void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponseStatus status,
-                                  PushUserAuth userAuth) {
+                                  @Nullable PushUserAuth userAuth) {
         final FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, status);
         resp.headers().add("Content-Length", "0");
         final ChannelFuture cf = ctx.channel().writeAndFlush(resp);
@@ -197,7 +190,7 @@ public abstract class PushMessageSender  extends SimpleChannelInboundHandler<Ful
         logger.warn("Push secure token verification failed");
     }
 
-    protected void logPushEvent(FullHttpRequest request, HttpResponseStatus status, PushUserAuth userAuth) {
+    protected void logPushEvent(FullHttpRequest request, HttpResponseStatus status, @Nullable PushUserAuth userAuth) {
         logger.debug("Push notification status: {}, auth: {}", status.code(), userAuth != null ? userAuth : "-");
     }
 

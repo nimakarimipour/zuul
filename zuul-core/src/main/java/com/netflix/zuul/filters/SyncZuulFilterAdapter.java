@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
+
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.handler.codec.http.HttpContent;
 import rx.Observable;
@@ -23,21 +25,6 @@ import rx.Observable;
 import static com.netflix.zuul.filters.FilterSyncType.SYNC;
 import static com.netflix.zuul.filters.FilterType.ENDPOINT;
 
-/**
- * Base class to help implement SyncZuulFilter. Note that the class BaseSyncFilter does exist but it derives from
- * BaseFilter which in turn creates a new instance of CachedDynamicBooleanProperty for "filterDisabled" every time you
- * create a new instance of the ZuulFilter. Normally it is not too much of a concern as the instances of ZuulFilters
- * are "effectively" singleton and are cached by ZuulFilterLoader. However, if you ever have a need for instantiating a
- * new ZuulFilter instance per request - aka EdgeProxyEndpoint or Inbound/Outbound PassportStampingFilter creating new
- * instances of CachedDynamicBooleanProperty per instance of ZuulFilter will quickly kill your server's performance in
- * two ways -
- * a) Instances of CachedDynamicBooleanProperty are *very* heavy CPU wise to create due to extensive hookups machinery
- *    in their constructor
- * b) They leak memory as they add themselves to some ConcurrentHashMap and are never garbage collected.
- *
- * TL;DR use this as a base class for your ZuulFilter if you intend to create new instances of ZuulFilter
- * Created by saroskar on 6/8/17.
- */
 public abstract class SyncZuulFilterAdapter<I extends ZuulMessage, O extends ZuulMessage> implements SyncZuulFilter<I, O> {
 
     @Override
@@ -81,7 +68,7 @@ public abstract class SyncZuulFilterAdapter<I extends ZuulMessage, O extends Zuu
         return false;
     }
 
-    @Override
+    @Override@Nullable
     public HttpContent processContentChunk(ZuulMessage zuulMessage, HttpContent chunk) {
         return chunk;
     }

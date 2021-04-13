@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.stats;
 
+import javax.annotation.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.zuul.message.http.HttpRequestInfo;
 import com.netflix.zuul.stats.monitoring.MonitorRegistry;
@@ -27,13 +29,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * High level statistics counter manager to count stats on various aspects of  requests
- *
- * @author Mikey Cohen
- *         Date: 2/3/12
- *         Time: 3:25 PM
- */
 public class StatsManager {
 
 
@@ -83,18 +78,19 @@ public class StatsManager {
      * @param statusCode
      * @return the RouteStatusCodeMonitor for the given route and status code
      */
+    @Nullable
     public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
         Map<Integer, RouteStatusCodeMonitor> map = routeStatusMap.get(route);
         if (map == null) return null;
         return map.get(statusCode);
     }
 
-    @VisibleForTesting
+    @VisibleForTesting@Nullable
     NamedCountingMonitor getHostMonitor(String host) {
         return this.hostCounterMap.get(hostKey(host));
     }
 
-    @VisibleForTesting
+    @VisibleForTesting@Nullable
     NamedCountingMonitor getProtocolMonitor(String proto) {
         return this.protocolCounterMap.get(protocolKey(proto));
     }

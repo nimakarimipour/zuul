@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server;
 
+import com.netflix.Initializer;
+
 import com.google.errorprone.annotations.ForOverride;
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.config.ChainedDynamicProperty;
@@ -99,7 +101,7 @@ public abstract class BaseServerStartup
         return server;
     }
 
-    @Inject
+    @Inject@Initializer
     public void init() throws Exception
     {
         ChannelGroup clientChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);

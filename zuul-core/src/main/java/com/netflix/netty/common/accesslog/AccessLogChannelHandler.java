@@ -16,6 +16,8 @@
 
 package com.netflix.netty.common.accesslog;
 
+import javax.annotation.Nullable;
+
 import com.netflix.netty.common.SourceAddressChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -31,11 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
-/**
- * User: michaels@netflix.com
- * Date: 4/14/16
- * Time: 3:51 PM
- */
 public final class AccessLogChannelHandler {
     private static final AttributeKey<RequestState> ATTR_REQ_STATE = AttributeKey.newInstance("_accesslog_requeststate");
 
@@ -123,7 +120,11 @@ public final class AccessLogChannelHandler {
     private static class RequestState
     {
         LocalDateTime dateTime = LocalDateTime.now();
+
+        @Nullable
         HttpRequest request;
+
+        @Nullable
         HttpResponse response;
         long startTimeNs;
         int requestBodySize = 0;

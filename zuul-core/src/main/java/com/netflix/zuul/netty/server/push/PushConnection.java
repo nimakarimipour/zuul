@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server.push;
 
+import com.netflix.Initializer;
+
 import com.google.common.base.Charsets;
 import com.netflix.config.CachedDynamicIntProperty;
 import io.netty.buffer.ByteBuf;
@@ -23,10 +25,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 
-/**
- * Author: Susheel Aroskar
- * Date:
- */
 public class PushConnection {
 
     private final PushProtocol pushProtocol;
@@ -52,6 +50,7 @@ public class PushConnection {
         return secureToken;
     }
 
+    @Initializer
     public void setSecureToken(String secureToken) {
         this.secureToken = secureToken;
     }

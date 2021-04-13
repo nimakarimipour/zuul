@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server;
 
+import com.netflix.Initializer;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.config.DynamicBooleanProperty;
@@ -78,14 +80,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- *
- * NOTE: Shout-out to <a href="https://github.com/adamfisk/LittleProxy">LittleProxy</a> which was great as a reference.
- *
- * User: michaels
- * Date: 11/8/14
- * Time: 8:39 PM
- */
 public class Server
 {
     /**
@@ -182,6 +176,7 @@ public class Server
         LOG.info("Completed zuul shutdown.");
     }
 
+    @Initializer
     public void start(boolean sync)
     {
         serverGroup = new ServerGroup(
@@ -340,6 +335,7 @@ public class Server
             return Collections.unmodifiableList(listeningAddresses);
         }
 
+        @Initializer
         private void initializeTransport()
         {
             // TODO - try our own impl of ChooserFactory that load-balances across the eventloops using leastconns algo?

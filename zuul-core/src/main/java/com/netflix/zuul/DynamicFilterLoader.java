@@ -16,6 +16,8 @@
 
 package com.netflix.zuul;
 
+import javax.annotation.Nullable;
+
 import com.netflix.zuul.filters.FilterRegistry;
 import com.netflix.zuul.filters.FilterType;
 import com.netflix.zuul.filters.ZuulFilter;
@@ -68,7 +70,7 @@ public final class DynamicFilterLoader implements FilterLoader {
      *             swapping of code seems to happen elsewhere.   This will be removed in a later
      *             Zuul release.
      */
-    @Deprecated
+    @Deprecated@Nullable
     public ZuulFilter<?, ?> getFilter(String sourceCode, String filterName) throws Exception {
         if (filterCheck.get(filterName) == null) {
             filterCheck.putIfAbsent(filterName, filterName);
@@ -200,7 +202,7 @@ public final class DynamicFilterLoader implements FilterLoader {
         return Collections.unmodifiableSortedSet(set);
     }
 
-    @Override
+    @Override@Nullable
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         if (name == null || type == null) {
             return null;

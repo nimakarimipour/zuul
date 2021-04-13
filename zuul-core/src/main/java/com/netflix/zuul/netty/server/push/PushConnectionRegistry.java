@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.netty.server.push;
 
+import javax.annotation.Nullable;
+
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -23,11 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * Maintains client identity to web socket or SSE channel mapping.
- *
- * Created by saroskar on 9/26/16.
- */
 @Singleton
 public class PushConnectionRegistry {
 
@@ -40,6 +37,7 @@ public class PushConnectionRegistry {
         secureTokenGenerator = new SecureRandom();
     }
 
+    @Nullable
     public PushConnection get(final String clientId) {
         return clientPushConnectionMap.get(clientId);
     }

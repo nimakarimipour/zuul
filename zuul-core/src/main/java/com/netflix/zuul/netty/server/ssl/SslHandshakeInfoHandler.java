@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.netty.server.ssl;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -42,11 +44,6 @@ import javax.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
 
-/**
- * Stores info about the client and server's SSL certificates in the context, after a successful handshake.
- * <p>
- * User: michaels@netflix.com Date: 3/29/16 Time: 10:48 AM
- */
 public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
 
     public static final AttributeKey<SslHandshakeInfo> ATTR_SSL_INFO = AttributeKey.newInstance("_ssl_handshake_info");
@@ -180,7 +177,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void incrementCounters(
-            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.
             return;

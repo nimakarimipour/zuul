@@ -16,6 +16,8 @@
 
 package com.netflix.zuul.message.http;
 
+import javax.annotation.Nullable;
+
 import io.netty.handler.codec.http.Cookie;
 
 import java.util.ArrayList;
@@ -23,11 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: Mike Smith
- * Date: 6/18/15
- * Time: 12:04 AM
- */
 public class Cookies
 {
     private Map<String, List<Cookie>> map = new HashMap<>();
@@ -49,11 +46,13 @@ public class Cookies
         return all;
     }
 
+    @Nullable
     public List<Cookie> get(String name)
     {
         return map.get(name);
     }
 
+    @Nullable
     public Cookie getFirst(String name)
     {
         List<Cookie> found = map.get(name);
@@ -63,6 +62,7 @@ public class Cookies
         return found.get(0);
     }
 
+    @Nullable
     public String getFirstValue(String name)
     {
         Cookie c = getFirst(name);

@@ -16,6 +16,8 @@
 
 package com.netflix.netty.common.throttle;
 
+import javax.annotation.Nullable;
+
 import static com.netflix.netty.common.proxyprotocol.HAProxyMessageChannelHandler.ATTR_HAPROXY_VERSION;
 import com.netflix.netty.common.ConnectionCloseChannelAttributes;
 import com.netflix.zuul.passport.CurrentPassport;
@@ -40,12 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
 
-/**
- * A collection of rejection related utilities useful for failing requests. These are tightly coupled with the channel
- * pipeline, but can be called from different handlers.
- */
 public final class RejectionUtils {
 
     // TODO(carl-mastrangelo): add tests for this.
@@ -63,7 +60,7 @@ public final class RejectionUtils {
      */
     public static void rejectByClosingConnection(
             ChannelHandlerContext ctx, StatusCategory nfStatus, String reason, HttpRequest request,
-             Integer injectedLatencyMillis) {
+             @Nullable Integer injectedLatencyMillis) {
         if (injectedLatencyMillis != null && injectedLatencyMillis > 0) {
             // Delay closing the connection for configured time.
             ctx.executor().schedule(() -> {
