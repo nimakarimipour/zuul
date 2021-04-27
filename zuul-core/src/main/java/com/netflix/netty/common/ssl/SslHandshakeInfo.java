@@ -13,13 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.netty.common.ssl;
 
 import io.netty.handler.ssl.ClientAuth;
-
 import javax.security.cert.X509Certificate;
 import java.security.cert.Certificate;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com Date: 3/29/16 Time: 11:06 AM
@@ -27,15 +26,18 @@ import java.security.cert.Certificate;
 public class SslHandshakeInfo {
 
     private final String protocol;
+
     private final String cipherSuite;
+
     private final ClientAuth clientAuthRequirement;
+
     private final Certificate serverCertificate;
+
     private final X509Certificate clientCertificate;
+
     private final boolean isOfIntermediary;
 
-    public SslHandshakeInfo(boolean isOfIntermediary, String protocol, String cipherSuite,
-            ClientAuth clientAuthRequirement,
-            Certificate serverCertificate, X509Certificate clientCertificate) {
+    public SslHandshakeInfo(boolean isOfIntermediary, String protocol, String cipherSuite, ClientAuth clientAuthRequirement, Certificate serverCertificate, X509Certificate clientCertificate) {
         this.protocol = protocol;
         this.cipherSuite = cipherSuite;
         this.clientAuthRequirement = clientAuthRequirement;
@@ -60,8 +62,7 @@ public class SslHandshakeInfo {
         return clientAuthRequirement;
     }
 
-    public Certificate getServerCertificate()
-    {
+    public Certificate getServerCertificate() {
         return serverCertificate;
     }
 
@@ -71,13 +72,6 @@ public class SslHandshakeInfo {
 
     @Override
     public String toString() {
-        return "SslHandshakeInfo{" +
-                "protocol='" + protocol + '\'' +
-                ", cipherSuite='" + cipherSuite + '\'' +
-                ", clientAuthRequirement=" + clientAuthRequirement +
-                ", serverCertificate=" + serverCertificate +
-                ", clientCertificate=" + clientCertificate +
-                ", isOfIntermediary=" + isOfIntermediary +
-                '}';
+        return "SslHandshakeInfo{" + "protocol='" + protocol + '\'' + ", cipherSuite='" + cipherSuite + '\'' + ", clientAuthRequirement=" + clientAuthRequirement + ", serverCertificate=" + serverCertificate + ", clientCertificate=" + clientCertificate + ", isOfIntermediary=" + isOfIntermediary + '}';
     }
 }

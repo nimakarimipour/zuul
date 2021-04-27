@@ -13,12 +13,10 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.insights;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
 import com.netflix.spectator.api.Registry;
@@ -30,7 +28,7 @@ import io.netty.channel.unix.Errors;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
@@ -38,50 +36,43 @@ import org.slf4j.LoggerFactory;
  * Time: 2:41 PM
  */
 public final class PassportStateServerHandler {
+
     private static final Logger LOG = LoggerFactory.getLogger(PassportStateServerHandler.class);
 
+    @Nullable()
     private static Registry registry;
 
-    private static CurrentPassport passport(ChannelHandlerContext ctx)
-    {
+    private static CurrentPassport passport(ChannelHandlerContext ctx) {
         return CurrentPassport.fromChannel(ctx.channel());
     }
 
     public static void setRegistry(Registry registry) {
         checkNotNull(registry, "registry");
-        checkState(
-                PassportStateServerHandler.registry == null || PassportStateServerHandler.registry == registry,
-                "registry already set");
+        checkState(PassportStateServerHandler.registry == null || PassportStateServerHandler.registry == registry, "registry already set");
         PassportStateServerHandler.registry = registry;
     }
 
     protected static void incrementExceptionCounter(Throwable throwable, String handler) {
         checkState(PassportStateServerHandler.registry != null, "registry not set");
-        registry.counter("server.connection.exception",
-                "handler", handler,
-                "id", throwable.getClass().getSimpleName())
-                .increment();
+        registry.counter("server.connection.exception", "handler", handler, "id", throwable.getClass().getSimpleName()).increment();
     }
 
-    public static final class InboundHandler extends ChannelInboundHandlerAdapter
-    {
+    public static final class InboundHandler extends ChannelInboundHandlerAdapter {
+
         @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception
-        {
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_ACTIVE);
             super.channelActive(ctx);
         }
 
         @Override
-        public void channelInactive(ChannelHandlerContext ctx) throws Exception
-        {
+        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_INACTIVE);
             super.channelInactive(ctx);
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-        {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_EXCEPTION);
             if (cause instanceof Errors.NativeIoException) {
                 LOG.debug("PassportStateServerHandler Inbound NativeIoException " + cause);
@@ -99,30 +90,26 @@ public final class PassportStateServerHandler {
                     passport.add(PassportState.SERVER_CH_IDLE_TIMEOUT);
                 }
             }
-
             super.userEventTriggered(ctx, evt);
         }
     }
 
-    public static final class OutboundHandler extends ChannelOutboundHandlerAdapter
-    {
+    public static final class OutboundHandler extends ChannelOutboundHandlerAdapter {
+
         @Override
-        public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
-        {
+        public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_CLOSE);
             super.close(ctx, promise);
         }
 
         @Override
-        public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
-        {
+        public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_DISCONNECT);
             super.disconnect(ctx, promise);
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-        {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             passport(ctx).add(PassportState.SERVER_CH_EXCEPTION);
             if (cause instanceof Errors.NativeIoException) {
                 LOG.debug("PassportStateServerHandler Outbound NativeIoException " + cause);

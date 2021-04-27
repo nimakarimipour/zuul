@@ -13,17 +13,18 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.filters;
 
 import com.netflix.zuul.message.ZuulMessage;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com
  * Date: 11/16/15
  * Time: 2:07 PM
  */
-public interface SyncZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ZuulFilter<I, O>
-{
+public interface SyncZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ZuulFilter<I, O> {
+
+    @Nullable()
     O apply(I input);
 }

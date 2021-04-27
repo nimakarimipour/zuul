@@ -13,18 +13,18 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.ratelimiting;
 
 import io.netty.channel.ChannelHandler;
-
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.annotation.Nullable;
 
 @Singleton
-public class NullChannelHandlerProvider implements Provider<ChannelHandler>
-{
+public class NullChannelHandlerProvider implements Provider<ChannelHandler> {
+
     @Override
+    @Nullable()
     public ChannelHandler get() {
         return null;
     }

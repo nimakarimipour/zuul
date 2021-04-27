@@ -16,9 +16,9 @@
 package com.netflix.zuul.stats;
 
 import com.netflix.zuul.stats.monitoring.MonitorRegistry;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 
 /**
  * Manager to handle Error Statistics
@@ -27,27 +27,28 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 4:16 PM
  */
 public class ErrorStatsManager {
+
     ConcurrentHashMap<String, ConcurrentHashMap<String, ErrorStatsData>> routeMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, ErrorStatsData>>();
+
     final static ErrorStatsManager INSTANCE = new ErrorStatsManager();
 
     /**
-     *
      * @return Singleton
      */
     public static ErrorStatsManager getManager() {
         return INSTANCE;
     }
 
-
     /**
-     *
      * @param route
      * @param cause
      * @return data structure for holding count information for a route and cause
      */
+    @Nullable()
     public ErrorStatsData getStats(String route, String cause) {
         Map<String, ErrorStatsData> map = routeMap.get(route);
-        if (map == null) return null;
+        if (map == null)
+            return null;
         return map.get(cause);
     }
 
@@ -57,7 +58,8 @@ public class ErrorStatsManager {
      * @param cause
      */
     public void putStats(String route, String cause) {
-        if (route == null) route = "UNKNOWN_ROUTE";
+        if (route == null)
+            route = "UNKNOWN_ROUTE";
         route = route.replace("/", "_");
         ConcurrentHashMap<String, ErrorStatsData> statsMap = routeMap.get(route);
         if (statsMap == null) {
@@ -77,12 +79,6 @@ public class ErrorStatsManager {
         sd.update();
     }
 
-
-
     public static class UnitTest {
-
     }
-
-
 }
-

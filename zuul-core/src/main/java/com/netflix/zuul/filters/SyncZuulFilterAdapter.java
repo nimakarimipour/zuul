@@ -13,15 +13,14 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.filters;
 
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.handler.codec.http.HttpContent;
 import rx.Observable;
-
 import static com.netflix.zuul.filters.FilterSyncType.SYNC;
 import static com.netflix.zuul.filters.FilterType.ENDPOINT;
+import javax.annotation.Nullable;
 
 /**
  * Base class to help implement SyncZuulFilter. Note that the class BaseSyncFilter does exist but it derives from
@@ -82,17 +81,18 @@ public abstract class SyncZuulFilterAdapter<I extends ZuulMessage, O extends Zuu
     }
 
     @Override
+    @Nullable()
     public HttpContent processContentChunk(ZuulMessage zuulMessage, HttpContent chunk) {
         return chunk;
     }
 
     @Override
     public void incrementConcurrency() {
-        //NOOP for sync filters
+        // NOOP for sync filters
     }
 
     @Override
     public void decrementConcurrency() {
-        //NOOP for sync filters
+        // NOOP for sync filters
     }
 }

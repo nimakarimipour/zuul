@@ -32,10 +32,11 @@ import org.slf4j.LoggerFactory;
  * Date: 4/28/15
  * Time: 11:05 PM
  */
-public class HttpUtils
-{
+public class HttpUtils {
+
     private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
-    private static final char[] MALICIOUS_HEADER_CHARS = {'\r', '\n'};
+
+    private static final char[] MALICIOUS_HEADER_CHARS = { '\r', '\n' };
 
     /**
      * Get the IP address of client making the request.
@@ -46,8 +47,8 @@ public class HttpUtils
      * @param request <code>HttpRequestMessage</code>
      * @return <code>String</code> IP address
      */
-    public static String getClientIP(HttpRequestInfo request)
-    {
+    @Nullable()
+    public static String getClientIP(HttpRequestInfo request) {
         final String xForwardedFor = request.getHeaders().getFirst(HttpHeaderNames.X_FORWARDED_FOR);
         String clientIP;
         if (xForwardedFor == null) {
@@ -64,12 +65,13 @@ public class HttpUtils
      * @param xForwardedFor a <code>String</code> value
      * @return a <code>String</code> value
      */
+    @Nullable()
     public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
         if (xForwardedFor == null) {
             return null;
         }
         xForwardedFor = xForwardedFor.trim();
-        String tokenized[] = xForwardedFor.split(",");
+        String[] tokenized = xForwardedFor.split(",");
         if (tokenized.length == 0) {
             return null;
         } else {
@@ -103,7 +105,8 @@ public class HttpUtils
      * @param input - decoded header string
      * @return - clean header string
      */
-    public static String stripMaliciousHeaderChars( String input) {
+    @Nullable()
+    public static String stripMaliciousHeaderChars(String input) {
         if (input == null) {
             return null;
         }
@@ -116,28 +119,25 @@ public class HttpUtils
         return input;
     }
 
-
-    public static boolean hasNonZeroContentLengthHeader(ZuulMessage msg)
-    {
+    public static boolean hasNonZeroContentLengthHeader(ZuulMessage msg) {
         final Integer contentLengthVal = getContentLengthIfPresent(msg);
         return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
     }
 
-    public static Integer getContentLengthIfPresent(ZuulMessage msg)
-    {
+    @Nullable()
+    public static Integer getContentLengthIfPresent(ZuulMessage msg) {
         final String contentLengthValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
         if (!Strings.isNullOrEmpty(contentLengthValue)) {
             try {
                 return Integer.valueOf(contentLengthValue);
-            }
-            catch (NumberFormatException e) {
-                LOG.info("Invalid Content-Length header value on request. " +
-                        "value = {}", contentLengthValue, e);
+            } catch (NumberFormatException e) {
+                LOG.info("Invalid Content-Length header value on request. " + "value = {}", contentLengthValue, e);
             }
         }
         return null;
     }
 
+    @Nullable()
     public static Integer getBodySizeIfKnown(ZuulMessage msg) {
         final Integer bodySize = getContentLengthIfPresent(msg);
         if (bodySize != null) {
@@ -149,8 +149,7 @@ public class HttpUtils
         return null;
     }
 
-    public static boolean hasChunkedTransferEncodingHeader(ZuulMessage msg)
-    {
+    public static boolean hasChunkedTransferEncodingHeader(ZuulMessage msg) {
         boolean isChunked = false;
         String teValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.TRANSFER_ENCODING);
         if (!Strings.isNullOrEmpty(teValue)) {
@@ -163,13 +162,11 @@ public class HttpUtils
      * If http/1 then will always want to just use ChannelHandlerContext.channel(), but for http/2
      * will want the parent channel (as the child channel is different for each h2 stream).
      */
-    public static Channel getMainChannel(ChannelHandlerContext ctx)
-    {
+    public static Channel getMainChannel(ChannelHandlerContext ctx) {
         return getMainChannel(ctx.channel());
     }
 
-    public static Channel getMainChannel(Channel channel)
-    {
+    public static Channel getMainChannel(Channel channel) {
         if (channel instanceof Http2StreamChannel) {
             return channel.parent();
         }

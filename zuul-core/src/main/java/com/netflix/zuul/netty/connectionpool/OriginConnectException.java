@@ -13,11 +13,10 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.connectionpool;
 
-
 import com.netflix.zuul.exception.ErrorType;
+import javax.annotation.Nullable;
 
 /**
  * Wrapper for exceptions failing to connect to origin with details on which server failed the attempt.
@@ -26,7 +25,7 @@ public class OriginConnectException extends Exception {
 
     private final ErrorType errorType;
 
-    public OriginConnectException(String message, ErrorType errorType) {
+    public OriginConnectException(@Nullable() String message, ErrorType errorType) {
         // ensure this exception does not fill its stacktrace, this causes a 10x slowdown
         super(message, null, true, false);
         this.errorType = errorType;
@@ -41,5 +40,4 @@ public class OriginConnectException extends Exception {
     public ErrorType getErrorType() {
         return errorType;
     }
-
 }

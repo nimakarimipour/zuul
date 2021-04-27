@@ -15,13 +15,13 @@
  */
 package com.netflix.zuul.netty.server.push;
 
-
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.annotation.Nullable;
 
 /**
  * Maintains client identity to web socket or SSE channel mapping.
@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 public class PushConnectionRegistry {
 
     private final ConcurrentMap<String, PushConnection> clientPushConnectionMap;
+
     private final SecureRandom secureTokenGenerator;
 
     @Inject
@@ -40,6 +41,7 @@ public class PushConnectionRegistry {
         secureTokenGenerator = new SecureRandom();
     }
 
+    @Nullable()
     public PushConnection get(final String clientId) {
         return clientPushConnectionMap.get(clientId);
     }
@@ -63,5 +65,4 @@ public class PushConnectionRegistry {
     public int size() {
         return clientPushConnectionMap.size();
     }
-
 }

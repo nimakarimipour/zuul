@@ -13,18 +13,18 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.message.http;
 
 import io.netty.handler.codec.http.Cookie;
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
  * Date: 7/16/15
  * Time: 12:45 AM
  */
-public interface HttpResponseMessage extends HttpResponseInfo
-{
+public interface HttpResponseMessage extends HttpResponseInfo {
+
     void setStatus(int status);
 
     @Override
@@ -36,13 +36,20 @@ public interface HttpResponseMessage extends HttpResponseInfo
 
     boolean removeExistingSetCookie(String cookieName);
 
-    /** The mutable request that will be sent to Origin. */
+    /**
+     * The mutable request that will be sent to Origin.
+     */
     HttpRequestMessage getOutboundRequest();
 
-    /** The immutable response that was received from Origin. */
+    /**
+     * The immutable response that was received from Origin.
+     */
+    @Nullable()
     HttpResponseInfo getInboundResponse();
 
-    /** This should be called after response received from Origin, to store
-     * a copy of the response as-is. */
+    /**
+     * This should be called after response received from Origin, to store
+     * a copy of the response as-is.
+     */
     void storeInboundResponse();
 }

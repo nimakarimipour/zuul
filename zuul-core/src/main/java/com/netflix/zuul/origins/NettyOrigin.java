@@ -13,7 +13,6 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.origins;
 
 import com.netflix.client.config.IClientConfig;
@@ -28,9 +27,9 @@ import com.netflix.zuul.niws.RequestAttempt;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 
 /**
  * Netty Origin interface for integrating cleanly with the ProxyEndpoint state management class.
@@ -40,10 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public interface NettyOrigin extends InstrumentedOrigin {
 
-    Promise<PooledConnection> connectToOrigin(final HttpRequestMessage zuulReq, EventLoop eventLoop,
-                                              int attemptNumber, CurrentPassport passport,
-                                              AtomicReference<Server> chosenServer,
-                                              AtomicReference<? super InetAddress> chosenHostAddr);
+    Promise<PooledConnection> connectToOrigin(final HttpRequestMessage zuulReq, EventLoop eventLoop, int attemptNumber, CurrentPassport passport, AtomicReference<Server> chosenServer, AtomicReference<? super InetAddress> chosenHostAddr);
 
     int getMaxRetriesForRequest(SessionContext context);
 
@@ -51,22 +47,20 @@ public interface NettyOrigin extends InstrumentedOrigin {
 
     void onRequestStartWithServer(final HttpRequestMessage zuulReq, final Server originServer, int attemptNum);
 
-    void onRequestExceptionWithServer(final HttpRequestMessage zuulReq, final Server originServer,
-                                      final int attemptNum, Throwable t);
+    void onRequestExceptionWithServer(final HttpRequestMessage zuulReq, @Nullable() final Server originServer, final int attemptNum, Throwable t);
 
-    void onRequestExecutionSuccess(final HttpRequestMessage zuulReq, final HttpResponseMessage zuulResp,
-                                   final Server originServer, final int attemptNum);
+    void onRequestExecutionSuccess(final HttpRequestMessage zuulReq, final HttpResponseMessage zuulResp, final Server originServer, final int attemptNum);
 
-    void onRequestExecutionFailed(final HttpRequestMessage zuulReq, final Server originServer,
-                                  final int attemptNum, Throwable t);
+    void onRequestExecutionFailed(final HttpRequestMessage zuulReq, @Nullable() final Server originServer, final int attemptNum, Throwable t);
 
     void recordFinalError(final HttpRequestMessage requestMsg, final Throwable throwable);
 
     void recordFinalResponse(final HttpResponseMessage resp);
 
-    RequestAttempt newRequestAttempt(final Server server, final SessionContext zuulCtx, int attemptNum);
+    RequestAttempt newRequestAttempt(@Nullable() final Server server, final SessionContext zuulCtx, int attemptNum);
 
-    String getIpAddrFromServer(Server server);
+    @Nullable()
+    String getIpAddrFromServer(@Nullable() Server server);
 
     IClientConfig getClientConfig();
 

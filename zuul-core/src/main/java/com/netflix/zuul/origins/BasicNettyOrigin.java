@@ -13,13 +13,11 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.origins;
 
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN_THROTTLED;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.SUCCESS;
-
 import com.google.common.base.Strings;
 import com.netflix.client.config.CommonClientConfigKey;
 import com.netflix.client.config.DefaultClientConfigImpl;
@@ -50,6 +48,7 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 
 /**
  * Netty Origin basic implementation that can be used for most apps, with the more complex methods having no-op
@@ -61,15 +60,23 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BasicNettyOrigin implements NettyOrigin {
 
     private final String name;
+
     private final String vip;
+
     private final Registry registry;
+
     private final IClientConfig config;
+
     private final ClientChannelManager clientChannelManager;
+
     private final NettyRequestAttemptFactory requestAttemptFactory;
 
     private final AtomicInteger concurrentRequests;
+
     private final Counter rejectedRequests;
+
     private final CachedDynamicIntProperty concurrencyMax;
+
     private final CachedDynamicBooleanProperty concurrencyProtectionEnabled;
 
     public BasicNettyOrigin(String name, String vip, Registry registry) {
@@ -80,7 +87,6 @@ public class BasicNettyOrigin implements NettyOrigin {
         this.clientChannelManager = new DefaultClientChannelManager(name, vip, config, registry);
         this.clientChannelManager.init();
         this.requestAttemptFactory = new NettyRequestAttemptFactory();
-
         this.concurrentRequests = SpectatorUtils.newGauge("zuul.origin.concurrent.requests", name, new AtomicInteger(0));
         this.rejectedRequests = SpectatorUtils.newCounter("zuul.origin.rejected.requests", name);
         this.concurrencyMax = new CachedDynamicIntProperty("zuul.origin." + name + ".concurrency.max.requests", 200);
@@ -116,9 +122,7 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public Promise<PooledConnection> connectToOrigin(
-            HttpRequestMessage zuulReq, EventLoop eventLoop, int attemptNumber, CurrentPassport passport,
-            AtomicReference<Server> chosenServer, AtomicReference<? super InetAddress> chosenHostAddr) {
+    public Promise<PooledConnection> connectToOrigin(HttpRequestMessage zuulReq, EventLoop eventLoop, int attemptNumber, CurrentPassport passport, AtomicReference<Server> chosenServer, AtomicReference<? super InetAddress> chosenHostAddr) {
         return clientChannelManager.acquire(eventLoop, null, passport, chosenServer, chosenHostAddr);
     }
 
@@ -128,12 +132,13 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public RequestAttempt newRequestAttempt(Server server, SessionContext zuulCtx, int attemptNum) {
+    public RequestAttempt newRequestAttempt(@Nullable() Server server, SessionContext zuulCtx, int attemptNum) {
         return new RequestAttempt(server, config, attemptNum, config.get(CommonClientConfigKey.ReadTimeout));
     }
 
     @Override
-    public String getIpAddrFromServer(Server server) {
+    @Nullable()
+    public String getIpAddrFromServer(@Nullable() Server server) {
         if (server instanceof DiscoveryEnabledServer) {
             DiscoveryEnabledServer discoveryServer = (DiscoveryEnabledServer) server;
             if (discoveryServer.getInstanceInfo() != null) {
@@ -165,11 +170,9 @@ public class BasicNettyOrigin implements NettyOrigin {
                 overriddenClientConfig = new DefaultClientConfigImpl();
                 zuulRequest.getContext().put(CommonContextKeys.REST_CLIENT_CONFIG, overriddenClientConfig);
             }
-
             final ExecutionContext<?> context = new ExecutionContext<>(zuulRequest, overriddenClientConfig, this.config, null);
             context.put("vip", getVip());
             context.put("clientName", getName());
-
             zuulRequest.getContext().set(CommonContextKeys.REST_EXECUTION_CONTEXT, context);
             execCtx = context;
         }
@@ -181,15 +184,12 @@ public class BasicNettyOrigin implements NettyOrigin {
         if (throwable == null) {
             return;
         }
-
         final SessionContext zuulCtx = requestMsg.getContext();
-
         // Choose StatusCategory based on the ErrorType.
         final ErrorType et = requestAttemptFactory.mapNettyToOutboundErrorType(throwable);
         final StatusCategory nfs = et.getStatusCategory();
         zuulCtx.set(CommonContextKeys.STATUS_CATGEORY, nfs);
         zuulCtx.set(CommonContextKeys.ORIGIN_STATUS_CATEGORY, nfs);
-
         zuulCtx.setError(throwable);
     }
 
@@ -197,17 +197,14 @@ public class BasicNettyOrigin implements NettyOrigin {
     public void recordFinalResponse(HttpResponseMessage resp) {
         if (resp != null) {
             final SessionContext zuulCtx = resp.getContext();
-
             // Store the status code of final attempt response.
             int originStatusCode = resp.getStatus();
             zuulCtx.set(CommonContextKeys.ORIGIN_STATUS, originStatusCode);
-
             // Mark origin StatusCategory based on http status code.
             StatusCategory originNfs = SUCCESS;
             if (originStatusCode == 503) {
                 originNfs = FAILURE_ORIGIN_THROTTLED;
-            }
-            else if (StatusCategoryUtils.isResponseHttpErrorStatus(originStatusCode)) {
+            } else if (StatusCategoryUtils.isResponseHttpErrorStatus(originStatusCode)) {
                 originNfs = FAILURE_ORIGIN;
             }
             zuulCtx.set(CommonContextKeys.ORIGIN_STATUS_CATEGORY, originNfs);
@@ -223,7 +220,6 @@ public class BasicNettyOrigin implements NettyOrigin {
             rejectedRequests.increment();
             throw new OriginConcurrencyExceededException(getName());
         }
-
         concurrentRequests.incrementAndGet();
     }
 
@@ -233,7 +229,6 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     /* Not required for basic operation */
-
     @Override
     public double getErrorPercentage() {
         return 0;
@@ -253,7 +248,7 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public void onRequestExceptionWithServer(HttpRequestMessage zuulReq, Server originServer, int attemptNum, Throwable t) {
+    public void onRequestExceptionWithServer(HttpRequestMessage zuulReq, @Nullable() Server originServer, int attemptNum, Throwable t) {
     }
 
     @Override
@@ -261,7 +256,7 @@ public class BasicNettyOrigin implements NettyOrigin {
     }
 
     @Override
-    public void onRequestExecutionFailed(HttpRequestMessage zuulReq, Server originServer, int attemptNum, Throwable t) {
+    public void onRequestExecutionFailed(HttpRequestMessage zuulReq, @Nullable() Server originServer, int attemptNum, Throwable t) {
     }
 
     @Override
