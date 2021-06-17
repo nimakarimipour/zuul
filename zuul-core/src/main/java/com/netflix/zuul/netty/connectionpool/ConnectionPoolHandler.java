@@ -32,12 +32,13 @@ import org.slf4j.LoggerFactory;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 6/23/16
  * Time: 1:57 PM
  */
+
 @ChannelHandler.Sharable
 public class ConnectionPoolHandler extends ChannelDuplexHandler
 {
@@ -145,6 +146,7 @@ public class ConnectionPoolHandler extends ChannelDuplexHandler
         }
     }
 
+    @Nullable
     private static String getConnectionHeader(CompleteEvent completeEvt) {
         HttpResponse response = completeEvt.getResponse();
         if (response != null) {

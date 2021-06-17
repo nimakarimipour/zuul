@@ -20,11 +20,13 @@ import io.netty.channel.ChannelHandler;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.annotation.Nullable;
 
 @Singleton
 public class NullChannelHandlerProvider implements Provider<ChannelHandler>
 {
     @Override
+    @Nullable
     public ChannelHandler get() {
         return null;
     }

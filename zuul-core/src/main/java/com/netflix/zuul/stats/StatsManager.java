@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javax.annotation.Nullable;
 /**
  * High level statistics counter manager to count stats on various aspects of  requests
  *
@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
  *         Date: 2/3/12
  *         Time: 3:25 PM
  */
+
 public class StatsManager {
 
 
@@ -83,6 +84,7 @@ public class StatsManager {
      * @param statusCode
      * @return the RouteStatusCodeMonitor for the given route and status code
      */
+    @Nullable
     public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
         Map<Integer, RouteStatusCodeMonitor> map = routeStatusMap.get(route);
         if (map == null) return null;
@@ -90,11 +92,13 @@ public class StatsManager {
     }
 
     @VisibleForTesting
+    @Nullable
     NamedCountingMonitor getHostMonitor(String host) {
         return this.hostCounterMap.get(hostKey(host));
     }
 
     @VisibleForTesting
+    @Nullable
     NamedCountingMonitor getProtocolMonitor(String proto) {
         return this.protocolCounterMap.get(protocolKey(proto));
     }

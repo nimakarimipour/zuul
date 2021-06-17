@@ -22,7 +22,7 @@ import rx.Observable;
 
 import static com.netflix.zuul.filters.FilterSyncType.SYNC;
 import static com.netflix.zuul.filters.FilterType.ENDPOINT;
-
+import javax.annotation.Nullable;
 /**
  * Base class to help implement SyncZuulFilter. Note that the class BaseSyncFilter does exist but it derives from
  * BaseFilter which in turn creates a new instance of CachedDynamicBooleanProperty for "filterDisabled" every time you
@@ -38,6 +38,7 @@ import static com.netflix.zuul.filters.FilterType.ENDPOINT;
  * TL;DR use this as a base class for your ZuulFilter if you intend to create new instances of ZuulFilter
  * Created by saroskar on 6/8/17.
  */
+
 public abstract class SyncZuulFilterAdapter<I extends ZuulMessage, O extends ZuulMessage> implements SyncZuulFilter<I, O> {
 
     @Override
@@ -82,6 +83,7 @@ public abstract class SyncZuulFilterAdapter<I extends ZuulMessage, O extends Zuu
     }
 
     @Override
+    @Nullable
     public HttpContent processContentChunk(ZuulMessage zuulMessage, HttpContent chunk) {
         return chunk;
     }

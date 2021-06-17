@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.Initializer;
 
 public abstract class BaseServerStartup
 {
@@ -100,6 +101,7 @@ public abstract class BaseServerStartup
     }
 
     @Inject
+    @Initializer
     public void init() throws Exception
     {
         ChannelGroup clientChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);

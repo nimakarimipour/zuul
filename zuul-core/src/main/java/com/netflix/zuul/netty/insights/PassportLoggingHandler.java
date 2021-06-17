@@ -38,12 +38,13 @@ import com.netflix.netty.common.metrics.HttpMetricsChannelHandler;
 import com.netflix.netty.common.metrics.ServerChannelMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 2/28/17
  * Time: 5:41 PM
  */
+
 @ChannelHandler.Sharable
 public class PassportLoggingHandler extends ChannelInboundHandlerAdapter
 {
@@ -143,7 +144,8 @@ public class PassportLoggingHandler extends ChannelInboundHandlerAdapter
         return req.getPath().equals("/healthcheck");
     }
 
-    protected String getRequestId(Channel channel, SessionContext ctx) {
+    @Nullable
+    protected String getRequestId(Channel channel, @Nullable SessionContext ctx) {
         return ctx == null ? "-" : ctx.getUUID();
     }
 }

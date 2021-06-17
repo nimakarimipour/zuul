@@ -22,20 +22,23 @@ import com.netflix.zuul.message.ZuulMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 6/9/15
  * Time: 2:48 PM
  */
+
 public class StatusCategoryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(StatusCategoryUtils.class);
 
+    @Nullable
     public static StatusCategory getStatusCategory(ZuulMessage msg) {
         return getStatusCategory(msg.getContext());
     }
 
-    public static StatusCategory getStatusCategory(SessionContext ctx) {
+    @Nullable
+    public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
         return (StatusCategory) ctx.get(CommonContextKeys.STATUS_CATGEORY);
     }
 
@@ -43,6 +46,7 @@ public class StatusCategoryUtils {
         ctx.set(CommonContextKeys.STATUS_CATGEORY, statusCategory);
     }
 
+    @Nullable
     public static StatusCategory getOriginStatusCategory(SessionContext ctx) {
         return (StatusCategory) ctx.get(CommonContextKeys.ORIGIN_STATUS_CATEGORY);
     }

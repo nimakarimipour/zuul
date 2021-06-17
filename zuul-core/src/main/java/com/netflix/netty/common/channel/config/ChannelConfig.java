@@ -17,12 +17,13 @@
 package com.netflix.netty.common.channel.config;
 
 import java.util.HashMap;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 2/8/17
  * Time: 6:43 PM
  */
+
 public class ChannelConfig implements Cloneable
 {
     private final HashMap<ChannelConfigKey, ChannelConfigValue> parameters;
@@ -59,6 +60,7 @@ public class ChannelConfig implements Cloneable
         return value;
     }
 
+    @Nullable
     public <T> ChannelConfigValue<T> getConfig(ChannelConfigKey<T> key)
     {
         return (ChannelConfigValue<T>) parameters.get(key);

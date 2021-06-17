@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 @Singleton
 public final class DynamicFilterLoader implements FilterLoader {
@@ -69,6 +70,7 @@ public final class DynamicFilterLoader implements FilterLoader {
      *             Zuul release.
      */
     @Deprecated
+    @Nullable
     public ZuulFilter<?, ?> getFilter(String sourceCode, String filterName) throws Exception {
         if (filterCheck.get(filterName) == null) {
             filterCheck.putIfAbsent(filterName, filterName);
@@ -201,6 +203,7 @@ public final class DynamicFilterLoader implements FilterLoader {
     }
 
     @Override
+    @Nullable
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         if (name == null || type == null) {
             return null;

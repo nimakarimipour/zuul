@@ -20,10 +20,11 @@ import io.netty.handler.ssl.ClientAuth;
 
 import javax.security.cert.X509Certificate;
 import java.security.cert.Certificate;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com Date: 3/29/16 Time: 11:06 AM
  */
+
 public class SslHandshakeInfo {
 
     private final String protocol;

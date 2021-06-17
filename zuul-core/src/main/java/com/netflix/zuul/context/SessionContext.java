@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.Nullable;
 /**
  * Represents the context between client and origin server for the duration of the dedicated connection/session
  * between them. But we're currently still only modelling single request/response pair per session.
@@ -35,6 +35,7 @@ import java.util.Map;
  * Date: 4/28/15
  * Time: 6:45 PM
  */
+
 public class SessionContext extends HashMap<String, Object> implements Cloneable
 {
     private static final int INITIAL_SIZE =
@@ -78,6 +79,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
         return (SessionContext) super.clone();
     }
 
+    @Nullable
     public String getString(String key)
     {
         return (String) get(key);
@@ -121,6 +123,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
         else remove(key);
     }
 
+    @Nullable
     public String getUUID()
     {
         return getString(KEY_UUID);
@@ -133,6 +136,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
     public void setStaticResponse(HttpResponseMessage response) {
         set(KEY_STATIC_RESPONSE, response);
     }
+    @Nullable
     public HttpResponseMessage getStaticResponse() {
         return (HttpResponseMessage) get(KEY_STATIC_RESPONSE);
     }
@@ -141,6 +145,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
      * Gets the throwable that will be use in the Error endpoint.
      *
      */
+    @Nullable
     public Throwable getError() {
         return (Throwable) get("_error");
 
@@ -154,6 +159,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
 
     }
 
+    @Nullable
     public String getErrorEndpoint() {
         return (String) get("_error-endpoint");
     }
@@ -225,6 +231,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
     /**
      * @return "routeHost" URL
      */
+    @Nullable
     public URL getRouteHost() {
         return (URL) get("routeHost");
     }
@@ -242,6 +249,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
     /**
      * @return String that represents the filter execution history for the current request
      */
+    @Nullable
     public StringBuilder getFilterExecutionSummary() {
         return (StringBuilder) get(KEY_FILTER_EXECS);
     }
@@ -300,6 +308,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
      * returns the routeVIP; that is the Eureka "vip" of registered instances
      *
      */
+    @Nullable
     public String getRouteVIP() {
         return (String) get(KEY_VIP);
     }
@@ -316,6 +325,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
         put(KEY_ENDPOINT, endpoint);
     }
 
+    @Nullable
     public String getEndpoint()
     {
         return (String) get(KEY_ENDPOINT);
@@ -329,6 +339,7 @@ public class SessionContext extends HashMap<String, Object> implements Cloneable
         return (Map<String, Object>) this.get(KEY_EVENT_PROPS);
     }
 
+    @Nullable
     public List<FilterError> getFilterErrors() {
         return (List<FilterError>) get(KEY_FILTER_ERRORS);
     }

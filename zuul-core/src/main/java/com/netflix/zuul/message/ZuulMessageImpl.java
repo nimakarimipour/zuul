@@ -31,12 +31,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 2/20/15
  * Time: 3:10 PM
  */
+
 public class ZuulMessageImpl implements ZuulMessage
 {
     protected static final DynamicIntProperty MAX_BODY_SIZE_PROP = DynamicPropertyFactory.getInstance().getIntProperty(
@@ -138,12 +139,14 @@ public class ZuulMessageImpl implements ZuulMessage
     }
 
     @Override
+    @Nullable
     public String getBodyAsText() {
         final byte[] body = getBody();
         return (body != null && body.length > 0) ? new String(getBody(), Charsets.UTF_8) : null;
     }
 
     @Override
+    @Nullable
     public byte[] getBody() {
         if (bodyChunks.size() == 0) {
             return null;

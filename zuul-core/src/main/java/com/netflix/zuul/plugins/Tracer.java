@@ -20,7 +20,7 @@ import com.netflix.zuul.monitoring.TracerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
-
+import javax.annotation.Nullable;
 /**
  * Plugin to hook up Servo Tracers
  *
@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: 4/10/13
  *         Time: 4:51 PM
  */
+
 public class Tracer extends TracerFactory {
 
     @Override

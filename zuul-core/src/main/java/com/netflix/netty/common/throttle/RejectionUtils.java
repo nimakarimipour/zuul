@@ -63,7 +63,7 @@ public final class RejectionUtils {
      */
     public static void rejectByClosingConnection(
             ChannelHandlerContext ctx, StatusCategory nfStatus, String reason, HttpRequest request,
-             Integer injectedLatencyMillis) {
+             @Nullable Integer injectedLatencyMillis) {
         if (injectedLatencyMillis != null && injectedLatencyMillis > 0) {
             // Delay closing the connection for configured time.
             ctx.executor().schedule(() -> {

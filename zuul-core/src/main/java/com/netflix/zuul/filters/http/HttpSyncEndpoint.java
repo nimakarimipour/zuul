@@ -28,12 +28,13 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.LastHttpContent;
 import rx.Observable;
 import rx.Subscriber;
-
+import javax.annotation.Nullable;
 /**
  * User: Mike Smith
  * Date: 6/16/15
  * Time: 12:23 AM
  */
+
 public abstract class HttpSyncEndpoint extends Endpoint<HttpRequestMessage, HttpResponseMessage> implements SyncZuulFilter<HttpRequestMessage, HttpResponseMessage>
 {
     // Feature flag for enabling this while we get some real data for the impact.
@@ -94,7 +95,7 @@ public abstract class HttpSyncEndpoint extends Endpoint<HttpRequestMessage, Http
         final ZuulMessage response;
         final Subscriber subscriber;
 
-        public ResponseState(ZuulMessage response, Subscriber subscriber)
+        public ResponseState(@Nullable ZuulMessage response, Subscriber subscriber)
         {
             this.response = response;
             this.subscriber = subscriber;

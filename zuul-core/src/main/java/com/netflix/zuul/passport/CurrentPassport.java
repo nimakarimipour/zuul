@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 public class CurrentPassport
@@ -322,6 +323,7 @@ public class CurrentPassport
         return items;
     }
 
+    @Nullable
     public PassportItem findState(PassportState state)
     {
         try (Unlocker ignored = lock()) {
@@ -334,6 +336,7 @@ public class CurrentPassport
         return null;
     }
 
+    @Nullable
     public PassportItem findStateBackwards(PassportState state)
     {
         try (Unlocker ignored = lock()) {
@@ -413,6 +416,7 @@ public class CurrentPassport
     }
 
     @VisibleForTesting
+    @Nullable
     public static CurrentPassport parseFromToString(String text)
     {
         CurrentPassport passport = null;

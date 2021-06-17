@@ -29,12 +29,13 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels
  * Date: 2/24/15
  * Time: 10:54 AM
  */
+
 public class HttpResponseMessageImpl implements HttpResponseMessage
 {
     private static final DynamicIntProperty MAX_BODY_SIZE_PROP = DynamicPropertyFactory.getInstance().getIntProperty(
@@ -44,6 +45,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
     private ZuulMessage message;
     private HttpRequestMessage outboundRequest;
     private int status;
+    @Nullable
     private HttpResponseInfo inboundResponse = null;
 
     public HttpResponseMessageImpl(SessionContext context, HttpRequestMessage request, int status)
@@ -288,6 +290,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
     }
 
     @Override
+    @Nullable
     public HttpResponseInfo getInboundResponse()
     {
         return inboundResponse;

@@ -27,11 +27,14 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.netflix.Initializer;
 /**
  * Author: Susheel Aroskar
  * Date: 5/14/18
  */
+import javax.annotation.Nullable;
+import javax.annotation.Nullable;
+
 public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
     protected final PushConnectionRegistry pushConnectionRegistry;
@@ -43,7 +46,9 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     /* state */
     protected final AtomicBoolean destroyed;
     private ChannelHandlerContext ctx;
+    @Nullable
     private volatile PushConnection pushConnection;
+    @Nullable
     private ScheduledFuture<?> keepAliveTask;
 
 
@@ -63,6 +68,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         this.destroyed = new AtomicBoolean();
     }
 
+    @Initializer
     protected final boolean isAuthenticated() {
         return (authEvent != null && authEvent.isSuccess());
     }
@@ -132,6 +138,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    @Initializer
     public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         this.ctx = ctx;
         if (! destroyed.get()) {

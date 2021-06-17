@@ -58,12 +58,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.netflix.Initializer;
 /**
  * User: michaels@netflix.com
  * Date: 7/8/16
  * Time: 12:39 PM
  */
+
 public class DefaultClientChannelManager implements ClientChannelManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultClientChannelManager.class);
 
@@ -134,6 +135,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     }
 
     @Override
+    @Initializer
     public void init()
     {
         // Load channel initializer and conn factory.
@@ -323,7 +325,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     @Override
     public Promise<PooledConnection> acquire(
             EventLoop eventLoop,
-             Object key,
+             @Nullable Object key,
             CurrentPassport passport,
             AtomicReference<Server> selectedServer,
             AtomicReference<? super InetAddress> selectedHostAddr) {

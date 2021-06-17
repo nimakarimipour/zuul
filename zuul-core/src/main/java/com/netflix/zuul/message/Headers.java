@@ -267,7 +267,7 @@ public final class Headers {
     /**
      * Removes entries that match the name, starting at the given index.
      */
-    private void clearMatchingStartingAt(int i, String normalName,  Collection<? super String> removed) {
+    private void clearMatchingStartingAt(int i, String normalName,  @Nullable Collection<? super String> removed) {
         // This works by having separate read and write indexes, that iterate along the list.
         // Values that don't match are moved to the front, leaving garbage values in place.
         // At the end, all values at and values are garbage and are removed.

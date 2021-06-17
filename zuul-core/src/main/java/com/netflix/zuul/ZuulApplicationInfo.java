@@ -14,6 +14,8 @@
  *      limitations under the License.
  */
 package com.netflix.zuul;
+import javax.annotation.Nullable;
+
 
 /**
  * Metadata about the Zuul instance/ application name and "stack"
@@ -22,9 +24,12 @@ package com.netflix.zuul;
  * Time: 1:56 PM
  */
 public class ZuulApplicationInfo {
+    @Nullable
     public static String applicationName;
+    @Nullable
     public static String stack;
 
+    @Nullable
     public static String getApplicationName() {
         return applicationName;
     }
@@ -33,6 +38,7 @@ public class ZuulApplicationInfo {
         ZuulApplicationInfo.applicationName = applicationName;
     }
 
+    @Nullable
     public static String getStack() {
         return stack;
     }

@@ -14,6 +14,8 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.stats.monitoring;
+import com.netflix.Initializer;
+
 
 /**
  * Registry to register a Counter. a Monitor publisher should  be set to get counter information.
@@ -31,6 +33,7 @@ public class MonitorRegistry {
      * A Monitor implementation should be set here
      * @param publisher
      */
+    @Initializer
     public void setPublisher(Monitor publisher) {
         this.publisher = publisher;
     }

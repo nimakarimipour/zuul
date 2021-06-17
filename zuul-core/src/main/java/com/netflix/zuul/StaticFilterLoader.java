@@ -142,12 +142,14 @@ public final class StaticFilterLoader implements FilterLoader {
     }
 
     @Override
+    @Nullable
     public SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType) {
         return filtersByType.get(filterType);
     }
 
     @Override
-    
+    @Nullable
+
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         Map<String, ZuulFilter<?, ?>> filtersByName = filtersByTypeAndName.get(type);
         if (filtersByName == null) {

@@ -45,6 +45,7 @@ public final class Attrs {
          */
         
         @SuppressWarnings("unchecked")
+        @Nullable
         public T get(Attrs attrs) {
             Objects.requireNonNull(attrs, "attrs");
             return (T) attrs.storage.get(this);

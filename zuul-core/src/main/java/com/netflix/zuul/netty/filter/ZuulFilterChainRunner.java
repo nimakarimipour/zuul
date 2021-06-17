@@ -30,17 +30,18 @@ import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import javax.annotation.Nullable;
 /**
  * This class is supposed to be thread safe and hence should not have any non final member variables
  * Created by saroskar on 5/17/17.
  */
+
 @ThreadSafe
 public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilterRunner<T, T> {
 
     private final ZuulFilter<T, T>[] filters;
 
-    public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, FilterRunner<T, ?> nextStage) {
+    public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, @Nullable FilterRunner<T, ?> nextStage) {
         super(zuulFilters[0].filterType(), usageNotifier, nextStage);
         this.filters = zuulFilters;
     }

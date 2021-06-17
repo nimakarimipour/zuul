@@ -49,10 +49,13 @@ import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_CLIENT_PI
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_CLIENT_TIMEOUT;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_LOCAL;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_LOCAL_IDLE_TIMEOUT;
-
+import com.netflix.Initializer;
 /**
  * Created by saroskar on 5/18/17.
  */
+import javax.annotation.Nullable;
+import javax.annotation.Nullable;
+
 public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
 
     private final ZuulFilterChainRunner<HttpRequestMessage> requestFilterChain;
@@ -115,6 +118,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
         super.userEventTriggered(ctx, evt);
     }
 
+    @Initializer
     private void sendResponse(final StatusCategory statusCategory, final int status, ChannelHandlerContext ctx) {
         if (zuulRequest == null) {
             ctx.close();

@@ -22,11 +22,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-
+import com.netflix.Initializer;
 /**
  * Author: Susheel Aroskar
  * Date:
  */
+
 public class PushConnection {
 
     private final PushProtocol pushProtocol;
@@ -52,6 +53,7 @@ public class PushConnection {
         return secureToken;
     }
 
+    @Initializer
     public void setSecureToken(String secureToken) {
         this.secureToken = secureToken;
     }

@@ -128,8 +128,9 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
      * Returns the String form of a socket address, or {@code null} if there isn't one.
      */
     @VisibleForTesting
-    
-    static String getHostAddress(InetSocketAddress socketAddress) {
+    @Nullable
+
+    static String getHostAddress(@Nullable InetSocketAddress socketAddress) {
         InetAddress address = socketAddress.getAddress();
         if (address instanceof Inet6Address) {
             // Strip the scope from the address since some other classes choke on it.
@@ -148,6 +149,7 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
         }
     }
 
+    @Nullable
     private InetSocketAddress sourceAddress(Channel channel) {
         SocketAddress remoteSocketAddr = channel.remoteAddress();
         if (null != remoteSocketAddr && InetSocketAddress.class.isAssignableFrom(remoteSocketAddr.getClass())) {
@@ -159,6 +161,7 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
         return null;
     }
 
+    @Nullable
     private InetSocketAddress localAddress(Channel channel) {
         SocketAddress localSocketAddress = channel.localAddress();
         if (null != localSocketAddress && InetSocketAddress.class.isAssignableFrom(localSocketAddress.getClass())) {

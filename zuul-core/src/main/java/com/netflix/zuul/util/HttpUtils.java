@@ -46,6 +46,7 @@ public class HttpUtils
      * @param request <code>HttpRequestMessage</code>
      * @return <code>String</code> IP address
      */
+    @Nullable
     public static String getClientIP(HttpRequestInfo request)
     {
         final String xForwardedFor = request.getHeaders().getFirst(HttpHeaderNames.X_FORWARDED_FOR);
@@ -64,6 +65,7 @@ public class HttpUtils
      * @param xForwardedFor a <code>String</code> value
      * @return a <code>String</code> value
      */
+    @Nullable
     public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
         if (xForwardedFor == null) {
             return null;
@@ -103,6 +105,7 @@ public class HttpUtils
      * @param input - decoded header string
      * @return - clean header string
      */
+    @Nullable
     public static String stripMaliciousHeaderChars( String input) {
         if (input == null) {
             return null;
@@ -123,6 +126,7 @@ public class HttpUtils
         return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
     }
 
+    @Nullable
     public static Integer getContentLengthIfPresent(ZuulMessage msg)
     {
         final String contentLengthValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
@@ -138,6 +142,7 @@ public class HttpUtils
         return null;
     }
 
+    @Nullable
     public static Integer getBodySizeIfKnown(ZuulMessage msg) {
         final Integer bodySize = getContentLengthIfPresent(msg);
         if (bodySize != null) {

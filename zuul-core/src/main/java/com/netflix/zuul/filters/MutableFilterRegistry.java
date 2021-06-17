@@ -35,7 +35,8 @@ public final class MutableFilterRegistry implements FilterRegistry {
     }
 
     @Override
-    
+    @Nullable
+
     public ZuulFilter<?, ?> get(String key) {
         return filters.get(requireNonNull(key, "key"));
     }

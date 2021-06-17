@@ -17,12 +17,13 @@
 package com.netflix.zuul.message.http;
 
 import com.netflix.zuul.message.ZuulMessage;
-
+import javax.annotation.Nullable;
 /**
  * User: Mike Smith
  * Date: 7/15/15
  * Time: 5:36 PM
  */
+
 public interface HttpRequestMessage extends HttpRequestInfo
 {
     void setProtocol(String protocol);

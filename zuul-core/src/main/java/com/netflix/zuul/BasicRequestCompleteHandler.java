@@ -36,7 +36,7 @@ public class BasicRequestCompleteHandler implements RequestCompleteHandler
     private RequestMetricsPublisher requestMetricsPublisher;
 
     @Override
-    public void handle(HttpRequestInfo inboundRequest, HttpResponseMessage response)
+    public void handle(HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response)
     {
         SessionContext context = inboundRequest.getContext();
 

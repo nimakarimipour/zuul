@@ -24,12 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels@netflix.com
  * Date: 8/16/16
  * Time: 2:40 PM
  */
+
 public class ServerSslConfig {
     private static final DynamicLongProperty DEFAULT_SESSION_TIMEOUT =
             new DynamicLongProperty("server.ssl.session.timeout", (18 * 60));  // 18 hours
@@ -59,7 +60,7 @@ public class ServerSslConfig {
     private final long sessionTimeout;
     private final boolean sessionTicketsEnabled;
 
-    public ServerSslConfig(String[] protocols, String[] ciphers, File certChainFile, File keyFile) {
+    public ServerSslConfig(String[] protocols, String[] ciphers, @Nullable File certChainFile, @Nullable File keyFile) {
         this(protocols, ciphers, certChainFile, keyFile, ClientAuth.NONE, null, (File) null, false);
     }
 

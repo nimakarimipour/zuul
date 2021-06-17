@@ -30,6 +30,7 @@ import io.netty.channel.unix.Errors;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 /**
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public final class PassportStateServerHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PassportStateServerHandler.class);
 
+    @Nullable
     private static Registry registry;
 
     private static CurrentPassport passport(ChannelHandlerContext ctx)

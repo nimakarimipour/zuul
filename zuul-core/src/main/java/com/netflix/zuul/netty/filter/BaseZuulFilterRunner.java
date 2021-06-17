@@ -61,11 +61,12 @@ import static io.perfmark.PerfMark.attachTag;
 import static io.perfmark.PerfMark.linkIn;
 import static io.perfmark.PerfMark.linkOut;
 import static io.perfmark.PerfMark.traceTask;
-
+import javax.annotation.Nullable;
 /**
  * Subclasses of this class are supposed to be thread safe and hence should not have any non final member variables
  * Created by saroskar on 5/18/17.
  */
+
 @ThreadSafe
 public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends ZuulMessage> implements FilterRunner<I, O> {
 
@@ -79,7 +80,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     private static final CachedDynamicIntProperty FILTER_EXCESSIVE_EXEC_TIME = new CachedDynamicIntProperty("zuul.filters.excessive.execTime", 500);
 
 
-    protected BaseZuulFilterRunner(FilterType filterType, FilterUsageNotifier usageNotifier, FilterRunner<O, ?> nextStage) {
+    protected BaseZuulFilterRunner(FilterType filterType, FilterUsageNotifier usageNotifier, @Nullable FilterRunner<O, ?> nextStage) {
         this.usageNotifier = Preconditions.checkNotNull(usageNotifier, "filter usage notifier");
         this.nextStage = nextStage;
         this.RUNNING_FILTER_IDX_SESSION_CTX_KEY = filterType + "RunningFilterIndex";
@@ -170,6 +171,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         attachTag("uuid", inMesg, m -> m.getContext().getUUID());
     }
 
+    @Nullable
     protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
         final long startTime = System.nanoTime();
         final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
@@ -312,7 +314,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     }
 
     protected void recordFilterCompletion(final ExecutionStatus status, final ZuulFilter<I, O> filter, long startTime,
-                                          final ZuulMessage zuulMesg, final ZuulMessage startSnapshot) {
+                                          final ZuulMessage zuulMesg, @Nullable final ZuulMessage startSnapshot) {
 
         final SessionContext zuulCtx = zuulMesg.getContext();
         final long execTimeNs = System.nanoTime() - startTime;

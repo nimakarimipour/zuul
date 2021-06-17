@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.BiFunction;
+import javax.annotation.Nullable;
 
 public class AccessLogPublisher
 {
@@ -53,7 +54,7 @@ public class AccessLogPublisher
         this.requestIdProvider = requestIdProvider;
     }
 
-    public void log(Channel channel, HttpRequest request, HttpResponse response, LocalDateTime dateTime, Integer localPort, String remoteIp,
+    public void log(Channel channel, @Nullable HttpRequest request, @Nullable HttpResponse response, LocalDateTime dateTime, Integer localPort, String remoteIp,
                     Long durationNs, Integer requestBodySize, Integer responseBodySize)
     {
         StringBuilder sb = new StringBuilder();

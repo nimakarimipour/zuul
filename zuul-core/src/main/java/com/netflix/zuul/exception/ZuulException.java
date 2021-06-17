@@ -14,6 +14,8 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.exception;
+import javax.annotation.Nullable;
+
 
 /**
  * All handled exceptions in Zuul are ZuulExceptions

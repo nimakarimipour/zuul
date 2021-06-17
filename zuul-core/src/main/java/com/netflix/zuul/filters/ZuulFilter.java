@@ -20,7 +20,7 @@ import com.netflix.zuul.exception.ZuulFilterConcurrencyExceededException;
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.handler.codec.http.HttpContent;
 import rx.Observable;
-
+import javax.annotation.Nullable;
 /**
  * BAse interface for ZuulFilters
  *
@@ -28,6 +28,7 @@ import rx.Observable;
  *         Date: 10/27/11
  *         Time: 3:03 PM
  */
+
 public interface ZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ShouldFilter<I>
 {
     boolean isDisabled();
@@ -114,4 +115,5 @@ public interface ZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extend
     /**
      * Optionally transform HTTP content chunk received.
      */
+    @Nullable
     HttpContent processContentChunk(ZuulMessage zuulMessage, HttpContent chunk);}

@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.netflix.Initializer;
 /**
  * This class manages the directory polling for changes and new Groovy filters.
  * Polling interval and directories are specified in the initialization of the class, and a poller will check
@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
  *         Date: 12/7/11
  *         Time: 12:09 PM
  */
+
 @Singleton
 public class FilterFileManager {
 
@@ -94,6 +95,7 @@ public class FilterFileManager {
         bRunning = false;
     }
 
+    @Initializer
     void startPoller() {
         poller = new Thread("GroovyFilterFileManagerPoller") {
             {

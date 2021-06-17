@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 /**
@@ -78,7 +79,9 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
 
     private final SessionContextDecorator decorator;
 
+    @Nullable
     private HttpRequestMessage zuulRequest;
+    @Nullable
     private HttpRequest clientRequest;
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientRequestReceiver.class);

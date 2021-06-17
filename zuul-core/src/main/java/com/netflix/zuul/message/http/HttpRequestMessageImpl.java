@@ -43,12 +43,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 /**
  * User: michaels
  * Date: 2/24/15
  * Time: 10:54 AM
  */
+
 public class HttpRequestMessageImpl implements HttpRequestMessage
 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestMessageImpl.class);
@@ -88,12 +89,17 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     private String serverName;
     private SocketAddress clientRemoteAddress;
 
+    @Nullable
     private HttpRequestInfo inboundRequest = null;
+    @Nullable
     private Cookies parsedCookies = null;
 
     // These attributes are populated only if immutable=true.
+    @Nullable
     private String reconstructedUri = null;
+    @Nullable
     private String pathAndQuery = null;
+    @Nullable
     private String infoForLogging = null;
 
     private static final SocketAddress UNDEFINED_CLIENT_DEST_ADDRESS = new SocketAddress() {
@@ -429,6 +435,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     }
 
     @Override
+    @Nullable
     public HttpRequestInfo getInboundRequest()
     {
         return inboundRequest;

@@ -49,12 +49,14 @@ import static com.netflix.zuul.exception.OutboundErrorType.RESET_CONNECTION;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
-
+import javax.annotation.Nullable;
 /**
  * Created by saroskar on 1/18/17.
  */
+
 public class OriginResponseReceiver extends ChannelDuplexHandler {
 
+    @Nullable
     private volatile ProxyEndpoint edgeProxy;
 
     private static final Logger LOG = LoggerFactory.getLogger(OriginResponseReceiver.class);
