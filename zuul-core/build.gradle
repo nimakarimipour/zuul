@@ -62,7 +62,7 @@ dependencies {
     jmh 'org.openjdk.jmh:jmh-core:1.+'
     jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.+'
 
-    annotationProcessor "edu.ucr.cs.riple:nullaway:0.7.12-SNAPSHOT"
+    annotationProcessor "ucr.uber.nullaway:nullaway:0.9.3-SNAPSHOT"
 
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
     errorprone "com.google.errorprone:error_prone_core:2.3.2"
@@ -96,6 +96,7 @@ tasks.withType(JavaCompile) {
                                               "-Xep:NullAway:ERROR",
                                               "-XepOpt:NullAway:AnnotatedPackages=com.netflix",
                                               "-XepOpt:NullAway:AutoFix=true",
+                                              "-XepOpt:NullAway:AutoFixOutPutDirectory=/tmp/NullAwayFix",
                                               "-XepDisableAllWarnings"]
         options.compilerArgs << "-Xmaxerrs" << "100000"
     }
