@@ -15,6 +15,8 @@
  */
 package com.netflix.zuul.netty.server.push;
 
+import javax.annotation.Nullable;
+import com.netflix.Initializer;
 import com.netflix.config.CachedDynamicBooleanProperty;
 import com.netflix.config.CachedDynamicIntProperty;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,7 +25,6 @@ import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.util.concurrent.ScheduledFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
     protected final PushConnectionRegistry pushConnectionRegistry;
+
     protected final PushProtocol pushProtocol;
 
     /* Identity */
@@ -42,33 +44,43 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
     /* state */
     protected final AtomicBoolean destroyed;
+
     private ChannelHandlerContext ctx;
+
+    @Nullable
     private volatile PushConnection pushConnection;
+
+    @Nullable
     private ScheduledFuture<?> keepAliveTask;
 
-
     public static final CachedDynamicIntProperty PUSH_REGISTRY_TTL = new CachedDynamicIntProperty("zuul.push.registry.ttl.seconds", 30 * 60);
+
     public static final CachedDynamicIntProperty RECONNECT_DITHER = new CachedDynamicIntProperty("zuul.push.reconnect.dither.seconds", 3 * 60);
+
     public static final CachedDynamicIntProperty UNAUTHENTICATED_CONN_TTL = new CachedDynamicIntProperty("zuul.push.noauth.ttl.seconds", 8);
+
     public static final CachedDynamicIntProperty CLIENT_CLOSE_GRACE_PERIOD = new CachedDynamicIntProperty("zuul.push.client.close.grace.period", 4);
+
     public static final CachedDynamicBooleanProperty KEEP_ALIVE_ENABLED = new CachedDynamicBooleanProperty("zuul.push.keepalive.enabled", true);
+
     public static final CachedDynamicIntProperty KEEP_ALIVE_INTERVAL = new CachedDynamicIntProperty("zuul.push.keepalive.interval.seconds", 3 * 60);
 
     private static Logger logger = LoggerFactory.getLogger(PushRegistrationHandler.class);
 
-
+    @Initializer
     public PushRegistrationHandler(PushConnectionRegistry pushConnectionRegistry, PushProtocol pushProtocol) {
         this.pushConnectionRegistry = pushConnectionRegistry;
         this.pushProtocol = pushProtocol;
         this.destroyed = new AtomicBoolean();
     }
 
+    @Initializer
     protected final boolean isAuthenticated() {
         return (authEvent != null && authEvent.isSuccess());
     }
 
-    private void tearDown()  {
-        if (! destroyed.get()) {
+    private void tearDown() {
+        if (!destroyed.get()) {
             destroyed.set(true);
             if (authEvent != null) {
                 pushConnectionRegistry.remove(authEvent.getClientIdentity());
@@ -96,14 +108,14 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     }
 
     protected final void forceCloseConnectionFromServerSide() {
-        if (! destroyed.get()) {
+        if (!destroyed.get()) {
             logger.debug("server forcing close connection");
             pushProtocol.sendErrorAndClose(ctx, 1000, "Server closed connection");
         }
     }
 
     private void closeIfNotAuthenticated() {
-        if (! isAuthenticated()) {
+        if (!isAuthenticated()) {
             logger.error("Closing connection because it is still unauthenticated after {} seconds.", UNAUTHENTICATED_CONN_TTL.get());
             forceCloseConnectionFromServerSide();
         }
@@ -132,17 +144,17 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    @Initializer
     public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         this.ctx = ctx;
-        if (! destroyed.get()) {
-            if (evt == pushProtocol.getHandshakeCompleteEvent())  {
+        if (!destroyed.get()) {
+            if (evt == pushProtocol.getHandshakeCompleteEvent()) {
                 pushConnection = new PushConnection(pushProtocol, ctx);
                 // Unauthenticated connection, wait for small amount of time for a client to send auth token in
                 // a first web socket frame, otherwise close connection
                 ctx.executor().schedule(this::closeIfNotAuthenticated, UNAUTHENTICATED_CONN_TTL.get(), TimeUnit.SECONDS);
                 logger.debug("WebSocket handshake complete.");
-            }
-            else if (evt instanceof PushUserAuth) {
+            } else if (evt instanceof PushUserAuth) {
                 authEvent = (PushUserAuth) evt;
                 if ((authEvent.isSuccess()) && (pushConnection != null)) {
                     logger.debug("registering client {}", authEvent);
@@ -174,14 +186,12 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
      * to use blocking Memcached/redis driver in a background thread-pool to do the actual registration so that Netty
      * event loop doesn't block
      */
-    protected void registerClient(ChannelHandlerContext ctx, PushUserAuth authEvent,
-                                 PushConnection conn, PushConnectionRegistry registry) {
+    protected void registerClient(ChannelHandlerContext ctx, PushUserAuth authEvent, PushConnection conn, PushConnectionRegistry registry) {
         registry.put(authEvent.getClientIdentity(), conn);
-        //Make client reconnect after ttl seconds by closing this connection to limit stickiness of the client
+        // Make client reconnect after ttl seconds by closing this connection to limit stickiness of the client
         ctx.executor().schedule(this::requestClientToCloseConnection, ditheredReconnectDeadline(), TimeUnit.SECONDS);
         if (KEEP_ALIVE_ENABLED.get()) {
             keepAliveTask = ctx.executor().scheduleWithFixedDelay(this::keepAlive, KEEP_ALIVE_INTERVAL.get(), KEEP_ALIVE_INTERVAL.get(), TimeUnit.SECONDS);
         }
     }
-
 }
