@@ -103,6 +103,7 @@ public class HttpUtils
      * @param input - decoded header string
      * @return - clean header string
      */
+    @Nullable
     public static String stripMaliciousHeaderChars( String input) {
         if (input == null) {
             return null;
