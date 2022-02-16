@@ -15,6 +15,7 @@
  */
 
 package com.netflix.zuul.netty.filter;
+import javax.annotation.Nullable;
 
 import com.netflix.config.CachedDynamicIntProperty;
 import com.netflix.spectator.impl.Preconditions;
@@ -312,7 +313,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     }
 
     protected void recordFilterCompletion(final ExecutionStatus status, final ZuulFilter<I, O> filter, long startTime,
-                                          final ZuulMessage zuulMesg, final ZuulMessage startSnapshot) {
+                                          final ZuulMessage zuulMesg, @Nullable final ZuulMessage startSnapshot) {
 
         final SessionContext zuulCtx = zuulMesg.getContext();
         final long execTimeNs = System.nanoTime() - startTime;
