@@ -14,6 +14,7 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.message.http;
+import javax.annotation.Nullable;
 
 
 import com.google.common.annotations.VisibleForTesting;
@@ -92,6 +93,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     private Cookies parsedCookies = null;
 
     // These attributes are populated only if immutable=true.
+    @Nullable
     private String reconstructedUri = null;
     private String pathAndQuery = null;
     private String infoForLogging = null;
