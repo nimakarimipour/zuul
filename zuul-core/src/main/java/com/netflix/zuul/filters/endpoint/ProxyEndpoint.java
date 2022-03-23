@@ -1030,6 +1030,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
      * Note: this method gets called in the constructor so if overloading it or any methods called within, you cannot
      * rely on your own constructor parameters.
      */
+    @Nullable
     protected NettyOrigin getOrigin(HttpRequestMessage request) {
         SessionContext context = request.getContext();
         OriginManager<NettyOrigin> originManager = (OriginManager<NettyOrigin>) context.get(CommonContextKeys.ORIGIN_MANAGER);
