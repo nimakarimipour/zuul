@@ -15,6 +15,8 @@
  */
 
 package com.netflix.netty.common.channel.config;
+import javax.annotation.Nullable;
+
 
 /**
  * User: michaels@netflix.com
@@ -24,6 +26,7 @@ package com.netflix.netty.common.channel.config;
 public class ChannelConfigKey<T>
 {
     private final String key;
+    @Nullable
     private final T defaultValue;
 
     public ChannelConfigKey(String key, T defaultValue)
