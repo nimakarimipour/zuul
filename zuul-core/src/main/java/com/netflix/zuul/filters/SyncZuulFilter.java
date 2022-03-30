@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.message.ZuulMessage;
 
 /**
@@ -23,7 +23,8 @@ import com.netflix.zuul.message.ZuulMessage;
  * Date: 11/16/15
  * Time: 2:07 PM
  */
-public interface SyncZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ZuulFilter<I, O>
-{
+public interface SyncZuulFilter<I extends ZuulMessage, O extends ZuulMessage> extends ZuulFilter<I, O> {
+
+    @Nullable
     O apply(I input);
 }
