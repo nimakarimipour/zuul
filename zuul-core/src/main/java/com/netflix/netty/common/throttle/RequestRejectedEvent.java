@@ -13,21 +13,24 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.netty.common.throttle;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.stats.status.StatusCategory;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 public final class RequestRejectedEvent {
+
     private final HttpRequest request;
+
     private final StatusCategory nfStatus;
+
     private final HttpResponseStatus httpStatus;
+
     private final String reason;
 
-    public RequestRejectedEvent(
-            HttpRequest request, StatusCategory nfStatus, HttpResponseStatus httpStatus, String reason) {
+    public RequestRejectedEvent(HttpRequest request, StatusCategory nfStatus, HttpResponseStatus httpStatus, String reason) {
         this.request = request;
         this.nfStatus = nfStatus;
         this.httpStatus = httpStatus;
