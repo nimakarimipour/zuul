@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.stats.status;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.message.ZuulMessage;
@@ -29,13 +29,16 @@ import org.slf4j.LoggerFactory;
  * Time: 2:48 PM
  */
 public class StatusCategoryUtils {
+
     private static final Logger LOG = LoggerFactory.getLogger(StatusCategoryUtils.class);
 
+    @Nullable
     public static StatusCategory getStatusCategory(ZuulMessage msg) {
         return getStatusCategory(msg.getContext());
     }
 
-    public static StatusCategory getStatusCategory(SessionContext ctx) {
+    @Nullable
+    public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
         return (StatusCategory) ctx.get(CommonContextKeys.STATUS_CATGEORY);
     }
 
@@ -43,6 +46,7 @@ public class StatusCategoryUtils {
         ctx.set(CommonContextKeys.STATUS_CATGEORY, statusCategory);
     }
 
+    @Nullable
     public static StatusCategory getOriginStatusCategory(SessionContext ctx) {
         return (StatusCategory) ctx.get(CommonContextKeys.ORIGIN_STATUS_CATEGORY);
     }

@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
 import com.netflix.config.CachedDynamicBooleanProperty;
 import com.netflix.config.CachedDynamicIntProperty;
 import com.netflix.spectator.api.Counter;
@@ -22,7 +23,6 @@ import com.netflix.zuul.exception.ZuulFilterConcurrencyExceededException;
 import com.netflix.zuul.message.ZuulMessage;
 import com.netflix.zuul.netty.SpectatorUtils;
 import io.netty.handler.codec.http.HttpContent;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -42,13 +42,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  *         Date: 10/26/11
  *         Time: 4:29 PM
  */
-public abstract class BaseFilter<I extends ZuulMessage, O extends ZuulMessage> implements ZuulFilter<I,O>
-{
+public abstract class BaseFilter<I extends ZuulMessage, O extends ZuulMessage> implements ZuulFilter<I, O> {
+
     private final String baseName;
+
     private final AtomicInteger concurrentCount;
+
     private final Counter concurrencyRejections;
 
     private final CachedDynamicBooleanProperty filterDisabled;
+
     private final CachedDynamicIntProperty filterConcurrencyLimit;
 
     private static final CachedDynamicBooleanProperty concurrencyProtectEnabled = new CachedDynamicBooleanProperty("zuul.filter.concurrency.protect.enabled", true);
@@ -67,8 +70,7 @@ public abstract class BaseFilter<I extends ZuulMessage, O extends ZuulMessage> i
     }
 
     @Override
-    public boolean overrideStopFilterProcessing()
-    {
+    public boolean overrideStopFilterProcessing() {
         return false;
     }
 
@@ -96,20 +98,17 @@ public abstract class BaseFilter<I extends ZuulMessage, O extends ZuulMessage> i
     }
 
     @Override
-    public O getDefaultOutput(I input)
-    {
-        return (O)input;
+    public O getDefaultOutput(I input) {
+        return (O) input;
     }
 
     @Override
-    public FilterSyncType getSyncType()
-    {
+    public FilterSyncType getSyncType() {
         return FilterSyncType.ASYNC;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return String.valueOf(filterType()) + ":" + String.valueOf(filterName());
     }
 
