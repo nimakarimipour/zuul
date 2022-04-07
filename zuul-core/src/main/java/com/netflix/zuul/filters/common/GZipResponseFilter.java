@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.filters.common;
 
+import javax.annotation.Nullable;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.config.CachedDynamicBooleanProperty;
 import com.netflix.config.CachedDynamicIntProperty;
@@ -45,41 +45,30 @@ import io.netty.handler.codec.http.LastHttpContent;
  * @author Mike Smith
  */
 @Filter(order = 110, type = FilterType.OUTBOUND)
-public class GZipResponseFilter extends HttpOutboundSyncFilter
-{
-    private static DynamicStringSetProperty GZIPPABLE_CONTENT_TYPES = new DynamicStringSetProperty("zuul.gzip.contenttypes",
-            "text/html,application/x-javascript,text/css,application/javascript,text/javascript,text/plain,text/xml," +
-                    "application/json,application/vnd.ms-fontobject,application/x-font-opentype,application/x-font-truetype," +
-                    "application/x-font-ttf,application/xml,font/eot,font/opentype,font/otf,image/svg+xml,image/vnd.microsoft.icon",
-            ",");
+public class GZipResponseFilter extends HttpOutboundSyncFilter {
+
+    private static DynamicStringSetProperty GZIPPABLE_CONTENT_TYPES = new DynamicStringSetProperty("zuul.gzip.contenttypes", "text/html,application/x-javascript,text/css,application/javascript,text/javascript,text/plain,text/xml," + "application/json,application/vnd.ms-fontobject,application/x-font-opentype,application/x-font-truetype," + "application/x-font-ttf,application/xml,font/eot,font/opentype,font/otf,image/svg+xml,image/vnd.microsoft.icon", ",");
 
     // https://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
-    private static final CachedDynamicIntProperty MIN_BODY_SIZE_FOR_GZIP =
-            new CachedDynamicIntProperty("zuul.min.gzip.body.size", 860);
+    private static final CachedDynamicIntProperty MIN_BODY_SIZE_FOR_GZIP = new CachedDynamicIntProperty("zuul.min.gzip.body.size", 860);
 
-    private static final CachedDynamicBooleanProperty ENABLED =
-            new CachedDynamicBooleanProperty("zuul.response.gzip.filter.enabled", true);
+    private static final CachedDynamicBooleanProperty ENABLED = new CachedDynamicBooleanProperty("zuul.response.gzip.filter.enabled", true);
 
     @Override
     public boolean shouldFilter(HttpResponseMessage response) {
         if (!ENABLED.get() || !response.hasBody() || response.getContext().isInBrownoutMode()) {
             return false;
         }
-
         if (response.getContext().get(CommonContextKeys.GZIPPER) != null) {
             return true;
         }
-
         // A flag on SessionContext can be set to override normal mechanism of checking if client accepts gzip.;
         final HttpRequestInfo request = response.getInboundRequest();
         final Boolean overrideIsGzipRequested = (Boolean) response.getContext().get(CommonContextKeys.OVERRIDE_GZIP_REQUESTED);
-        final boolean isGzipRequested = (overrideIsGzipRequested == null) ?
-                HttpUtils.acceptsGzip(request.getHeaders()) :  overrideIsGzipRequested.booleanValue();
-
+        final boolean isGzipRequested = (overrideIsGzipRequested == null) ? HttpUtils.acceptsGzip(request.getHeaders()) : overrideIsGzipRequested.booleanValue();
         // Check the headers to see if response is already gzipped.
         final Headers respHeaders = response.getHeaders();
         boolean isResponseGzipped = HttpUtils.isGzipped(respHeaders);
-
         // Decide what to do.;
         final boolean shouldGzip = isGzippableContentType(response) && isGzipRequested && !isResponseGzipped && isRightSizeForGzip(response);
         if (shouldGzip) {
@@ -95,7 +84,7 @@ public class GZipResponseFilter extends HttpOutboundSyncFilter
     @VisibleForTesting
     boolean isRightSizeForGzip(HttpResponseMessage response) {
         final Integer bodySize = HttpUtils.getBodySizeIfKnown(response);
-        //bodySize == null is chunked encoding which is eligible for gzip compression
+        // bodySize == null is chunked encoding which is eligible for gzip compression
         return (bodySize == null) || (bodySize.intValue() >= MIN_BODY_SIZE_FOR_GZIP.get());
     }
 
