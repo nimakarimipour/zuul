@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.server.push;
 
+import javax.annotation.Nullable;
 import com.google.common.base.Charsets;
 import com.netflix.config.CachedDynamicIntProperty;
 import io.netty.buffer.ByteBuf;
@@ -30,16 +30,20 @@ import io.netty.channel.ChannelHandlerContext;
 public class PushConnection {
 
     private final PushProtocol pushProtocol;
+
     private final ChannelHandlerContext ctx;
+
+    @Nullable
     private String secureToken;
 
-    //Token bucket implementation state.
+    // Token bucket implementation state.
     private double tkBktAllowance;
+
     private long tkBktLastCheckTime;
+
     public static final CachedDynamicIntProperty TOKEN_BUCKET_RATE = new CachedDynamicIntProperty("zuul.push.tokenBucket.rate", 3);
+
     public static final CachedDynamicIntProperty TOKEN_BUCKET_WINDOW = new CachedDynamicIntProperty("zuul.push.tokenBucket.window.millis", 2000);
-
-
 
     public PushConnection(PushProtocol pushProtocol, ChannelHandlerContext ctx) {
         this.pushProtocol = pushProtocol;
@@ -48,6 +52,7 @@ public class PushConnection {
         tkBktLastCheckTime = System.currentTimeMillis();
     }
 
+    @Nullable
     public String getSecureToken() {
         return secureToken;
     }
@@ -65,18 +70,15 @@ public class PushConnection {
         final double window = TOKEN_BUCKET_WINDOW.get();
         final long current = System.currentTimeMillis();
         final double timePassed = current - tkBktLastCheckTime;
-
         tkBktLastCheckTime = current;
         tkBktAllowance = tkBktAllowance + timePassed * (rate / window);
-
         if (tkBktAllowance > rate) {
-            tkBktAllowance = rate; //cap max to rate
+            // cap max to rate
+            tkBktAllowance = rate;
         }
-
         if (tkBktAllowance < 1.0) {
             return true;
         }
-
         tkBktAllowance = tkBktAllowance - 1.0;
         return false;
     }
@@ -92,5 +94,4 @@ public class PushConnection {
     public ChannelFuture sendPing() {
         return pushProtocol.sendPing(ctx);
     }
-
 }
