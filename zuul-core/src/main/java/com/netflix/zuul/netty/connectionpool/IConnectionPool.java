@@ -13,13 +13,12 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,15 +27,21 @@ import java.util.concurrent.atomic.AtomicReference;
  * Date: 7/8/16
  * Time: 1:10 PM
  */
-public interface IConnectionPool
-{
-    Promise<PooledConnection> acquire(
-            EventLoop eventLoop, CurrentPassport passport, AtomicReference<? super InetAddress> selectedHostAddr);
+public interface IConnectionPool {
+
+    Promise<PooledConnection> acquire(EventLoop eventLoop, CurrentPassport passport, AtomicReference<? super InetAddress> selectedHostAddr);
+
     boolean release(PooledConnection conn);
+
     boolean remove(PooledConnection conn);
+
     void shutdown();
+
     boolean isAvailable();
+
     int getConnsInUse();
+
     int getConnsInPool();
+
     ConnectionPoolConfig getConfig();
 }
