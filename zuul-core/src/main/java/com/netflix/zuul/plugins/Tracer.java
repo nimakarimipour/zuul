@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.plugins;
 
+import javax.annotation.Nullable;
 import com.netflix.spectator.api.Spectator;
 import com.netflix.zuul.monitoring.TracerFactory;
 import java.net.InetAddress;
@@ -31,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 public class Tracer extends TracerFactory {
 
     @Override
-
     public com.netflix.zuul.monitoring.Tracer startMicroTracer(String name) {
         return new SpectatorTracer(name);
     }
@@ -39,6 +39,7 @@ public class Tracer extends TracerFactory {
     class SpectatorTracer implements com.netflix.zuul.monitoring.Tracer {
 
         private String name;
+
         private final long start;
 
         private SpectatorTracer(String name) {
@@ -48,8 +49,7 @@ public class Tracer extends TracerFactory {
 
         @Override
         public void stopAndLog() {
-            Spectator.globalRegistry().timer(name, "hostname", getHostName(), "ip", getIp())
-                    .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            Spectator.globalRegistry().timer(name, "hostname", getHostName(), "ip", getIp()).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
 
         @Override
@@ -66,6 +66,7 @@ public class Tracer extends TracerFactory {
         return (loadAddress() != null) ? loadAddress().getHostAddress() : "unknownHost";
     }
 
+    @Nullable
     private static InetAddress loadAddress() {
         try {
             return InetAddress.getLocalHost();

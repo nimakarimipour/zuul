@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.message.http;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.message.ZuulMessage;
 
 /**
@@ -23,8 +23,8 @@ import com.netflix.zuul.message.ZuulMessage;
  * Date: 7/15/15
  * Time: 5:36 PM
  */
-public interface HttpRequestMessage extends HttpRequestInfo
-{
+public interface HttpRequestMessage extends HttpRequestInfo {
+
     void setProtocol(String protocol);
 
     void setMethod(String method);
@@ -39,6 +39,7 @@ public interface HttpRequestMessage extends HttpRequestInfo
 
     void storeInboundRequest();
 
+    @Nullable
     HttpRequestInfo getInboundRequest();
 
     void setQueryParams(HttpQueryParams queryParams);

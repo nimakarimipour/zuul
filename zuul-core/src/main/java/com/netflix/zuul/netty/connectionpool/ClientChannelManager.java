@@ -13,15 +13,13 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.connectionpool;
 
-
+import javax.annotation.Nullable;
 import com.netflix.loadbalancer.Server;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,8 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * Date: 7/8/16
  * Time: 12:36 PM
  */
-public interface ClientChannelManager
-{
+public interface ClientChannelManager {
+
     void init();
 
     boolean isAvailable();
@@ -44,12 +42,7 @@ public interface ClientChannelManager
 
     Promise<PooledConnection> acquire(EventLoop eventLoop);
 
-    Promise<PooledConnection> acquire(
-            EventLoop eventLoop,
-            Object key,
-            CurrentPassport passport,
-            AtomicReference<Server> selectedServer,
-            AtomicReference<? super InetAddress> selectedHostAddr);
+    Promise<PooledConnection> acquire(EventLoop eventLoop, @Nullable Object key, @Nullable CurrentPassport passport, AtomicReference<Server> selectedServer, AtomicReference<? super InetAddress> selectedHostAddr);
 
     boolean isCold();
 

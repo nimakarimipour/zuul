@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.netty.common.proxyprotocol;
 
+import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
@@ -33,11 +33,14 @@ import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 public final class ElbProxyProtocolChannelHandler extends ChannelInboundHandlerAdapter {
 
     public static final String NAME = ElbProxyProtocolChannelHandler.class.getSimpleName();
+
     private final boolean withProxyProtocol;
+
     private final Registry spectatorRegistry;
+
     private final Counter hapmDecodeFailure;
 
-    public ElbProxyProtocolChannelHandler(Registry registry, boolean withProxyProtocol) {
+    public ElbProxyProtocolChannelHandler(@Nullable Registry registry, boolean withProxyProtocol) {
         this.withProxyProtocol = withProxyProtocol;
         this.spectatorRegistry = checkNotNull(registry);
         this.hapmDecodeFailure = spectatorRegistry.counter("zuul.hapm.failure");
@@ -50,8 +53,7 @@ public final class ElbProxyProtocolChannelHandler extends ChannelInboundHandlerA
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (withProxyProtocol && isHAPMDetected(msg)) {
-            ctx.pipeline().addAfter(NAME, null, new HAProxyMessageChannelHandler())
-                    .replace(this, null, new HAProxyMessageDecoder());
+            ctx.pipeline().addAfter(NAME, null, new HAProxyMessageChannelHandler()).replace(this, null, new HAProxyMessageDecoder());
         } else {
             if (withProxyProtocol) {
                 // This likely means initialization was requested with proxy protocol, but we failed to decode the message
