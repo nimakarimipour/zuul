@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.filter;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.handler.codec.http.HttpContent;
 
@@ -25,5 +25,6 @@ import io.netty.handler.codec.http.HttpContent;
 public interface FilterRunner<I extends ZuulMessage, O extends ZuulMessage> {
 
     void filter(I zuulMesg);
+
     void filter(I zuulMesg, HttpContent chunk);
 }

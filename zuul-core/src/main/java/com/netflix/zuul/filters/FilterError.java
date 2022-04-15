@@ -15,18 +15,23 @@
  */
 package com.netflix.zuul.filters;
 
+import javax.annotation.Nullable;
+
 /**
  * User: michaels@netflix.com
  * Date: 5/7/15
  * Time: 10:19 AM
  */
-public class FilterError implements Cloneable
-{
+public class FilterError implements Cloneable {
+
     private String filterName;
+
     private String filterType;
+
+    @Nullable
     private Throwable exception = null;
 
-    public FilterError(String filterName, String filterType, Throwable exception) {
+    public FilterError(String filterName, String filterType, @Nullable Throwable exception) {
         this.filterName = filterName;
         this.filterType = filterType;
         this.exception = exception;
@@ -40,6 +45,7 @@ public class FilterError implements Cloneable
         return filterType;
     }
 
+    @Nullable
     public Throwable getException() {
         return exception;
     }
@@ -51,10 +57,6 @@ public class FilterError implements Cloneable
 
     @Override
     public String toString() {
-        return "FilterError{" +
-                "filterName='" + filterName + '\'' +
-                ", filterType='" + filterType + '\'' +
-                ", exception=" + exception +
-                '}';
+        return "FilterError{" + "filterName='" + filterName + '\'' + ", filterType='" + filterType + '\'' + ", exception=" + exception + '}';
     }
 }
