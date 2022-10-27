@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.origins;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN;
 import static com.netflix.zuul.stats.status.ZuulStatusCategory.FAILURE_ORIGIN_THROTTLED;
@@ -129,6 +130,7 @@ public class BasicNettyOrigin implements NettyOrigin {
 
     @Override
     @Nullable
+    @NullUnmarked
     public String getIpAddrFromServer(@Nullable DiscoveryResult discoveryResult) {
         final Optional<String> ipAddr = discoveryResult.getIPAddr();
         return ipAddr.isPresent() ? ipAddr.get() : null;

@@ -106,7 +106,7 @@ tasks.withType(JavaCompile) {
             check("NullAway", CheckSeverity.ERROR)
             check("TypeAnnotatorScanner", CheckSeverity.ERROR)
             check("ExhaustiveFixSerializer", CheckSeverity.OFF)
-            check("NullUnmarkedCollector", CheckSeverity.OFF)
+            check("NullUnmarkedCollector", CheckSeverity.ERROR)
             option("NullAway:AnnotatedPackages", "com.netflix.zuul")
             option("NullAway:UnannotatedSubPackages", "com.netflix.zuul.discovery")
             option("NullAway:UnannotatedSubPackages", "com.netflix.zuul.resolver")

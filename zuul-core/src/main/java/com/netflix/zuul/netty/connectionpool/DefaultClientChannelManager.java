@@ -111,8 +111,10 @@ public class DefaultClientChannelManager implements ClientChannelManager {
 
     private final ConcurrentHashMap<DiscoveryResult, IConnectionPool> perServerPools;
 
+    @SuppressWarnings("NullAway.Init")
     private NettyClientConnectionFactory clientConnFactory;
 
+    @SuppressWarnings("NullAway.Init")
     private OriginChannelInitializer channelInitializer;
 
     public static final String IDLE_STATE_HANDLER_NAME = "idleStateHandler";

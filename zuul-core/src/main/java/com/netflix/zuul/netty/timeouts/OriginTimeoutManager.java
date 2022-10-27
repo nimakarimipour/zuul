@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.netty.timeouts;
 
+import com.netflix.NullUnmarked;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.client.config.CommonClientConfigKey;
 import com.netflix.client.config.DefaultClientConfigImpl;
@@ -56,6 +57,7 @@ public class OriginTimeoutManager {
      * @param request    the request.
      * @param attemptNum the attempt number, starting at 1.
      */
+    @NullUnmarked
     public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
         IClientConfig clientConfig = getRequestClientConfig(request);
         Long originTimeout = getOriginReadTimeout();

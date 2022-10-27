@@ -117,6 +117,7 @@ public class Server {
 
     private final Registry registry;
 
+    @SuppressWarnings("NullAway.Init")
     private ServerGroup serverGroup;
 
     private final ClientConnectionsShutdown clientConnectionsShutdown;
@@ -302,11 +303,13 @@ public class Server {
         @Nullable
         private EventLoopGroup clientToProxyBossPool;
 
+        @SuppressWarnings("NullAway.Init")
         private EventLoopGroup clientToProxyWorkerPool;
 
         @Nullable
         private Class<? extends ServerChannel> channelType;
 
+        @SuppressWarnings("NullAway.Init")
         private Map<ChannelOption<?>, ?> transportChannelOptions;
 
         private volatile boolean stopped = false;

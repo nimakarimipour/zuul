@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.netty.server.ssl;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.annotations.VisibleForTesting;
@@ -61,12 +62,14 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
     @VisibleForTesting
+    @NullUnmarked
     SslHandshakeInfoHandler() {
         spectatorRegistry = null;
         isSSlFromIntermediary = false;
     }
 
     @Override
+    @NullUnmarked
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof SslHandshakeCompletionEvent) {
             try {
@@ -148,6 +151,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
         return clientAuth;
     }
 
+    @NullUnmarked
     private void incrementCounters(SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.

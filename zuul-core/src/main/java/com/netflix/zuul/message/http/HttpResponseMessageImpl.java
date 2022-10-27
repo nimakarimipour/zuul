@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.message.http;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import com.netflix.config.DynamicIntProperty;
 import com.netflix.config.DynamicPropertyFactory;
@@ -159,6 +160,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage {
 
     @Override
     @Nullable
+    @NullUnmarked
     public HttpRequestInfo getInboundRequest() {
         return outboundRequest.getInboundRequest();
     }

@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.netty.server;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.exception.ZuulException;
@@ -227,6 +228,7 @@ public class OriginResponseReceiver extends ChannelDuplexHandler {
     protected void preWriteHook(ChannelHandlerContext ctx, HttpRequestMessage zuulReq) {
     }
 
+    @NullUnmarked
     private void fireWriteError(String requestPart, Throwable cause, ChannelHandlerContext ctx) throws Exception {
         String errMesg = "Error while proxying " + requestPart + " to origin ";
         if (edgeProxy != null) {

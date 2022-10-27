@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.netty.filter;
 
+import com.netflix.NullUnmarked;
 import com.google.common.base.Strings;
 import com.netflix.config.DynamicStringProperty;
 import com.netflix.netty.common.ByteBufUtil;
@@ -113,6 +114,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
     }
 
     @Override
+    @NullUnmarked
     public void filter(final HttpRequestMessage zuulReq, final HttpContent chunk) {
         if (zuulReq.getContext().isCancelled()) {
             chunk.release();

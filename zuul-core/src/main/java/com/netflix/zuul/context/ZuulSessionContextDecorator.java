@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.context;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import com.netflix.netty.common.metrics.HttpBodySizeRecordingChannelHandler;
 import com.netflix.util.UUIDFactory;
@@ -47,6 +48,7 @@ public class ZuulSessionContextDecorator implements SessionContextDecorator {
 
     @Override
     @Nullable
+    @NullUnmarked
     public SessionContext decorate(SessionContext ctx) {
         // TODO split out commons parts from BaseSessionContextDecorator
         ChannelHandlerContext nettyCtx = (ChannelHandlerContext) ctx.get(CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT);

@@ -49,6 +49,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     /* state */
     protected final AtomicBoolean destroyed;
 
+    @SuppressWarnings("NullAway.Init")
     private ChannelHandlerContext ctx;
 
     @Nullable

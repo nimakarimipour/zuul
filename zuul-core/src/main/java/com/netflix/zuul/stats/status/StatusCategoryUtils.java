@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.stats.status;
 
+import com.netflix.NullUnmarked;
 import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.message.ZuulMessage;
@@ -38,6 +39,7 @@ public class StatusCategoryUtils {
     }
 
     @Nullable
+    @NullUnmarked
     public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
         return ctx.get(CommonContextKeys.STATUS_CATGEORY);
     }

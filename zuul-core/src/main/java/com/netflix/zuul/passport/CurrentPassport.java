@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.passport;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Ticker;
@@ -115,6 +116,7 @@ public class CurrentPassport {
         return new CurrentPassport();
     }
 
+    @NullUnmarked
     public static CurrentPassport fromSessionContext(SessionContext ctx) {
         return ctx.get(CommonContextKeys.PASSPORT);
     }
@@ -451,6 +453,7 @@ class CountingCurrentPassport extends CurrentPassport {
         incrementStateCounter(state);
     }
 
+    @NullUnmarked
     private void incrementStateCounter(@Nullable PassportState state) {
         switch(state) {
             case IN_REQ_HEADERS_RECEIVED:

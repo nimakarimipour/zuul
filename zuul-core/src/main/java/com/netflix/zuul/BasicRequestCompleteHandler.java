@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul;
 
+import com.netflix.NullUnmarked;
 import com.netflix.zuul.message.http.HttpRequestInfo;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.context.SessionContext;
@@ -34,6 +35,7 @@ public class BasicRequestCompleteHandler implements RequestCompleteHandler {
     private RequestMetricsPublisher requestMetricsPublisher;
 
     @Override
+    @NullUnmarked
     public void handle(@Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response) {
         SessionContext context = inboundRequest.getContext();
         // Publish request-level metrics.

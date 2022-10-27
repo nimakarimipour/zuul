@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.context;
 
+import com.netflix.NullUnmarked;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.zuul.filters.FilterError;
@@ -135,6 +136,7 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
      * <p>This method exists for static analysis.
      */
     @Override
+    @NullUnmarked
     public Object get(Object key) {
         return super.get(key);
     }

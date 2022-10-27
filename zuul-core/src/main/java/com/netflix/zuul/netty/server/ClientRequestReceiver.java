@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.netty.server;
 
+import com.netflix.NullUnmarked;
 import javax.annotation.Nullable;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
@@ -236,6 +237,7 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
         debugInfo.forEach((dbg) -> LOG.debug(dbg));
     }
 
+    @NullUnmarked
     private void handleExpect100Continue(ChannelHandlerContext ctx, HttpRequest req) {
         if (HttpUtil.is100ContinueExpected(req)) {
             PerfMark.event("CRR.handleExpect100Continue");

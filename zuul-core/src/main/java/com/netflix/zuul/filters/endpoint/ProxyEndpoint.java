@@ -15,6 +15,7 @@
  */
 package com.netflix.zuul.filters.endpoint;
 
+import com.netflix.NullUnmarked;
 import static com.netflix.zuul.context.CommonContextKeys.ORIGIN_CHANNEL;
 import static com.netflix.zuul.netty.server.ClientRequestReceiver.ATTR_ZUUL_RESP;
 import static com.netflix.zuul.passport.PassportState.ORIGIN_CONN_ACQUIRE_END;
@@ -152,10 +153,12 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
 
     protected MethodBinding<?> methodBinding;
 
+    @SuppressWarnings("NullAway.Init")
     protected HttpResponseMessage zuulResponse;
 
     protected boolean startedSendingResponseToClient;
 
+    @SuppressWarnings("NullAway.Init")
     protected Duration timeLeftForAttempt;
 
     /* Individual retry related state */
@@ -171,10 +174,12 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
 
     protected int attemptNum;
 
+    @SuppressWarnings("NullAway.Init")
     protected RequestAttempt currentRequestAttempt;
 
     protected List<RequestStat> requestStats = new ArrayList<>();
 
+    @SuppressWarnings("NullAway.Init")
     protected RequestStat currentRequestStat;
 
     public static final Set<String> IDEMPOTENT_HTTP_METHODS = Sets.newHashSet("GET", "HEAD", "OPTIONS");
@@ -246,6 +251,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
 
     // Unlink OriginResponseReceiver from origin channel pipeline so that we no longer receive events
     @Nullable
+    @NullUnmarked
     private Channel unlinkFromOrigin() {
         if (originResponseReceiver != null) {
             originResponseReceiver.unlinkFromClientRequest();
@@ -263,6 +269,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         return origCh;
     }
 
+    @NullUnmarked
     public void finish(boolean error) {
         final Channel origCh = unlinkFromOrigin();
         while (concurrentReqCount > 0) {
@@ -331,6 +338,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
 
     @Override
     @Nullable
+    @NullUnmarked
     public HttpResponseMessage getDefaultOutput(final HttpRequestMessage input) {
         return null;
     }
@@ -382,6 +390,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         }
     }
 
+    @NullUnmarked
     private void storeAndLogOriginRequestInfo() {
         final Map<String, Object> eventProps = context.getEventProperties();
         // These two maps appear to be almost the same but are slightly different.   Also, the types in the map don't
@@ -416,6 +425,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         // override
     }
 
+    @NullUnmarked
     private void proxyRequestToOrigin() {
         Promise<PooledConnection> promise = null;
         try {
@@ -464,6 +474,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
     }
 
     @Override
+    @NullUnmarked
     public void operationComplete(final Future<PooledConnection> connectResult) {
         // MUST run this within bindingcontext to support ThreadVariables.
         try {
@@ -555,6 +566,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         return true;
     }
 
+    @NullUnmarked
     protected boolean isBelowRetryLimit() {
         int maxAllowedRetries = origin.getMaxRetriesForRequest(context);
         return (attemptNum <= maxAllowedRetries) && isRemoteZuulRetriesBelowRetryLimit(maxAllowedRetries);
@@ -579,6 +591,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         }
     }
 
+    @NullUnmarked
     private void processErrorFromOrigin(final Throwable ex, @Nullable final Channel origCh) {
         try {
             final SessionContext zuulCtx = context;
@@ -702,6 +715,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         }
     }
 
+    @NullUnmarked
     protected void handleOriginSuccessResponse(final HttpResponse originResponse, @Nullable DiscoveryResult chosenServer) {
         origin.recordSuccessResponse();
         if (originConn != null) {
@@ -722,6 +736,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         invokeNext(zuulResponse);
     }
 
+    @NullUnmarked
     private HttpResponseMessage buildZuulHttpResponse(final HttpResponse httpResponse, final StatusCategory statusCategory, final Throwable ex) {
         startedSendingResponseToClient = true;
         // Translate the netty HttpResponse into a zuul HttpResponseMessage.
@@ -769,6 +784,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
         return resp;
     }
 
+    @NullUnmarked
     protected void handleOriginNonSuccessResponse(final HttpResponse originResponse, @Nullable DiscoveryResult chosenServer) {
         final int respStatus = originResponse.status().code();
         OutboundException obe;
