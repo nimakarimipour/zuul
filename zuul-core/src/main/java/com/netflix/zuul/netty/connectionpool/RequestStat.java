@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.exception.ErrorType;
@@ -30,18 +30,16 @@ public interface RequestStat {
 
     String SESSION_CONTEXT_KEY = "niwsRequestStat";
 
-    static RequestStat putInSessionContext(RequestStat stat, SessionContext context)
-    {
+    static RequestStat putInSessionContext(RequestStat stat, SessionContext context) {
         context.put(SESSION_CONTEXT_KEY, stat);
         return stat;
     }
 
-    static RequestStat getFromSessionContext(SessionContext context)
-    {
+    static RequestStat getFromSessionContext(SessionContext context) {
         return (RequestStat) context.get(SESSION_CONTEXT_KEY);
     }
 
-    RequestStat server(DiscoveryResult server);
+    RequestStat server(@Nullable DiscoveryResult server);
 
     boolean isFinished();
 

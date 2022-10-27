@@ -13,16 +13,14 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.connectionpool;
 
+import javax.annotation.Nullable;
 import com.google.common.base.Stopwatch;
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.exception.ErrorType;
 import com.netflix.zuul.exception.OutboundErrorType;
-
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * @author michaels
@@ -30,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class BasicRequestStat implements RequestStat {
 
     private volatile boolean isFinished;
+
     private volatile Stopwatch stopwatch;
 
     public BasicRequestStat() {
@@ -38,7 +37,7 @@ public class BasicRequestStat implements RequestStat {
     }
 
     @Override
-    public RequestStat server(DiscoveryResult server) {
+    public RequestStat server(@Nullable DiscoveryResult server) {
         return this;
     }
 
@@ -74,7 +73,8 @@ public class BasicRequestStat implements RequestStat {
     }
 
     @Override
-    public void finalAttempt(boolean finalAttempt) {}
+    public void finalAttempt(boolean finalAttempt) {
+    }
 
     @Override
     public boolean finishIfNotAlready() {
@@ -82,9 +82,7 @@ public class BasicRequestStat implements RequestStat {
             return false;
         }
         stopwatch.stop();
-
         publishMetrics();
-
         isFinished = true;
         return true;
     }

@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.message.http;
 
+import javax.annotation.Nullable;
 import com.netflix.zuul.message.Headers;
 import com.netflix.zuul.message.ZuulMessage;
 import java.util.Optional;
@@ -25,8 +25,8 @@ import java.util.Optional;
  * Date: 7/15/15
  * Time: 1:18 PM
  */
-public interface HttpRequestInfo extends ZuulMessage
-{
+public interface HttpRequestInfo extends ZuulMessage {
+
     String getProtocol();
 
     String getMethod();
@@ -45,12 +45,14 @@ public interface HttpRequestInfo extends ZuulMessage
 
     int getPort();
 
+    @Nullable
     String getServerName();
 
     int getMaxBodySize();
 
     String getInfoForLogging();
 
+    @Nullable
     String getOriginalHost();
 
     String getOriginalScheme();
@@ -70,7 +72,9 @@ public interface HttpRequestInfo extends ZuulMessage
 
     String reconstructURI();
 
-    /** Parse and lazily cache the request cookies. */
+    /**
+     * Parse and lazily cache the request cookies.
+     */
     Cookies parseCookies();
 
     /**
