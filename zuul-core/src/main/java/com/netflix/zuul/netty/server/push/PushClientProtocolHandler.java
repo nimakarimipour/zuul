@@ -13,7 +13,6 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.server.push;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -25,8 +24,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  */
 public class PushClientProtocolHandler extends ChannelInboundHandlerAdapter {
 
+    @SuppressWarnings("NullAway.Init")
     protected PushUserAuth authEvent;
-
 
     protected boolean isAuthenticated() {
         return (authEvent != null && authEvent.isSuccess());
@@ -39,5 +38,4 @@ public class PushClientProtocolHandler extends ChannelInboundHandlerAdapter {
         }
         super.userEventTriggered(ctx, evt);
     }
-
 }

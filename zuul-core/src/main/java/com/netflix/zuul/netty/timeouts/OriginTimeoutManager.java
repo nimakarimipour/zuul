@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.timeouts;
 
+import com.netflix.NullUnmarked;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.client.config.CommonClientConfigKey;
 import com.netflix.client.config.DefaultClientConfigImpl;
@@ -44,8 +44,7 @@ public class OriginTimeoutManager {
     }
 
     @VisibleForTesting
-    static final DynamicLongProperty MAX_OUTBOUND_READ_TIMEOUT_MS =
-            new DynamicLongProperty("zuul.origin.readtimeout.max", Duration.ofSeconds(90).toMillis());
+    static final DynamicLongProperty MAX_OUTBOUND_READ_TIMEOUT_MS = new DynamicLongProperty("zuul.origin.readtimeout.max", Duration.ofSeconds(90).toMillis());
 
     /**
      * Derives the read timeout from the configuration.  This implementation prefers the longer of either the origin
@@ -58,11 +57,11 @@ public class OriginTimeoutManager {
      * @param request    the request.
      * @param attemptNum the attempt number, starting at 1.
      */
+    @NullUnmarked
     public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
         IClientConfig clientConfig = getRequestClientConfig(request);
         Long originTimeout = getOriginReadTimeout();
         Long requestTimeout = getRequestReadTimeout(clientConfig);
-
         long computedTimeout;
         if (originTimeout == null && requestTimeout == null) {
             computedTimeout = MAX_OUTBOUND_READ_TIMEOUT_MS.get();
@@ -72,7 +71,6 @@ public class OriginTimeoutManager {
             // return the stricter (i.e. lower) of the two timeouts
             computedTimeout = Math.min(originTimeout, requestTimeout);
         }
-
         // enforce max timeout upperbound
         return Duration.ofMillis(Math.min(computedTimeout, MAX_OUTBOUND_READ_TIMEOUT_MS.get()));
     }
@@ -89,7 +87,6 @@ public class OriginTimeoutManager {
             overriddenClientConfig = new DefaultClientConfigImpl();
             zuulRequest.getContext().put(CommonContextKeys.REST_CLIENT_CONFIG, overriddenClientConfig);
         }
-
         return overriddenClientConfig;
     }
 
@@ -98,9 +95,7 @@ public class OriginTimeoutManager {
      */
     @Nullable
     private Long getRequestReadTimeout(IClientConfig clientConfig) {
-        return Optional.ofNullable(clientConfig.get(CommonClientConfigKey.ReadTimeout))
-                .map(Long::valueOf)
-                .orElse(null);
+        return Optional.ofNullable(clientConfig.get(CommonClientConfigKey.ReadTimeout)).map(Long::valueOf).orElse(null);
     }
 
     /**
@@ -108,8 +103,6 @@ public class OriginTimeoutManager {
      */
     @Nullable
     private Long getOriginReadTimeout() {
-        return Optional.ofNullable(origin.getClientConfig().get(CommonClientConfigKey.ReadTimeout))
-                .map(Long::valueOf)
-                .orElse(null);
+        return Optional.ofNullable(origin.getClientConfig().get(CommonClientConfigKey.ReadTimeout)).map(Long::valueOf).orElse(null);
     }
 }

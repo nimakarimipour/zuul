@@ -22,7 +22,11 @@ package com.netflix.zuul;
  * Time: 1:56 PM
  */
 public class ZuulApplicationInfo {
+
+    @SuppressWarnings("NullAway.Init")
     public static String applicationName;
+
+    @SuppressWarnings("NullAway.Init")
     public static String stack;
 
     public static String getApplicationName() {

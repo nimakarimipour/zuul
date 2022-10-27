@@ -13,9 +13,9 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.netty.filter;
 
+import com.netflix.NullUnmarked;
 import com.netflix.netty.common.ByteBufUtil;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.impl.Preconditions;
@@ -27,7 +27,6 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
 import io.netty.handler.codec.http.HttpContent;
-
 import io.netty.util.ReferenceCountUtil;
 import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
@@ -43,12 +42,12 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
 
     private final ZuulFilter<T, T>[] filters;
 
-    public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier,
-                                 FilterRunner<T, ?> nextStage, Registry registry) {
+    public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, FilterRunner<T, ?> nextStage, Registry registry) {
         super(zuulFilters[0].filterType(), usageNotifier, nextStage, registry);
         this.filters = zuulFilters;
     }
 
+    @NullUnmarked
     public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
         this(zuulFilters, usageNotifier, null, registry);
     }
@@ -76,22 +75,20 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         try {
             Preconditions.checkNotNull(mesg, "Input message");
             int i = runningFilterIdx.get();
-
             while (i < filters.length) {
                 final ZuulFilter<T, T> filter = filters[i];
                 filterName = filter.filterName();
                 final T outMesg = filter(filter, inMesg);
                 if (outMesg == null) {
-                    return; //either async filter or waiting for the message body to be buffered
+                    // either async filter or waiting for the message body to be buffered
+                    return;
                 }
                 inMesg = outMesg;
                 i = runningFilterIdx.incrementAndGet();
             }
-
-            //Filter chain has reached its end, pass result to the next stage
+            // Filter chain has reached its end, pass result to the next stage
             invokeNextStage(inMesg);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             handleException(inMesg, filterName, ex);
         }
     }
@@ -102,20 +99,19 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         try (TaskCloseable ignored = PerfMark.traceTask(this, s -> s.getClass().getSimpleName() + ".filterChunk")) {
             addPerfMarkTags(inMesg);
             Preconditions.checkNotNull(inMesg, "input message");
-
             final AtomicInteger runningFilterIdx = getRunningFilterIndex(inMesg);
             final int limit = runningFilterIdx.get();
             for (int i = 0; i < limit; i++) {
                 final ZuulFilter<T, T> filter = filters[i];
                 filterName = filter.filterName();
-                if ((! filter.isDisabled()) && (! shouldSkipFilter(inMesg, filter))) {
+                if ((!filter.isDisabled()) && (!shouldSkipFilter(inMesg, filter))) {
                     ByteBufUtil.touch(chunk, "Filter runner processing chunk, filter: " + filter.filterName());
                     final HttpContent newChunk = filter.processContentChunk(inMesg, chunk);
-                    if (newChunk == null)  {
-                        //Filter wants to break the chain and stop propagating this chunk any further
+                    if (newChunk == null) {
+                        // Filter wants to break the chain and stop propagating this chunk any further
                         return;
                     }
-                    //deallocate original chunk if necessary
+                    // deallocate original chunk if necessary
                     if ((newChunk != chunk) && (chunk.refCnt() > 0)) {
                         ByteBufUtil.touch(chunk, "Filter runner processing newChunk, filter: " + filter.filterName());
                         chunk.release(chunk.refCnt());
@@ -123,17 +119,14 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
                     chunk = newChunk;
                 }
             }
-
             if (limit >= filters.length) {
-                //Filter chain has run to end, pass down the channel pipeline
+                // Filter chain has run to end, pass down the channel pipeline
                 ByteBufUtil.touch(chunk, "Filter runner chain complete, message: ", inMesg);
                 invokeNextStage(inMesg, chunk);
             } else {
                 ByteBufUtil.touch(chunk, "Filter runner buffering chunk, message: ", inMesg);
                 inMesg.bufferBodyContents(chunk);
-
                 boolean isAwaitingBody = isFilterAwaitingBody(inMesg.getContext());
-
                 // Record passport states for start and end of buffering bodies.
                 if (isAwaitingBody) {
                     CurrentPassport passport = CurrentPassport.fromSessionContext(inMesg.getContext());
@@ -143,8 +136,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
                         } else if (inMesg instanceof HttpResponseMessage) {
                             passport.addIfNotAlready(PassportState.FILTERS_OUTBOUND_BUF_END);
                         }
-                    }
-                    else {
+                    } else {
                         if (inMesg instanceof HttpRequestMessage) {
                             passport.addIfNotAlready(PassportState.FILTERS_INBOUND_BUF_START);
                         } else if (inMesg instanceof HttpResponseMessage) {
@@ -152,15 +144,13 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
                         }
                     }
                 }
-
                 if (isAwaitingBody && inMesg.hasCompleteBody()) {
-                    //whole body has arrived, resume filter chain
+                    // whole body has arrived, resume filter chain
                     ByteBufUtil.touch(chunk, "Filter body complete, resume chain, ZuulMessage: ", inMesg);
                     runFilters(inMesg, runningFilterIdx);
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ReferenceCountUtil.safeRelease(chunk);
             handleException(inMesg, filterName, ex);
         }

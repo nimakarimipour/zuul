@@ -13,12 +13,11 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-
 package com.netflix.zuul.exception;
 
+import com.netflix.NullUnmarked;
 import com.netflix.zuul.niws.RequestAttempt;
 import com.netflix.zuul.niws.RequestAttempts;
-
 
 /**
  * Outbound Exception Decorator
@@ -27,13 +26,13 @@ import com.netflix.zuul.niws.RequestAttempts;
  * Date: 10/21/15
  * Time: 11:46 AM
  */
-public class OutboundException extends ZuulException
-{
+public class OutboundException extends ZuulException {
+
     private final ErrorType outboundErrorType;
+
     private final RequestAttempts requestAttempts;
 
-    public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts)
-    {
+    public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts) {
         super(outboundErrorType.toString(), outboundErrorType.toString(), true);
         this.outboundErrorType = outboundErrorType;
         this.requestAttempts = requestAttempts;
@@ -41,8 +40,8 @@ public class OutboundException extends ZuulException
         this.dontLogAsError();
     }
 
-    public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts, Throwable cause)
-    {
+    @NullUnmarked
+    public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts, Throwable cause) {
         super(outboundErrorType.toString(), cause.getMessage(), true);
         this.outboundErrorType = outboundErrorType;
         this.requestAttempts = requestAttempts;
@@ -50,15 +49,12 @@ public class OutboundException extends ZuulException
         this.dontLogAsError();
     }
 
-    public RequestAttempt getFinalRequestAttempt()
-    {
+    @NullUnmarked
+    public RequestAttempt getFinalRequestAttempt() {
         return requestAttempts == null ? null : requestAttempts.getFinalAttempt();
     }
 
-
-    public ErrorType getOutboundErrorType()
-    {
+    public ErrorType getOutboundErrorType() {
         return outboundErrorType;
     }
-
 }
