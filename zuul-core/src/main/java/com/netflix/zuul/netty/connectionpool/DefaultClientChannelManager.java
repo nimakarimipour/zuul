@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -93,8 +94,8 @@ public class DefaultClientChannelManager implements ClientChannelManager {
 
     private final ConcurrentHashMap<DiscoveryResult, IConnectionPool> perServerPools;
 
-    private NettyClientConnectionFactory clientConnFactory;
-    private OriginChannelInitializer channelInitializer;
+    @SuppressWarnings("NullAway.Init") private NettyClientConnectionFactory clientConnFactory;
+    @SuppressWarnings("NullAway.Init") private OriginChannelInitializer channelInitializer;
 
     public static final String IDLE_STATE_HANDLER_NAME = "idleStateHandler";
 
@@ -325,7 +326,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
         return acquire(eventLoop, null, CurrentPassport.create(), new AtomicReference<>(), new AtomicReference<>());
     }
 
-    @Override
+    @NullUnmarked @Override
     public Promise<PooledConnection> acquire(
             EventLoop eventLoop,
             @Nullable Object key,

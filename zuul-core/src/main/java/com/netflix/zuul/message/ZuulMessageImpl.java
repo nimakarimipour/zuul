@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -114,7 +115,7 @@ public class ZuulMessageImpl implements ZuulMessage
         headers.set(HttpHeaderNames.CONTENT_LENGTH, Integer.toString(length));
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBodyAsText(String bodyText) {
         disposeBufferedBody();
         if (! Strings.isNullOrEmpty(bodyText)) {
@@ -127,7 +128,7 @@ public class ZuulMessageImpl implements ZuulMessage
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBody(byte[] body) {
         disposeBufferedBody();
         if (body != null && body.length > 0) {
@@ -140,13 +141,13 @@ public class ZuulMessageImpl implements ZuulMessage
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public String getBodyAsText() {
         final byte[] body = getBody();
         return (body != null && body.length > 0) ? new String(getBody(), Charsets.UTF_8) : null;
     }
 
-    @Override
+    @NullUnmarked @Override
     public byte[] getBody() {
         if (bodyChunks.size() == 0) {
             return null;

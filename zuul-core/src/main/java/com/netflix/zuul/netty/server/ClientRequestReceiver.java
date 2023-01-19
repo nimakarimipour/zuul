@@ -74,6 +74,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 
 /**
@@ -95,8 +96,8 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
 
     private final SessionContextDecorator decorator;
 
-    private HttpRequestMessage zuulRequest;
-    private HttpRequest clientRequest;
+    @SuppressWarnings("NullAway.Init") private HttpRequestMessage zuulRequest;
+    @SuppressWarnings("NullAway.Init") private HttpRequest clientRequest;
 
 
     public ClientRequestReceiver(SessionContextDecorator decorator) {
@@ -206,7 +207,7 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof CompleteEvent) {
             final CompleteReason reason = ((CompleteEvent) evt).getReason();
@@ -419,7 +420,7 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
         return headers;
     }
 
-    public static HttpQueryParams copyQueryParams(final HttpRequest nativeRequest) {
+    @NullUnmarked public static HttpQueryParams copyQueryParams(final HttpRequest nativeRequest) {
         final String uri = nativeRequest.uri();
         int queryStart = uri.indexOf('?');
         final String query = queryStart == -1 ? null : uri.substring(queryStart + 1);

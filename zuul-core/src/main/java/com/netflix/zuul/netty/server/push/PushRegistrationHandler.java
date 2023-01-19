@@ -42,12 +42,12 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     protected final PushProtocol pushProtocol;
 
     /* Identity */
-    private volatile PushUserAuth authEvent;
+    @SuppressWarnings("NullAway.Init") private volatile PushUserAuth authEvent;
 
     /* state */
     protected final AtomicBoolean destroyed;
-    private ChannelHandlerContext ctx;
-    private volatile PushConnection pushConnection;
+    @SuppressWarnings("NullAway.Init") private ChannelHandlerContext ctx;
+    @SuppressWarnings("NullAway.Init") private volatile PushConnection pushConnection;
     private final List<ScheduledFuture<?>> scheduledFutures;
 
     public static final CachedDynamicIntProperty PUSH_REGISTRY_TTL = new CachedDynamicIntProperty("zuul.push.registry.ttl.seconds", 30 * 60);

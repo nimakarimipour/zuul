@@ -45,6 +45,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * Serves "/push" URL that is used by the backend to POST push messages to a given Zuul instance. This URL handler
@@ -92,7 +93,7 @@ public abstract class PushMessageSender  extends SimpleChannelInboundHandler<Ful
     }
 
 
-        @Override
+        @NullUnmarked @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
         if (!request.decoderResult().isSuccess()) {
             sendHttpResponse(ctx, request, BAD_REQUEST, null);

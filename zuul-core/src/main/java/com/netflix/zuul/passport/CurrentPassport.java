@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 
 public class CurrentPassport
@@ -124,7 +125,7 @@ public class CurrentPassport
         return new CurrentPassport();
     }
 
-    public static CurrentPassport fromSessionContext(SessionContext ctx)
+    @NullUnmarked public static CurrentPassport fromSessionContext(SessionContext ctx)
     {
         return ctx.get(CommonContextKeys.PASSPORT);
     }
@@ -160,7 +161,7 @@ public class CurrentPassport
         ch.attr(CHANNEL_ATTR).set(null);
     }
 
-    public PassportState getState() {
+    @NullUnmarked public PassportState getState() {
         try (Unlocker ignored = lock()){
             PassportItem passportItem = history.peekLast();
             return passportItem != null ? passportItem.getState() : null;
@@ -323,7 +324,7 @@ public class CurrentPassport
         return items;
     }
 
-    public PassportItem findState(PassportState state)
+    @NullUnmarked public PassportItem findState(PassportState state)
     {
         try (Unlocker ignored = lock()) {
             for (PassportItem item : history) {
@@ -335,7 +336,7 @@ public class CurrentPassport
         return null;
     }
 
-    public PassportItem findStateBackwards(PassportState state)
+    @NullUnmarked public PassportItem findStateBackwards(PassportState state)
     {
         try (Unlocker ignored = lock()) {
             Iterator itr = history.descendingIterator();
@@ -413,7 +414,7 @@ public class CurrentPassport
         }
     }
 
-    @VisibleForTesting
+    @NullUnmarked @VisibleForTesting
     public static CurrentPassport parseFromToString(String text)
     {
         CurrentPassport passport = null;

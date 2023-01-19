@@ -25,7 +25,7 @@ package com.netflix.zuul.stats.monitoring;
 public class MonitorRegistry {
 
     private static  final MonitorRegistry instance = new MonitorRegistry();
-    private Monitor publisher;
+    @SuppressWarnings("NullAway.Init") private Monitor publisher;
 
     /**
      * A Monitor implementation should be set here

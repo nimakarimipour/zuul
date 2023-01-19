@@ -59,6 +59,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
+import com.netflix.NullUnmarked;
 
 /**
  * Created by saroskar on 2/26/17.
@@ -76,7 +77,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
     private boolean closeConnection;
 
     //data
-    private HttpResponseMessage zuulResponse;
+    @SuppressWarnings("NullAway.Init") private HttpResponseMessage zuulResponse;
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientResponseWriter.class);
 
@@ -211,7 +212,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
         return nativeResponse;
     }
 
-    @Override
+    @NullUnmarked @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof StartEvent) {
             isHandlingRequest = true;

@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -174,7 +175,7 @@ public class PerServerConnectionPool implements IConnectionPool
         return promise;
     }
 
-    public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
+    @NullUnmarked public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
     {
         PooledConnection conn;
         Deque<PooledConnection> connections = getPoolForEventLoop(eventLoop);
@@ -270,7 +271,7 @@ public class PerServerConnectionPool implements IConnectionPool
         return connectionFactory.connect(eventLoop, serverAddr, passport);
     }
 
-    protected void handleConnectCompletion(
+    @NullUnmarked protected void handleConnectCompletion(
             ChannelFuture cf, Promise<PooledConnection> callerPromise, CurrentPassport passport) {
         connCreationsInProgress.decrementAndGet();
         

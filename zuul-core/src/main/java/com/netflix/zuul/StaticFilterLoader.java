@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * An immutable static collection of filters.
@@ -141,12 +142,12 @@ public final class StaticFilterLoader implements FilterLoader {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    @NullUnmarked @Override
     public SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType) {
         return filtersByType.get(filterType);
     }
 
-    @Override
+    @NullUnmarked @Override
     @Nullable
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         Map<String, ZuulFilter<?, ?>> filtersByName = filtersByTypeAndName.get(type);

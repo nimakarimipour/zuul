@@ -14,6 +14,7 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.exception;
+import com.netflix.NullUnmarked;
 
 /**
  * All handled exceptions in Zuul are ZuulExceptions
@@ -47,7 +48,7 @@ public class ZuulException extends RuntimeException
         this(sMessage, errorCause, false);
     }
 
-    public ZuulException(String sMessage, String errorCause, boolean noStackTrace) {
+    @NullUnmarked public ZuulException(String sMessage, String errorCause, boolean noStackTrace) {
         super(sMessage, null, noStackTrace, ! noStackTrace);
         this.errorCause = errorCause;
     }

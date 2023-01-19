@@ -23,6 +23,7 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class StatusCategoryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(StatusCategoryUtils.class);
 
-    public static StatusCategory getStatusCategory(ZuulMessage msg) {
+    @NullUnmarked public static StatusCategory getStatusCategory(ZuulMessage msg) {
         return getStatusCategory(msg.getContext());
     }
 
