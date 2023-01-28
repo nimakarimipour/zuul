@@ -14,6 +14,7 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.context;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com

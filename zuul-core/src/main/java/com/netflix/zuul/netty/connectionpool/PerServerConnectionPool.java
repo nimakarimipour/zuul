@@ -174,7 +174,7 @@ public class PerServerConnectionPool implements IConnectionPool
         return promise;
     }
 
-    public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
+    @Nullable public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
     {
         PooledConnection conn;
         Deque<PooledConnection> connections = getPoolForEventLoop(eventLoop);

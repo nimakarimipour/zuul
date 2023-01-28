@@ -18,6 +18,7 @@ package com.netflix.zuul.netty.filter;
 
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.handler.codec.http.HttpContent;
+import javax.annotation.Nullable;
 
 /**
  * Created by saroskar on 5/18/17.

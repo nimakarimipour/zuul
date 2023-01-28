@@ -17,6 +17,7 @@
 package com.netflix.zuul.message.http;
 
 import io.netty.handler.codec.http.Cookie;
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
@@ -40,7 +41,7 @@ public interface HttpResponseMessage extends HttpResponseInfo
     HttpRequestMessage getOutboundRequest();
 
     /** The immutable response that was received from Origin. */
-    HttpResponseInfo getInboundResponse();
+    @Nullable HttpResponseInfo getInboundResponse();
 
     /** This should be called after response received from Origin, to store
      * a copy of the response as-is. */

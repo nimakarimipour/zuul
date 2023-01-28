@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 /**
  * This class manages the directory polling for changes and new Groovy filters.
@@ -50,7 +51,7 @@ public class FilterFileManager {
     private static final DynamicIntProperty FILE_PROCESSOR_THREADS = new DynamicIntProperty("zuul.filterloader.threads", 1);
     private static final DynamicIntProperty FILE_PROCESSOR_TASKS_TIMEOUT_SECS = new DynamicIntProperty("zuul.filterloader.tasks.timeout", 120);
 
-    Thread poller;
+    @Nullable Thread poller;
     boolean bRunning = true;
 
     private final FilterFileManagerConfig config;
