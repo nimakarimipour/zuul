@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
+import javax.annotation.Nullable;
 
 /**
  * Stores info about the client and server's SSL certificates in the context, after a successful handshake.
@@ -169,7 +170,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void incrementCounters(
-            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.
             return;

@@ -14,6 +14,7 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.stats.monitoring;
+import javax.annotation.Nullable;
 
 /**
  * Registry to register a Counter. a Monitor publisher should  be set to get counter information.
@@ -25,7 +26,7 @@ package com.netflix.zuul.stats.monitoring;
 public class MonitorRegistry {
 
     private static  final MonitorRegistry instance = new MonitorRegistry();
-    private Monitor publisher;
+    @Nullable private Monitor publisher;
 
     /**
      * A Monitor implementation should be set here

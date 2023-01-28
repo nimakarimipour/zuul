@@ -18,6 +18,7 @@ package com.netflix.zuul.netty.connectionpool;
 
 
 import com.netflix.zuul.exception.ErrorType;
+import javax.annotation.Nullable;
 
 /**
  * Wrapper for exceptions failing to connect to origin with details on which server failed the attempt.
@@ -32,7 +33,7 @@ public class OriginConnectException extends Exception {
         this.errorType = errorType;
     }
 
-    public OriginConnectException(String message, Throwable cause, ErrorType errorType) {
+    public OriginConnectException(@Nullable String message, Throwable cause, ErrorType errorType) {
         // ensure this exception does not fill its stacktrace, this causes a 10x slowdown
         super(message, cause, true, false);
         this.errorType = errorType;

@@ -29,6 +29,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels
@@ -44,7 +45,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
     private ZuulMessage message;
     private HttpRequestMessage outboundRequest;
     private int status;
-    private HttpResponseInfo inboundResponse = null;
+    @Nullable private HttpResponseInfo inboundResponse = null;
 
     public HttpResponseMessageImpl(SessionContext context, HttpRequestMessage request, int status)
     {
@@ -102,21 +103,21 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
     }
 
     @Override
-    public void setBodyAsText(String bodyText) {
+    public void setBodyAsText(@Nullable String bodyText) {
         message.setBodyAsText(bodyText);
     }
 
     @Override
-    public void setBody(byte[] body) {
+    public void setBody(@Nullable byte[] body) {
         message.setBody(body);
     }
 
-    @Override
+    @Nullable @Override
     public String getBodyAsText() {
         return message.getBodyAsText();
     }
 
-    @Override
+    @Nullable @Override
     public byte[] getBody() {
         return message.getBody();
     }
@@ -290,7 +291,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
         inboundResponse = copyResponseInfo();
     }
 
-    @Override
+    @Nullable @Override
     public HttpResponseInfo getInboundResponse()
     {
         return inboundResponse;

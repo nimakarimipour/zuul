@@ -181,7 +181,7 @@ public final class Headers {
      *
      * If value is {@code null}, then not added, but any existing header of same name is removed.
      */
-    public void set(HeaderName headerName, String value) {
+    public void set(HeaderName headerName, @Nullable String value) {
         String normalName = requireNonNull(headerName, "headerName").getNormalised();
         setNormal(headerName.getName(), normalName, value);
     }
@@ -236,7 +236,7 @@ public final class Headers {
         setNormal(validateField(headerName.getName()), validateField(normalName), validateField(value));
     }
 
-    private void setNormal(String originalName, String normalName, @Nullable String value) {
+    private void setNormal(@Nullable String originalName, @Nullable String normalName, @Nullable String value) {
         int i = findNormal(normalName);
         if (i == ABSENT) {
             if (value != null) {
@@ -255,7 +255,7 @@ public final class Headers {
     /**
      * Returns the first index entry that has a matching name.  Returns {@link #ABSENT} if absent.
      */
-    private int findNormal(String normalName) {
+    private int findNormal(@Nullable String normalName) {
         for (int i = 0; i < size(); i++) {
             if (name(i).equals(normalName)) {
                 return i;
@@ -267,7 +267,7 @@ public final class Headers {
     /**
      * Removes entries that match the name, starting at the given index.
      */
-    private void clearMatchingStartingAt(int i, String normalName, @Nullable Collection<? super String> removed) {
+    private void clearMatchingStartingAt(int i, @Nullable String normalName, @Nullable Collection<? super String> removed) {
         // This works by having separate read and write indexes, that iterate along the list.
         // Values that don't match are moved to the front, leaving garbage values in place.
         // At the end, all values at and values are garbage and are removed.
@@ -596,7 +596,7 @@ public final class Headers {
         return originalNames.get(i);
     }
 
-    private void originalName(int i, String originalName) {
+    private void originalName(int i, @Nullable String originalName) {
         originalNames.set(i, originalName);
     }
 
@@ -616,7 +616,7 @@ public final class Headers {
         values.set(i, val);
     }
 
-    private void addNormal(String originalName, String normalName, String value) {
+    private void addNormal(@Nullable String originalName, @Nullable String normalName, @Nullable String value) {
         originalNames.add(originalName);
         names.add(normalName);
         values.add(value);
@@ -648,7 +648,7 @@ public final class Headers {
      * Checks if the input value is compliant with our RFC 7230 based check
      * Returns input value if valid, raises ZuulException otherwise
      */
-    private static String validateField(@Nullable String value) {
+    @Nullable private static String validateField(@Nullable String value) {
         if (value != null) {
             int pos = findInvalid(value);
             if (pos != ABSENT) {
