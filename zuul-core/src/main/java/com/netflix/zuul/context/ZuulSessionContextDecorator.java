@@ -27,6 +27,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.annotation.Nullable;
 
 /**
  * Base Session Context Decorator
@@ -46,7 +47,7 @@ public class ZuulSessionContextDecorator implements SessionContextDecorator {
         this.originManager = originManager;
     }
 
-    @Override
+    @Nullable @Override
     public SessionContext decorate(SessionContext ctx) {
         // TODO split out commons parts from BaseSessionContextDecorator
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
@@ -49,12 +50,12 @@ public class Cookies
         return all;
     }
 
-    public List<Cookie> get(String name)
+    @Nullable public List<Cookie> get(String name)
     {
         return map.get(name);
     }
 
-    public Cookie getFirst(String name)
+    @Nullable public Cookie getFirst(String name)
     {
         List<Cookie> found = map.get(name);
         if (found == null || found.size() == 0) {
@@ -63,7 +64,7 @@ public class Cookies
         return found.get(0);
     }
 
-    public String getFirstValue(String name)
+    @Nullable public String getFirstValue(String name)
     {
         Cookie c = getFirst(name);
         String value;

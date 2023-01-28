@@ -17,6 +17,7 @@
 package com.netflix.zuul.message.http;
 
 import com.netflix.zuul.message.ZuulMessage;
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
@@ -39,7 +40,7 @@ public interface HttpRequestMessage extends HttpRequestInfo
 
     void storeInboundRequest();
 
-    HttpRequestInfo getInboundRequest();
+    @Nullable HttpRequestInfo getInboundRequest();
 
     void setQueryParams(HttpQueryParams queryParams);
 }
