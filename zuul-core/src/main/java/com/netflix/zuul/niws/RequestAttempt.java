@@ -31,6 +31,7 @@ import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import io.netty.handler.timeout.ReadTimeoutException;
 
 import javax.net.ssl.SSLHandshakeException;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com
@@ -44,17 +45,17 @@ public class RequestAttempt
     private int attempt;
     private int status;
     private long duration;
-    private String cause;
-    private String error;
-    private String exceptionType;
-    private String app;
-    private String asg;
-    private String instanceId;
-    private String host;
+    @Nullable private String cause;
+    @Nullable private String error;
+    @Nullable private String exceptionType;
+    @Nullable private String app;
+    @Nullable private String asg;
+    @Nullable private String instanceId;
+    @Nullable private String host;
     private int port;
-    private String vip;
-    private String region;
-    private String availabilityZone;
+    @Nullable private String vip;
+    @Nullable private String region;
+    @Nullable private String availabilityZone;
     private long readTimeout;
     private int connectTimeout;
     private int maxRetries;
@@ -157,7 +158,7 @@ public class RequestAttempt
         return attempt;
     }
 
-    public String getVip()
+    @Nullable public String getVip()
     {
         return vip;
     }
@@ -170,24 +171,24 @@ public class RequestAttempt
         return this.duration;
     }
 
-    public String getError() {
+    @Nullable public String getError() {
         return error;
     }
 
-    public String getApp()
+    @Nullable public String getApp()
     {
         return app;
     }
 
-    public String getAsg() {
+    @Nullable public String getAsg() {
         return asg;
     }
 
-    public String getInstanceId() {
+    @Nullable public String getInstanceId() {
         return instanceId;
     }
 
-    public String getHost() {
+    @Nullable public String getHost() {
         return host;
     }
 
@@ -195,16 +196,16 @@ public class RequestAttempt
         return port;
     }
 
-    public String getRegion()
+    @Nullable public String getRegion()
     {
         return region;
     }
 
-    public String getAvailabilityZone() {
+    @Nullable public String getAvailabilityZone() {
         return availabilityZone;
     }
 
-    public String getExceptionType()
+    @Nullable public String getExceptionType()
     {
         return exceptionType;
     }
@@ -369,7 +370,7 @@ public class RequestAttempt
         return root;
     }
 
-    private static ObjectNode putNullableAttribute(ObjectNode node, String name, String value)
+    private static ObjectNode putNullableAttribute(ObjectNode node, String name, @Nullable String value)
     {
         if (value != null) {
             node.put(name, value);

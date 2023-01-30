@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.Nullable;
 
 /**
  * Author: Susheel Aroskar
@@ -42,12 +43,12 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     protected final PushProtocol pushProtocol;
 
     /* Identity */
-    private volatile PushUserAuth authEvent;
+    @Nullable private volatile PushUserAuth authEvent;
 
     /* state */
     protected final AtomicBoolean destroyed;
-    private ChannelHandlerContext ctx;
-    private volatile PushConnection pushConnection;
+    @Nullable private ChannelHandlerContext ctx;
+    @Nullable private volatile PushConnection pushConnection;
     private final List<ScheduledFuture<?>> scheduledFutures;
 
     public static final CachedDynamicIntProperty PUSH_REGISTRY_TTL = new CachedDynamicIntProperty("zuul.push.registry.ttl.seconds", 30 * 60);
@@ -193,7 +194,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    @VisibleForTesting
+    @Nullable @VisibleForTesting
     PushConnection getPushConnection() {
         return pushConnection;
     }

@@ -14,6 +14,7 @@
  *      limitations under the License.
  */
 package com.netflix.zuul.context;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com
@@ -21,5 +22,5 @@ package com.netflix.zuul.context;
  * Time: 4:09 PM
  */
 public interface SessionContextDecorator {
-    public SessionContext decorate(SessionContext ctx);
+    @Nullable public SessionContext decorate(SessionContext ctx);
 }

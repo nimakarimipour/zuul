@@ -49,6 +49,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 
 /**
  * Netty Origin basic implementation that can be used for most apps, with the more complex methods having no-op
@@ -130,7 +131,7 @@ public class BasicNettyOrigin implements NettyOrigin {
         return new RequestAttempt(server, config, attemptNum, config.get(CommonClientConfigKey.ReadTimeout));
     }
 
-    @Override
+    @Nullable @Override
     public String getIpAddrFromServer(DiscoveryResult discoveryResult) {
         final Optional<String> ipAddr = discoveryResult.getIPAddr();
         return ipAddr.isPresent() ? ipAddr.get() : null;

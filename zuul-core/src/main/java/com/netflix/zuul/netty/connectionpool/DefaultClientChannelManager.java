@@ -93,8 +93,8 @@ public class DefaultClientChannelManager implements ClientChannelManager {
 
     private final ConcurrentHashMap<DiscoveryResult, IConnectionPool> perServerPools;
 
-    private NettyClientConnectionFactory clientConnFactory;
-    private OriginChannelInitializer channelInitializer;
+    @Nullable private NettyClientConnectionFactory clientConnFactory;
+    @Nullable private OriginChannelInitializer channelInitializer;
 
     public static final String IDLE_STATE_HANDLER_NAME = "idleStateHandler";
 
@@ -377,7 +377,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
 
     protected IConnectionPool createConnectionPool(
             DiscoveryResult discoveryResult, SocketAddress serverAddr,
-            NettyClientConnectionFactory clientConnFactory, PooledConnectionFactory pcf,
+            @Nullable NettyClientConnectionFactory clientConnFactory, PooledConnectionFactory pcf,
             ConnectionPoolConfig connPoolConfig, IClientConfig clientConfig, Counter createNewConnCounter,
             Counter createConnSucceededCounter, Counter createConnFailedCounter, Counter requestConnCounter,
             Counter reuseConnCounter, Counter connTakenFromPoolIsNotOpen, Counter closeAbovePoolHighWaterMarkCounter, Counter maxConnsPerHostExceededCounter,

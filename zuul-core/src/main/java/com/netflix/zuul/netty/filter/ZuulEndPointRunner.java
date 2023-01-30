@@ -82,7 +82,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
     }
 
     @Override
-    public void filter(final HttpRequestMessage zuulReq) {
+    public void filter(@Nullable final HttpRequestMessage zuulReq) {
         if (zuulReq.getContext().isCancelled()) {
             PerfMark.event(getClass().getName(), "filterCancelled");
             zuulReq.disposeBufferedBody();
@@ -160,7 +160,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         }
     }
 
-    protected String getEndPointName(final SessionContext zuulCtx) {
+    @Nullable protected String getEndPointName(final SessionContext zuulCtx) {
         if (zuulCtx.shouldSendErrorResponse()) {
             zuulCtx.setShouldSendErrorResponse(false);
             zuulCtx.setErrorResponseSent(true);
@@ -171,7 +171,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         }
     }
 
-    protected ZuulFilter<HttpRequestMessage, HttpResponseMessage> getEndpoint(final String endpointName,
+    protected ZuulFilter<HttpRequestMessage, HttpResponseMessage> getEndpoint(@Nullable final String endpointName,
                 final HttpRequestMessage zuulRequest) {
         final SessionContext zuulCtx = zuulRequest.getContext();
 
@@ -205,7 +205,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         return new ProxyEndpoint(zuulRequest, getChannelHandlerContext(zuulRequest), getNextStage(), MethodBinding.NO_OP_BINDING);
     }
 
-    protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(String endpointName) {
+    @Nullable protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(String endpointName) {
         return (Endpoint<I, O>) filterLoader.getFilterByNameAndType(endpointName, FilterType.ENDPOINT);
     }
 
