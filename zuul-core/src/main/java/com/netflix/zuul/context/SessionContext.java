@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Represents the context between client and origin server for the duration of the dedicated connection/session
@@ -43,7 +44,7 @@ import javax.annotation.Nullable;
  * Date: 4/28/15
  * Time: 6:45 PM
  */
-public final class SessionContext extends HashMap<String, Object> implements Cloneable {
+@NullUnmarked public final class SessionContext extends HashMap<String, Object> implements Cloneable {
     private static final int INITIAL_SIZE =
             DynamicPropertyFactory.getInstance().getIntProperty("com.netflix.zuul.context.SessionContext.initialSize", 60).get();
 
@@ -125,7 +126,7 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
      *
      * <p>This method exists for static analysis.
      */
-    @Override
+    @NullUnmarked @Override
     public Object get(Object key) {
         return super.get(key);
     }

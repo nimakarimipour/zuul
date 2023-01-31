@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 
 public class CurrentPassport
@@ -125,7 +126,7 @@ public class CurrentPassport
         return new CurrentPassport();
     }
 
-    public static CurrentPassport fromSessionContext(SessionContext ctx)
+    @NullUnmarked public static CurrentPassport fromSessionContext(SessionContext ctx)
     {
         return ctx.get(CommonContextKeys.PASSPORT);
     }
@@ -498,7 +499,7 @@ class CountingCurrentPassport extends CurrentPassport
         incrementStateCounter(state);
     }
 
-    private void incrementStateCounter(@Nullable PassportState state)
+    @NullUnmarked private void incrementStateCounter(@Nullable PassportState state)
     {
         switch (state) {
             case IN_REQ_HEADERS_RECEIVED:

@@ -20,6 +20,7 @@ import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.exception.ErrorType;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Request Stat
@@ -27,7 +28,7 @@ import javax.annotation.Nullable;
  * Author: Arthur Gonigberg
  * Date: November 29, 2017
  */
-public interface RequestStat {
+@NullUnmarked public interface RequestStat {
 
     String SESSION_CONTEXT_KEY = "niwsRequestStat";
 

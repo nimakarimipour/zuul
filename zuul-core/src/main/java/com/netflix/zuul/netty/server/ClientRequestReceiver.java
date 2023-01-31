@@ -75,6 +75,7 @@ import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 
 /**
@@ -274,7 +275,7 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
         debugInfo.forEach((dbg) -> LOG.debug(dbg));
     }
 
-    private void handleExpect100Continue(ChannelHandlerContext ctx, HttpRequest req) {
+    @NullUnmarked private void handleExpect100Continue(ChannelHandlerContext ctx, HttpRequest req) {
         if (HttpUtil.is100ContinueExpected(req)) {
             PerfMark.event("CRR.handleExpect100Continue");
             final ChannelFuture f = ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));

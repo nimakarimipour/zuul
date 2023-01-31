@@ -30,6 +30,7 @@ import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels
@@ -157,7 +158,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
         message.disposeBufferedBody();
     }
 
-    @Nullable @Override
+    @NullUnmarked @Nullable @Override
     public HttpRequestInfo getInboundRequest() {
         return outboundRequest.getInboundRequest();
     }

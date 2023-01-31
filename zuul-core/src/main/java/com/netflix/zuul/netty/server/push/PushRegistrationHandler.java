@@ -47,7 +47,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
     /* state */
     protected final AtomicBoolean destroyed;
-    private ChannelHandlerContext ctx;
+    @SuppressWarnings("NullAway.Init") private ChannelHandlerContext ctx;
     @Nullable private volatile PushConnection pushConnection;
     private final List<ScheduledFuture<?>> scheduledFutures;
 

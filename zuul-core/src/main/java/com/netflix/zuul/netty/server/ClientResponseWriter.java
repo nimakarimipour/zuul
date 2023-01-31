@@ -60,11 +60,12 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Created by saroskar on 2/26/17.
  */
-public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
+@NullUnmarked public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
 
     private static final Registry NOOP_REGISTRY = new NoopRegistry();
 

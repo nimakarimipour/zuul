@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.concurrent.ThreadSafe;
 
 import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
+import com.netflix.NullUnmarked;
 
 
 /**
@@ -121,7 +122,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public void filter(final HttpRequestMessage zuulReq, final HttpContent chunk) {
         if (zuulReq.getContext().isCancelled()) {
             chunk.release();
