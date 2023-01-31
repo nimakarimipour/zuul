@@ -18,6 +18,7 @@ package com.netflix.zuul.exception;
 
 import com.netflix.zuul.niws.RequestAttempt;
 import com.netflix.zuul.niws.RequestAttempts;
+import javax.annotation.Nullable;
 
 
 /**
@@ -50,7 +51,7 @@ public class OutboundException extends ZuulException
         this.dontLogAsError();
     }
 
-    public RequestAttempt getFinalRequestAttempt()
+    @Nullable public RequestAttempt getFinalRequestAttempt()
     {
         return requestAttempts == null ? null : requestAttempts.getFinalAttempt();
     }

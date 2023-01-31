@@ -44,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels
@@ -93,13 +94,13 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     private String serverName;
     private SocketAddress clientRemoteAddress;
 
-    private HttpRequestInfo inboundRequest = null;
-    private Cookies parsedCookies = null;
+    @Nullable private HttpRequestInfo inboundRequest = null;
+    @Nullable private Cookies parsedCookies = null;
 
     // These attributes are populated only if immutable=true.
-    private String reconstructedUri = null;
-    private String pathAndQuery = null;
-    private String infoForLogging = null;
+    @Nullable private String reconstructedUri = null;
+    @Nullable private String pathAndQuery = null;
+    @Nullable private String infoForLogging = null;
 
     private static final SocketAddress UNDEFINED_CLIENT_DEST_ADDRESS = new SocketAddress() {
         @Override
@@ -110,7 +111,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
 
     public HttpRequestMessageImpl(SessionContext context, String protocol, String method, String path,
                                   HttpQueryParams queryParams, Headers headers, String clientIp, String scheme,
-                                  int port, String serverName)
+                                  int port, @Nullable String serverName)
     {
         this(context, protocol, method, path, queryParams, headers, clientIp, scheme, port, serverName,
                 UNDEFINED_CLIENT_DEST_ADDRESS, false);
@@ -184,12 +185,12 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     }
 
     @Override
-    public void setBodyAsText(String bodyText) {
+    public void setBodyAsText(@Nullable String bodyText) {
         message.setBodyAsText(bodyText);
     }
 
     @Override
-    public void setBody(byte[] body) {
+    public void setBody(@Nullable byte[] body) {
         message.setBody(body);
     }
 
@@ -208,12 +209,12 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
         message.runBufferedBodyContentThroughFilter(filter);
     }
 
-    @Override
+    @Nullable @Override
     public String getBodyAsText() {
         return message.getBodyAsText();
     }
 
-    @Override
+    @Nullable @Override
     public byte[] getBody() {
         return message.getBody();
     }
@@ -443,7 +444,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
         inboundRequest = copyRequestInfo();
     }
 
-    @Override
+    @Nullable @Override
     public HttpRequestInfo getInboundRequest()
     {
         return inboundRequest;
