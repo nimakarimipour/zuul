@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -151,7 +152,7 @@ public class ConnectionPoolHandler extends ChannelDuplexHandler
         }
     }
 
-    private static String getConnectionHeader(CompleteEvent completeEvt) {
+    @NullUnmarked private static String getConnectionHeader(CompleteEvent completeEvt) {
         HttpResponse response = completeEvt.getResponse();
         if (response != null) {
             return response.headers().get(HttpHeaderNames.CONNECTION);

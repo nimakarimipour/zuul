@@ -50,7 +50,7 @@ public class FilterFileManager {
     private static final DynamicIntProperty FILE_PROCESSOR_THREADS = new DynamicIntProperty("zuul.filterloader.threads", 1);
     private static final DynamicIntProperty FILE_PROCESSOR_TASKS_TIMEOUT_SECS = new DynamicIntProperty("zuul.filterloader.tasks.timeout", 120);
 
-    Thread poller;
+    @SuppressWarnings("NullAway.Init") Thread poller;
     boolean bRunning = true;
 
     private final FilterFileManagerConfig config;

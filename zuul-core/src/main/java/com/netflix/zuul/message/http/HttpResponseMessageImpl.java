@@ -29,6 +29,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels
@@ -44,7 +45,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
     private ZuulMessage message;
     private HttpRequestMessage outboundRequest;
     private int status;
-    private HttpResponseInfo inboundResponse = null;
+    @SuppressWarnings("NullAway") private HttpResponseInfo inboundResponse = null;
 
     public HttpResponseMessageImpl(SessionContext context, HttpRequestMessage request, int status)
     {
@@ -101,22 +102,22 @@ public class HttpResponseMessageImpl implements HttpResponseMessage
         message.bufferBodyContents(chunk);
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBodyAsText(String bodyText) {
         message.setBodyAsText(bodyText);
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBody(byte[] body) {
         message.setBody(body);
     }
 
-    @Override
+    @NullUnmarked @Override
     public String getBodyAsText() {
         return message.getBodyAsText();
     }
 
-    @Override
+    @NullUnmarked @Override
     public byte[] getBody() {
         return message.getBody();
     }

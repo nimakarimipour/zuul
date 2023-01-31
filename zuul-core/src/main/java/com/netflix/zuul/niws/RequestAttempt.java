@@ -31,6 +31,7 @@ import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import io.netty.handler.timeout.ReadTimeoutException;
 
 import javax.net.ssl.SSLHandshakeException;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -44,22 +45,22 @@ public class RequestAttempt
     private int attempt;
     private int status;
     private long duration;
-    private String cause;
-    private String error;
-    private String exceptionType;
-    private String app;
-    private String asg;
-    private String instanceId;
-    private String host;
+    @SuppressWarnings("NullAway.Init") private String cause;
+    @SuppressWarnings("NullAway.Init") private String error;
+    @SuppressWarnings("NullAway.Init") private String exceptionType;
+    @SuppressWarnings("NullAway.Init") private String app;
+    @SuppressWarnings("NullAway.Init") private String asg;
+    @SuppressWarnings("NullAway.Init") private String instanceId;
+    @SuppressWarnings("NullAway.Init") private String host;
     private int port;
-    private String vip;
-    private String region;
-    private String availabilityZone;
+    @SuppressWarnings("NullAway.Init") private String vip;
+    @SuppressWarnings("NullAway.Init") private String region;
+    @SuppressWarnings("NullAway.Init") private String availabilityZone;
     private long readTimeout;
     private int connectTimeout;
     private int maxRetries;
 
-    public RequestAttempt(int attemptNumber, InstanceInfo server, String targetVip, String chosenWarmupLB, int status, String error, String exceptionType,
+    @NullUnmarked public RequestAttempt(int attemptNumber, InstanceInfo server, String targetVip, String chosenWarmupLB, int status, String error, String exceptionType,
                           int readTimeout, int connectTimeout, int maxRetries)
     {
         if (attemptNumber < 1) {
@@ -99,7 +100,7 @@ public class RequestAttempt
         this.maxRetries = maxRetries;
     }
 
-    public RequestAttempt(final DiscoveryResult server, final IClientConfig clientConfig, int attemptNumber, int readTimeout) {
+    @NullUnmarked public RequestAttempt(final DiscoveryResult server, final IClientConfig clientConfig, int attemptNumber, int readTimeout) {
         this.status = -1;
         this.attempt = attemptNumber;
         this.readTimeout = readTimeout;
@@ -289,7 +290,7 @@ public class RequestAttempt
         this.connectTimeout = connectTimeout;
     }
 
-    public void setException(Throwable t) {
+    @NullUnmarked public void setException(Throwable t) {
         if (t != null) {
             if (t instanceof ReadTimeoutException) {
                 error = "READ_TIMEOUT";

@@ -34,13 +34,14 @@ import static com.netflix.zuul.exception.OutboundErrorType.ORIGIN_CONCURRENCY_EX
 import static com.netflix.zuul.exception.OutboundErrorType.OTHER;
 import static com.netflix.zuul.exception.OutboundErrorType.READ_TIMEOUT;
 import static com.netflix.zuul.exception.OutboundErrorType.RESET_CONNECTION;
+import com.netflix.NullUnmarked;
 
 
 public class NettyRequestAttemptFactory {
 
     private final static Logger LOG = LoggerFactory.getLogger(NettyRequestAttemptFactory.class);
 
-    public ErrorType mapNettyToOutboundErrorType(final Throwable t) {
+    @NullUnmarked public ErrorType mapNettyToOutboundErrorType(final Throwable t) {
         if (t instanceof ReadTimeoutException) {
             return READ_TIMEOUT;
         }

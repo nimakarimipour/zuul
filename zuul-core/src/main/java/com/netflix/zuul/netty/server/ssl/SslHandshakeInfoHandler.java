@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
+import com.netflix.NullUnmarked;
 
 /**
  * Stores info about the client and server's SSL certificates in the context, after a successful handshake.
@@ -60,13 +61,13 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
         this.isSSlFromIntermediary = isSSlFromIntermediary;
     }
 
-    @VisibleForTesting
+    @NullUnmarked @VisibleForTesting
     SslHandshakeInfoHandler() {
         spectatorRegistry = null;
         isSSlFromIntermediary = false;
     }
 
-    @Override
+    @NullUnmarked @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof SslHandshakeCompletionEvent) {
             try {

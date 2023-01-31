@@ -20,11 +20,12 @@ import io.netty.channel.ChannelHandler;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import com.netflix.NullUnmarked;
 
 @Singleton
 public class NullChannelHandlerProvider implements Provider<ChannelHandler>
 {
-    @Override
+    @NullUnmarked @Override
     public ChannelHandler get() {
         return null;
     }

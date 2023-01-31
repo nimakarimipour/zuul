@@ -25,7 +25,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  */
 public class PushClientProtocolHandler extends ChannelInboundHandlerAdapter {
 
-    protected PushUserAuth authEvent;
+    @SuppressWarnings("NullAway.Init") protected PushUserAuth authEvent;
 
 
     protected boolean isAuthenticated() {

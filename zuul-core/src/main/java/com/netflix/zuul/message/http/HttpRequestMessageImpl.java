@@ -44,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels
@@ -93,13 +94,13 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
     private String serverName;
     private SocketAddress clientRemoteAddress;
 
-    private HttpRequestInfo inboundRequest = null;
-    private Cookies parsedCookies = null;
+    @SuppressWarnings("NullAway") private HttpRequestInfo inboundRequest = null;
+    @SuppressWarnings("NullAway") private Cookies parsedCookies = null;
 
     // These attributes are populated only if immutable=true.
-    private String reconstructedUri = null;
-    private String pathAndQuery = null;
-    private String infoForLogging = null;
+    @SuppressWarnings("NullAway") private String reconstructedUri = null;
+    @SuppressWarnings("NullAway") private String pathAndQuery = null;
+    @SuppressWarnings("NullAway") private String infoForLogging = null;
 
     private static final SocketAddress UNDEFINED_CLIENT_DEST_ADDRESS = new SocketAddress() {
         @Override
@@ -183,12 +184,12 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
         message.bufferBodyContents(chunk);
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBodyAsText(String bodyText) {
         message.setBodyAsText(bodyText);
     }
 
-    @Override
+    @NullUnmarked @Override
     public void setBody(byte[] body) {
         message.setBody(body);
     }
@@ -208,12 +209,12 @@ public class HttpRequestMessageImpl implements HttpRequestMessage
         message.runBufferedBodyContentThroughFilter(filter);
     }
 
-    @Override
+    @NullUnmarked @Override
     public String getBodyAsText() {
         return message.getBodyAsText();
     }
 
-    @Override
+    @NullUnmarked @Override
     public byte[] getBody() {
         return message.getBody();
     }

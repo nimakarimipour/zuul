@@ -31,7 +31,7 @@ public class PushConnection {
 
     private final PushProtocol pushProtocol;
     private final ChannelHandlerContext ctx;
-    private String secureToken;
+    @SuppressWarnings("NullAway.Init") private String secureToken;
 
     //Token bucket implementation state.
     private double tkBktAllowance;
