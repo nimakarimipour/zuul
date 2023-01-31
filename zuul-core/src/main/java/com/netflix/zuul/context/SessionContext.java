@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Represents the context between client and origin server for the duration of the dedicated connection/session
@@ -382,7 +383,7 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
      * appends filter name and status to the filter execution history for the
      * current request
      */
-    public void addFilterExecutionSummary(String name, String status, long time) {
+    @NullUnmarked public void addFilterExecutionSummary(String name, String status, long time) {
         StringBuilder sb = getFilterExecutionSummary();
         if (sb.length() > 0) sb.append(", ");
         sb.append(name).append('[').append(status).append(']').append('[').append(time).append("ms]");
@@ -470,7 +471,7 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
         return (String) get(KEY_ENDPOINT);
     }
 
-    public void setEventProperty(String key, Object value) {
+    @NullUnmarked public void setEventProperty(String key, Object value) {
         getEventProperties().put(key, value);
     }
 

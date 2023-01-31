@@ -67,6 +67,7 @@ import static io.perfmark.PerfMark.linkIn;
 import static io.perfmark.PerfMark.linkOut;
 import static io.perfmark.PerfMark.traceTask;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Subclasses of this class are supposed to be thread safe and hence should not have any non final member variables
@@ -97,7 +98,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         this.filterExcessiveTimerId = registry.createId("zuul.request.timing.filterExcessive");
     }
 
-    public static final ChannelHandlerContext getChannelHandlerContext(@Nullable final ZuulMessage mesg) {
+    @NullUnmarked public static final ChannelHandlerContext getChannelHandlerContext(@Nullable final ZuulMessage mesg) {
         return (ChannelHandlerContext) checkNotNull(mesg.getContext().get(NETTY_SERVER_CHANNEL_HANDLER_CONTEXT),
                 "channel handler context");
     }
@@ -106,7 +107,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         return nextStage;
     }
 
-    protected final AtomicInteger initRunningFilterIndex(@Nullable I zuulMesg) {
+    @NullUnmarked protected final AtomicInteger initRunningFilterIndex(@Nullable I zuulMesg) {
         final AtomicInteger idx = new AtomicInteger(0);
         zuulMesg.getContext().put(RUNNING_FILTER_IDX_SESSION_CTX_KEY, idx);
         return idx;
@@ -155,7 +156,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         }
     }
 
-    protected final void invokeNextStage(@Nullable final O zuulMesg) {
+    @NullUnmarked protected final void invokeNextStage(@Nullable final O zuulMesg) {
         if (nextStage != null) {
             try (TaskCloseable ignored =
                     traceTask(this, s -> s.getClass().getSimpleName() + ".invokeNextStage")) {
@@ -198,7 +199,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         attachTag("uuid", inMesg, m -> m.getContext().getUUID());
     }
 
-    @Nullable protected final O filter(final ZuulFilter<I, O> filter, @Nullable final I inMesg) {
+    @NullUnmarked @Nullable protected final O filter(final ZuulFilter<I, O> filter, @Nullable final I inMesg) {
         final long startTime = System.nanoTime();
         final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
         FilterChainResumer resumer = null;
@@ -319,7 +320,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         return filter.getDefaultOutput(inMesg);
     }
 
-    protected void recordFilterError(final I inMesg, final ZuulFilter<I, O> filter, final Throwable t) {
+    @NullUnmarked protected void recordFilterError(final I inMesg, final ZuulFilter<I, O> filter, final Throwable t) {
         // Add a log statement for this exception.
         final String errorMsg = "Filter Exception: filter=" + filter.filterName() +
                 ", request-info=" + inMesg.getInfoForLogging() + ", msg=" + String.valueOf(t.getMessage());

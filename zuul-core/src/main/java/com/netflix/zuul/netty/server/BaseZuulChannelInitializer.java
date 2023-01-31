@@ -71,6 +71,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
+import com.netflix.NullUnmarked;
 
 /**
  * User: Mike Smith
@@ -350,7 +351,7 @@ public abstract class BaseZuulChannelInitializer extends ChannelInitializer<Chan
         return new ZuulFilterChainRunner<>(filters, filterUsageNotifier, filterRunner, registry);
     }
 
-    @SuppressWarnings("unchecked") // For the conversion from getFiltersByType.  It's not safe, sorry.
+    @NullUnmarked @SuppressWarnings("unchecked") // For the conversion from getFiltersByType.  It's not safe, sorry.
     public <T extends ZuulMessage> ZuulFilter<T, T> [] getFilters(ZuulFilter<T, T> start, ZuulFilter<T, T> stop) {
         final SortedSet<ZuulFilter<?, ?>> zuulFilters = filterLoader.getFiltersByType(start.filterType());
         final ZuulFilter<T, T>[] filters = new ZuulFilter[zuulFilters.size() + 2];

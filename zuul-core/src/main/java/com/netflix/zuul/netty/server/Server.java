@@ -82,6 +82,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  *
@@ -180,7 +181,7 @@ public class Server
         this.eventLoopGroupMetrics = checkNotNull(eventLoopGroupMetrics, "eventLoopGroupMetrics");
     }
 
-    public void stop() {
+    @NullUnmarked public void stop() {
         LOG.info("Shutting down Zuul.");
         serverGroup.stop();
 
@@ -243,7 +244,7 @@ public class Server
         return Collections.unmodifiableList(new ArrayList<>(addressesToChannels.keySet()));
     }
 
-    @VisibleForTesting
+    @NullUnmarked @VisibleForTesting
     public void waitForEachEventLoop() throws InterruptedException, ExecutionException
     {
         for (EventExecutor exec : serverGroup.clientToProxyWorkerPool)
@@ -260,7 +261,7 @@ public class Server
         clientConnectionsShutdown.gracefullyShutdownClientChannels();
     }
 
-    private ChannelFuture setupServerBootstrap(
+    @NullUnmarked private ChannelFuture setupServerBootstrap(
             NamedSocketAddress listenAddress, ChannelInitializer<?> channelInitializer) throws InterruptedException {
         ServerBootstrap serverBootstrap =
                 new ServerBootstrap().group(serverGroup.clientToProxyBossPool, serverGroup.clientToProxyWorkerPool);

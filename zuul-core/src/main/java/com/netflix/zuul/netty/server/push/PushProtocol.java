@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Created by saroskar on 10/10/16.
@@ -119,7 +120,7 @@ public enum PushProtocol {
 
     };
 
-    public final void sendErrorAndClose(@Nullable ChannelHandlerContext ctx, int statusCode, String reasonText) {
+    @NullUnmarked public final void sendErrorAndClose(@Nullable ChannelHandlerContext ctx, int statusCode, String reasonText) {
         final Object mesg = serverClosingConnectionMessage(statusCode, reasonText);
         ctx.writeAndFlush(mesg).addListener(ChannelFutureListener.CLOSE);
     }

@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.concurrent.ThreadSafe;
 
 import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
+import com.netflix.NullUnmarked;
 
 
 /**
@@ -81,7 +82,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         zuulReq.getContext().put(ZUUL_ENDPOINT, endpoint);
     }
 
-    @Override
+    @NullUnmarked @Override
     public void filter(@Nullable final HttpRequestMessage zuulReq) {
         if (zuulReq.getContext().isCancelled()) {
             PerfMark.event(getClass().getName(), "filterCancelled");
@@ -210,7 +211,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
     }
 
     final protected static ZuulFilter<HttpRequestMessage, HttpResponseMessage> STATIC_RESPONSE_ENDPOINT = new SyncZuulFilterAdapter<HttpRequestMessage, HttpResponseMessage>() {
-        @Override
+        @NullUnmarked @Override
         public HttpResponseMessage apply(HttpRequestMessage request) {
             final HttpResponseMessage resp = request.getContext().getStaticResponse();
             resp.finishBufferedBodyIfIncomplete();

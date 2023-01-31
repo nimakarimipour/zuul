@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -197,7 +198,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
         return false;
     }
 
-    @Override
+    @NullUnmarked @Override
     public int getInflightRequestsCount() {
         return this.channelInitializer.getHttpMetricsHandler().getInflightRequestsCount();
     }
@@ -325,7 +326,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
         return acquire(eventLoop, null, CurrentPassport.create(), new AtomicReference<>(), new AtomicReference<>());
     }
 
-    @Override
+    @NullUnmarked @Override
     public Promise<PooledConnection> acquire(
             EventLoop eventLoop,
             @Nullable Object key,

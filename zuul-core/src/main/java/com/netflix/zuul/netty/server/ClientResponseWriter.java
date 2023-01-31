@@ -60,6 +60,7 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Created by saroskar on 2/26/17.
@@ -90,7 +91,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
         this.responseBeforeReceivedLastContentCounter = registry.counter("server.http.requests.responseBeforeReceivedLastContent");
     }
 
-    @Override
+    @NullUnmarked @Override
     public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
         final Channel channel = ctx.channel();
 
@@ -168,7 +169,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
         zuulResponse.getBodyContents().forEach(chunk -> channel.write(chunk.retain()));
     }
 
-    private HttpResponse buildHttpResponse(final HttpResponseMessage zuulResp) {
+    @NullUnmarked private HttpResponse buildHttpResponse(final HttpResponseMessage zuulResp) {
         final HttpRequestInfo zuulRequest = zuulResp.getInboundRequest();
         HttpVersion responseHttpVersion;
         final String inboundProtocol = zuulRequest.getProtocol();

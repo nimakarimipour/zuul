@@ -23,6 +23,7 @@ import com.netflix.zuul.stats.RequestMetricsPublisher;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -35,7 +36,7 @@ public class BasicRequestCompleteHandler implements RequestCompleteHandler
     @Nullable
     private RequestMetricsPublisher requestMetricsPublisher;
 
-    @Override
+    @NullUnmarked @Override
     public void handle(@Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response)
     {
         SessionContext context = inboundRequest.getContext();

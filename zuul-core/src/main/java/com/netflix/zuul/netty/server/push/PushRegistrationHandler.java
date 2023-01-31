@@ -32,6 +32,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * Author: Susheel Aroskar
@@ -116,7 +117,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void requestClientToCloseConnection() {
+    @NullUnmarked private void requestClientToCloseConnection() {
         if (ctx.channel().isActive()) {
             // Application level protocol for asking client to close connection
             ctx.writeAndFlush(pushProtocol.goAwayMessage());
@@ -128,7 +129,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    protected void keepAlive() {
+    @NullUnmarked protected void keepAlive() {
         if (KEEP_ALIVE_ENABLED.get()) {
             ctx.writeAndFlush(new PingWebSocketFrame());
         }

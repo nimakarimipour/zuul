@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netflix.NullUnmarked;
 
 /**
  * User: michaels@netflix.com
@@ -266,7 +267,7 @@ public class PerServerConnectionPool implements IConnectionPool
         }
     }
 
-    protected ChannelFuture connectToServer(EventLoop eventLoop, CurrentPassport passport, SocketAddress serverAddr) {
+    @NullUnmarked protected ChannelFuture connectToServer(EventLoop eventLoop, CurrentPassport passport, SocketAddress serverAddr) {
         return connectionFactory.connect(eventLoop, serverAddr, passport);
     }
 

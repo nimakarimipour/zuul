@@ -34,6 +34,7 @@ import io.perfmark.TaskCloseable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
+import com.netflix.NullUnmarked;
 
 /**
  * This class is supposed to be thread safe and hence should not have any non final member variables
@@ -97,7 +98,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public void filter(T inMesg, HttpContent chunk) {
         String filterName = "-";
         try (TaskCloseable ignored = PerfMark.traceTask(this, s -> s.getClass().getSimpleName() + ".filterChunk")) {
