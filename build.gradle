@@ -1,6 +1,5 @@
 
 plugins {
-    id 'com.netflix.nebula.netflixoss' version '11.1.1'
     id "com.google.osdetector" version "1.7.1"
     id "me.champeau.jmh" version "0.6.8"
     id "org.openrewrite.rewrite" version "5.33.2"
@@ -8,12 +7,6 @@ plugins {
 
 ext.githubProjectName = rootProject.name
 
-
-idea {
-    project {
-        languageLevel = '1.8'
-    }
-}
 
 configurations.all {
     exclude group: 'asm', module: 'asm'
@@ -28,34 +21,14 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'com.netflix.nebula.netflixoss'
     apply plugin: 'java'
-    apply plugin: 'com.netflix.nebula.javadoc-jar'
-    apply plugin: 'com.netflix.nebula.dependency-lock'
     apply plugin: 'me.champeau.jmh'
     apply plugin: 'org.openrewrite.rewrite'
-
-    license {
-        ignoreFailures = false
-        excludes([
-                "**/META-INF/services/javax.annotation.processing.Processor",
-                "**/META-INF/gradle/incremental.annotation.processors",
-                "**/*.cert",
-                "**/*.jks",
-                "**/*.key",
-        ])
-    }
 
     group = "com.netflix.${githubProjectName}"
 
     sourceCompatibility = '1.8'
 
-    eclipse {
-        classpath {
-            downloadSources = true
-            downloadJavadoc = true
-        }
-    }
 
     tasks.withType(Javadoc).each {
         it.classpath = sourceSets.main.compileClasspath
