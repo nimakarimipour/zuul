@@ -1,5 +1,5 @@
 {
-  "BUILD_COMMAND": "cd /Users/nima/Developer/NullAwayFixer/Projects/zuul && ./gradlew zuul-core:compileJava",
+  "BUILD_COMMAND": "cd /Users/Developer/NullAwayFixer/Projects/zuul && ./gradlew zuul-core:compileJava",
   "ANNOTATION": {
     "INITIALIZER": "com.netflix.Initializer",
     "NULLABLE": "javax.annotation.Nullable",
