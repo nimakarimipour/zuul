@@ -47,7 +47,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.nio.channels.ClosedChannelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Created by saroskar on 5/18/17.
@@ -56,7 +56,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
 
     private final ZuulFilterChainRunner<HttpRequestMessage> requestFilterChain;
     private final ZuulFilterChainRunner<HttpResponseMessage> responseFilterChain;
-    @SuppressWarnings("NullAway.Init") private HttpRequestMessage zuulRequest;
+     private HttpRequestMessage zuulRequest;
 
     private static final Logger LOG = LoggerFactory.getLogger(ZuulFilterChainHandler.class);
 
@@ -132,7 +132,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
         return zuulRequest;
     }
 
-    @NullUnmarked protected void fireEndpointFinish(final boolean error, final ChannelHandlerContext ctx) {
+     protected void fireEndpointFinish(final boolean error, final ChannelHandlerContext ctx) {
         // make sure filter chain is not left hanging
         finishResponseFilters(ctx);
 

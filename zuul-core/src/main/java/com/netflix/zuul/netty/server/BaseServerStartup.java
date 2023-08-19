@@ -68,9 +68,9 @@ public abstract class BaseServerStartup
     protected final FilterLoader filterLoader;
     protected final FilterUsageNotifier usageNotifier;
 
-    @SuppressWarnings("NullAway.Init") private Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addrsToChannelInitializers;
-    @SuppressWarnings("NullAway.Init") private ClientConnectionsShutdown clientConnectionsShutdown;
-    @SuppressWarnings("NullAway.Init") private Server server;
+     private Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addrsToChannelInitializers;
+     private ClientConnectionsShutdown clientConnectionsShutdown;
+     private Server server;
 
 
     @Inject

@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import com.netflix.NullUnmarked;
+
 
 /**
  * This class expresses an address that Zuul can bind to.  Similar to {@link
@@ -108,7 +108,7 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
 
         static final Decoder INSTANCE = new Decoder();
 
-        @NullUnmarked @Override
+         @Override
         public SocketAddress apply(String input) {
             if (input == null || input.isEmpty()) {
                 throw new IllegalArgumentException("Invalid address");

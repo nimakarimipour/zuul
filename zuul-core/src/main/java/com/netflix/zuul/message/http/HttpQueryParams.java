@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import com.netflix.NullUnmarked;
+
 
 /**
  * User: michaels
@@ -110,7 +110,7 @@ public class HttpQueryParams implements Cloneable
      * Get the first value found for this key even if there are multiple. If none, then
      * return null.
      */
-    @NullUnmarked public String getFirst(String name)
+     public String getFirst(String name)
     {
         List<String> values = delegate.get(name);
         if (values != null) {

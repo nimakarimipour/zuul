@@ -66,7 +66,7 @@ import static io.perfmark.PerfMark.attachTag;
 import static io.perfmark.PerfMark.linkIn;
 import static io.perfmark.PerfMark.linkOut;
 import static io.perfmark.PerfMark.traceTask;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Subclasses of this class are supposed to be thread safe and hence should not have any non final member variables
@@ -198,7 +198,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         attachTag("uuid", inMesg, m -> m.getContext().getUUID());
     }
 
-    @NullUnmarked protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
+     protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
         final long startTime = System.nanoTime();
         final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
         FilterChainResumer resumer = null;

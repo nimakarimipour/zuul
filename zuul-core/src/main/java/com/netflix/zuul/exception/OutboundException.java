@@ -18,7 +18,7 @@ package com.netflix.zuul.exception;
 
 import com.netflix.zuul.niws.RequestAttempt;
 import com.netflix.zuul.niws.RequestAttempts;
-import com.netflix.NullUnmarked;
+
 
 
 /**
@@ -42,7 +42,7 @@ public class OutboundException extends ZuulException
         this.dontLogAsError();
     }
 
-    @NullUnmarked public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts, Throwable cause)
+     public OutboundException(ErrorType outboundErrorType, RequestAttempts requestAttempts, Throwable cause)
     {
         super(outboundErrorType.toString(), cause.getMessage(), true);
         this.outboundErrorType = outboundErrorType;
@@ -51,7 +51,7 @@ public class OutboundException extends ZuulException
         this.dontLogAsError();
     }
 
-    @NullUnmarked public RequestAttempt getFinalRequestAttempt()
+     public RequestAttempt getFinalRequestAttempt()
     {
         return requestAttempts == null ? null : requestAttempts.getFinalAttempt();
     }

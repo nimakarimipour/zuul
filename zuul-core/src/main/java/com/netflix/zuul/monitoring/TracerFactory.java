@@ -23,7 +23,7 @@ package com.netflix.zuul.monitoring;
  */
 public abstract class TracerFactory {
 
-    @SuppressWarnings("NullAway.Init") private static TracerFactory INSTANCE;
+     private static TracerFactory INSTANCE;
 
     /**
      * sets a TracerFactory Implementation

@@ -81,7 +81,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.netflix.NullUnmarked;
+
 
 /**
  *
@@ -123,7 +123,7 @@ public class Server
 
     private final Thread jvmShutdownHook = new Thread(this::stop, "Zuul-JVM-shutdown-hook");
     private final Registry registry;
-    @SuppressWarnings("NullAway.Init") private ServerGroup serverGroup;
+     private ServerGroup serverGroup;
     private final ClientConnectionsShutdown clientConnectionsShutdown;
     private final ServerStatusManager serverStatusManager;
     private final Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addressesToInitializers;
@@ -326,14 +326,14 @@ public class Server
         private final EventLoopGroupMetrics eventLoopGroupMetrics;
         private final Thread jvmShutdownHook = new Thread(this::stop, "Zuul-ServerGroup-JVM-shutdown-hook");
 
-        @SuppressWarnings("NullAway.Init") private EventLoopGroup clientToProxyBossPool;
-        @SuppressWarnings("NullAway.Init") private EventLoopGroup clientToProxyWorkerPool;
-        @SuppressWarnings("NullAway.Init") private Class<? extends ServerChannel> channelType;
-        @SuppressWarnings("NullAway.Init") private Map<ChannelOption<?>, ?> transportChannelOptions;
+         private EventLoopGroup clientToProxyBossPool;
+         private EventLoopGroup clientToProxyWorkerPool;
+         private Class<? extends ServerChannel> channelType;
+         private Map<ChannelOption<?>, ?> transportChannelOptions;
 
         private volatile boolean stopped = false;
 
-        @NullUnmarked private ServerGroup(String name, int acceptorThreads, int workerThreads, EventLoopGroupMetrics eventLoopGroupMetrics) {
+         private ServerGroup(String name, int acceptorThreads, int workerThreads, EventLoopGroupMetrics eventLoopGroupMetrics) {
             this.name = name;
             this.acceptorThreads = acceptorThreads;
             this.workerThreads = workerThreads;

@@ -19,7 +19,7 @@ import com.netflix.zuul.stats.monitoring.MonitorRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Manager to handle Error Statistics
@@ -46,7 +46,7 @@ public class ErrorStatsManager {
      * @param cause
      * @return data structure for holding count information for a route and cause
      */
-    @NullUnmarked public ErrorStatsData getStats(String route, String cause) {
+     public ErrorStatsData getStats(String route, String cause) {
         Map<String, ErrorStatsData> map = routeMap.get(route);
         if (map == null) return null;
         return map.get(cause);

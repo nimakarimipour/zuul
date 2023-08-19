@@ -19,7 +19,7 @@ package com.netflix.zuul.netty.connectionpool;
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.exception.ErrorType;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Request Stat
@@ -27,7 +27,7 @@ import com.netflix.NullUnmarked;
  * Author: Arthur Gonigberg
  * Date: November 29, 2017
  */
-@NullUnmarked public interface RequestStat {
+ public interface RequestStat {
 
     String SESSION_CONTEXT_KEY = "niwsRequestStat";
 

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import com.netflix.NullUnmarked;
+
 
 /**
  * User: michaels@netflix.com
@@ -55,7 +55,7 @@ public class RequestAttempts extends ArrayList<RequestAttempt>
         }
     }
 
-    @NullUnmarked public static RequestAttempts getFromSessionContext(SessionContext ctx)
+     public static RequestAttempts getFromSessionContext(SessionContext ctx)
     {
         return ctx.get(CommonContextKeys.REQUEST_ATTEMPTS);
     }

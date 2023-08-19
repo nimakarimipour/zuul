@@ -20,7 +20,7 @@ import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import com.netflix.NullUnmarked;
+
 
 public class PassportStateListener implements GenericFutureListener
 {
@@ -28,7 +28,7 @@ public class PassportStateListener implements GenericFutureListener
     private final PassportState successState;
     private final PassportState failState;
 
-    @NullUnmarked public PassportStateListener(CurrentPassport passport, PassportState successState)
+     public PassportStateListener(CurrentPassport passport, PassportState successState)
     {
         this.passport = passport;
         this.successState = successState;

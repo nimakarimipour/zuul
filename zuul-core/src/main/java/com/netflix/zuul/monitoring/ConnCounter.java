@@ -61,7 +61,7 @@ public final class ConnCounter {
     private final Channel chan;
     private final Id metricBase;
 
-    @SuppressWarnings("NullAway.Init") private String lastCountKey;
+     private String lastCountKey;
 
     private final Map<String, Gauge> counts = new HashMap<>();
 

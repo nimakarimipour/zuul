@@ -51,7 +51,7 @@ import static com.netflix.zuul.exception.OutboundErrorType.RESET_CONNECTION;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Created by saroskar on 1/18/17.
@@ -68,7 +68,7 @@ public class OriginResponseReceiver extends ChannelDuplexHandler {
         this.edgeProxy = edgeProxy;
     }
 
-    @NullUnmarked public void unlinkFromClientRequest() {
+     public void unlinkFromClientRequest() {
         edgeProxy = null;
     }
 
@@ -246,7 +246,7 @@ public class OriginResponseReceiver extends ChannelDuplexHandler {
     protected void preWriteHook(ChannelHandlerContext ctx, HttpRequestMessage zuulReq) {
     }
 
-    @NullUnmarked private void fireWriteError(String requestPart, Throwable cause, ChannelHandlerContext ctx) throws Exception {
+     private void fireWriteError(String requestPart, Throwable cause, ChannelHandlerContext ctx) throws Exception {
         String errMesg = "Error while proxying " + requestPart + " to origin ";
         if (edgeProxy != null) {
             final ProxyEndpoint ep = edgeProxy;

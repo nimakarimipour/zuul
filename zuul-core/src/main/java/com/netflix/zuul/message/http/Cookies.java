@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.netflix.NullUnmarked;
+
 
 /**
  * User: Mike Smith
@@ -50,12 +50,12 @@ public class Cookies
         return all;
     }
 
-    @NullUnmarked public List<Cookie> get(String name)
+     public List<Cookie> get(String name)
     {
         return map.get(name);
     }
 
-    @NullUnmarked public Cookie getFirst(String name)
+     public Cookie getFirst(String name)
     {
         List<Cookie> found = map.get(name);
         if (found == null || found.size() == 0) {
@@ -64,7 +64,7 @@ public class Cookies
         return found.get(0);
     }
 
-    @NullUnmarked public String getFirstValue(String name)
+     public String getFirstValue(String name)
     {
         Cookie c = getFirst(name);
         String value;

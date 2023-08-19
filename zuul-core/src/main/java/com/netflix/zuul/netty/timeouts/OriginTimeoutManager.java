@@ -28,7 +28,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import com.netflix.NullUnmarked;
+
 
 /**
  * Origin Timeout Manager
@@ -59,7 +59,7 @@ public class OriginTimeoutManager {
      * @param request    the request.
      * @param attemptNum the attempt number, starting at 1.
      */
-    @NullUnmarked public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
+     public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
         IClientConfig clientConfig = getRequestClientConfig(request);
         Long originTimeout = getOriginReadTimeout();
         Long requestTimeout = getRequestReadTimeout(clientConfig);

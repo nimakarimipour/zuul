@@ -28,7 +28,7 @@ import io.netty.handler.codec.http2.Http2StreamChannel;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.netflix.NullUnmarked;
+
 
 /**
  * User: Mike Smith
@@ -67,7 +67,7 @@ public class HttpUtils
      * @param xForwardedFor a <code>String</code> value
      * @return a <code>String</code> value
      */
-    @NullUnmarked public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
+     public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
         if (xForwardedFor == null) {
             return null;
         }
@@ -104,7 +104,7 @@ public class HttpUtils
      * @param input - decoded header string
      * @return - clean header string
      */
-    @NullUnmarked public static String stripMaliciousHeaderChars(@Nullable String input) {
+     public static String stripMaliciousHeaderChars(@Nullable String input) {
         if (input == null) {
             return null;
         }
@@ -124,7 +124,7 @@ public class HttpUtils
         return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
     }
 
-    @NullUnmarked public static Integer getContentLengthIfPresent(ZuulMessage msg)
+     public static Integer getContentLengthIfPresent(ZuulMessage msg)
     {
         final String contentLengthValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
         if (!Strings.isNullOrEmpty(contentLengthValue)) {
@@ -139,7 +139,7 @@ public class HttpUtils
         return null;
     }
 
-    @NullUnmarked public static Integer getBodySizeIfKnown(ZuulMessage msg) {
+     public static Integer getBodySizeIfKnown(ZuulMessage msg) {
         final Integer bodySize = getContentLengthIfPresent(msg);
         if (bodySize != null) {
             return bodySize;

@@ -33,7 +33,7 @@ import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.netflix.NullUnmarked;
+
 
 /**
  * This class is supposed to be thread safe and hence should not have any non final member variables
@@ -50,7 +50,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         this.filters = zuulFilters;
     }
 
-    @NullUnmarked public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
+     public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
         this(zuulFilters, usageNotifier, null, registry);
     }
 

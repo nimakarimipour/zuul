@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import com.netflix.NullUnmarked;
+
 
 /**
  * An abstraction over a collection of http headers. Allows multiple headers with same name, and header names are
@@ -649,7 +649,7 @@ public final class Headers {
      * Checks if the input value is compliant with our RFC 7230 based check
      * Returns input value if valid, raises ZuulException otherwise
      */
-    @NullUnmarked private static String validateField(@Nullable String value) {
+     private static String validateField(@Nullable String value) {
         if (value != null) {
             int pos = findInvalid(value);
             if (pos != ABSENT) {

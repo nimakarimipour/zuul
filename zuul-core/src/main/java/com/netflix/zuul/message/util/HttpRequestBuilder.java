@@ -50,7 +50,7 @@ public final class HttpRequestBuilder {
     private String clientIp;
     private String scheme;
     private int port;
-    @SuppressWarnings("NullAway.Init") private String serverName;
+     private String serverName;
     private boolean isBuilt;
 
     public HttpRequestBuilder(SessionContext context) {

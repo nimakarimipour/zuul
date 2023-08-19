@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.netflix.NullUnmarked;
+
 
 /**
  * High level statistics counter manager to count stats on various aspects of  requests
@@ -84,18 +84,18 @@ public class StatsManager {
      * @param statusCode
      * @return the RouteStatusCodeMonitor for the given route and status code
      */
-    @NullUnmarked public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
+     public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
         Map<Integer, RouteStatusCodeMonitor> map = routeStatusMap.get(route);
         if (map == null) return null;
         return map.get(statusCode);
     }
 
-    @NullUnmarked @VisibleForTesting
+     @VisibleForTesting
     NamedCountingMonitor getHostMonitor(String host) {
         return this.hostCounterMap.get(hostKey(host));
     }
 
-    @NullUnmarked @VisibleForTesting
+     @VisibleForTesting
     NamedCountingMonitor getProtocolMonitor(String proto) {
         return this.protocolCounterMap.get(protocolKey(proto));
     }
