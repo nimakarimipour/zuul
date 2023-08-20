@@ -74,6 +74,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 
@@ -96,8 +97,8 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
 
     private final SessionContextDecorator decorator;
 
-     private HttpRequestMessage zuulRequest;
-     private HttpRequest clientRequest;
+     @Nullable private HttpRequestMessage zuulRequest;
+     @Nullable private HttpRequest clientRequest;
 
 
     public ClientRequestReceiver(SessionContextDecorator decorator) {

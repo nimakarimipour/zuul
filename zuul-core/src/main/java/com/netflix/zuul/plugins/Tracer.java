@@ -20,6 +20,7 @@ import com.netflix.zuul.monitoring.TracerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 
 /**
@@ -67,7 +68,7 @@ public class Tracer extends TracerFactory {
         return (loadAddress() != null) ? loadAddress().getHostAddress() : "unknownHost";
     }
 
-     private static InetAddress loadAddress() {
+     @Nullable private static InetAddress loadAddress() {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {

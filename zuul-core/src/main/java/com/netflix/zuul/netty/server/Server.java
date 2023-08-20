@@ -81,6 +81,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 /**
@@ -326,9 +327,9 @@ public class Server
         private final EventLoopGroupMetrics eventLoopGroupMetrics;
         private final Thread jvmShutdownHook = new Thread(this::stop, "Zuul-ServerGroup-JVM-shutdown-hook");
 
-         private EventLoopGroup clientToProxyBossPool;
+         @Nullable private EventLoopGroup clientToProxyBossPool;
          private EventLoopGroup clientToProxyWorkerPool;
-         private Class<? extends ServerChannel> channelType;
+         @Nullable private Class<? extends ServerChannel> channelType;
          private Map<ChannelOption<?>, ?> transportChannelOptions;
 
         private volatile boolean stopped = false;

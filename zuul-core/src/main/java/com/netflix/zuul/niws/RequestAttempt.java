@@ -31,6 +31,7 @@ import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import io.netty.handler.timeout.ReadTimeoutException;
 
 import javax.net.ssl.SSLHandshakeException;
+import javax.annotation.Nullable;
 
 
 /**
@@ -45,8 +46,8 @@ public class RequestAttempt
     private int attempt;
     private int status;
     private long duration;
-     private String cause;
-     private String error;
+     @Nullable private String cause;
+     @Nullable private String error;
      private String exceptionType;
      private String app;
      private String asg;
@@ -55,7 +56,7 @@ public class RequestAttempt
     private int port;
      private String vip;
      private String region;
-     private String availabilityZone;
+     @Nullable private String availabilityZone;
     private long readTimeout;
     private int connectTimeout;
     private int maxRetries;
@@ -171,7 +172,7 @@ public class RequestAttempt
         return this.duration;
     }
 
-    public String getError() {
+    @Nullable public String getError() {
         return error;
     }
 
@@ -201,7 +202,7 @@ public class RequestAttempt
         return region;
     }
 
-    public String getAvailabilityZone() {
+    @Nullable public String getAvailabilityZone() {
         return availabilityZone;
     }
 
@@ -370,7 +371,7 @@ public class RequestAttempt
         return root;
     }
 
-    private static ObjectNode putNullableAttribute(ObjectNode node, String name, String value)
+    private static ObjectNode putNullableAttribute(ObjectNode node, String name, @Nullable String value)
     {
         if (value != null) {
             node.put(name, value);

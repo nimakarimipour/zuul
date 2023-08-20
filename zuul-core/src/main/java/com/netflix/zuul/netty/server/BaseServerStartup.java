@@ -68,9 +68,9 @@ public abstract class BaseServerStartup
     protected final FilterLoader filterLoader;
     protected final FilterUsageNotifier usageNotifier;
 
-     private Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addrsToChannelInitializers;
-     private ClientConnectionsShutdown clientConnectionsShutdown;
-     private Server server;
+     @Nullable private Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addrsToChannelInitializers;
+     @Nullable private ClientConnectionsShutdown clientConnectionsShutdown;
+     @Nullable private Server server;
 
 
     @Inject
