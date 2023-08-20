@@ -33,6 +33,7 @@ import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 
 
 /**
@@ -45,7 +46,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
     private final ZuulFilter<T, T>[] filters;
 
     public ZuulFilterChainRunner(ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier,
-                                 FilterRunner<T, ?> nextStage, Registry registry) {
+                                 @Nullable FilterRunner<T, ?> nextStage, Registry registry) {
         super(zuulFilters[0].filterType(), usageNotifier, nextStage, registry);
         this.filters = zuulFilters;
     }
@@ -55,7 +56,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
     }
 
     @Override
-    public void filter(final T inMesg) {
+    public void filter(@Nullable final T inMesg) {
         try (TaskCloseable ignored = PerfMark.traceTask(this, s -> s.getClass().getSimpleName() + ".filter")) {
             addPerfMarkTags(inMesg);
             runFilters(inMesg, initRunningFilterIndex(inMesg));
@@ -71,7 +72,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         }
     }
 
-    private final void runFilters(final T mesg, final AtomicInteger runningFilterIdx) {
+    private final void runFilters(@Nullable final T mesg, final AtomicInteger runningFilterIdx) {
         T inMesg = mesg;
         String filterName = "-";
         try {

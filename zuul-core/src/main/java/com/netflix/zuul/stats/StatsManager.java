@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 
 /**
@@ -84,18 +85,18 @@ public class StatsManager {
      * @param statusCode
      * @return the RouteStatusCodeMonitor for the given route and status code
      */
-     public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
+     @Nullable public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
         Map<Integer, RouteStatusCodeMonitor> map = routeStatusMap.get(route);
         if (map == null) return null;
         return map.get(statusCode);
     }
 
-     @VisibleForTesting
+     @Nullable @VisibleForTesting
     NamedCountingMonitor getHostMonitor(String host) {
         return this.hostCounterMap.get(hostKey(host));
     }
 
-     @VisibleForTesting
+     @Nullable @VisibleForTesting
     NamedCountingMonitor getProtocolMonitor(String proto) {
         return this.protocolCounterMap.get(protocolKey(proto));
     }

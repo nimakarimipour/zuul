@@ -142,7 +142,7 @@ public final class StaticFilterLoader implements FilterLoader {
         throw new UnsupportedOperationException();
     }
 
-     @Override
+     @Nullable @Override
     public SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType) {
         return filtersByType.get(filterType);
     }

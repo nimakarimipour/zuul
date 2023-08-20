@@ -19,6 +19,7 @@ package com.netflix.zuul.message.http;
 import com.netflix.zuul.message.Headers;
 import com.netflix.zuul.message.ZuulMessage;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * User: Mike Smith
@@ -45,13 +46,13 @@ public interface HttpRequestInfo extends ZuulMessage
 
     int getPort();
 
-    String getServerName();
+    @Nullable String getServerName();
 
     int getMaxBodySize();
 
     String getInfoForLogging();
 
-    String getOriginalHost();
+    @Nullable String getOriginalHost();
 
     String getOriginalScheme();
 

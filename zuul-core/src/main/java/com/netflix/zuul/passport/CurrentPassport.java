@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 
@@ -125,7 +126,7 @@ public class CurrentPassport
         return new CurrentPassport();
     }
 
-     public static CurrentPassport fromSessionContext(SessionContext ctx)
+     @Nullable public static CurrentPassport fromSessionContext(SessionContext ctx)
     {
         return ctx.get(CommonContextKeys.PASSPORT);
     }
@@ -161,7 +162,7 @@ public class CurrentPassport
         ch.attr(CHANNEL_ATTR).set(null);
     }
 
-     public PassportState getState() {
+     @Nullable public PassportState getState() {
         try (Unlocker ignored = lock()){
             PassportItem passportItem = history.peekLast();
             return passportItem != null ? passportItem.getState() : null;
@@ -324,7 +325,7 @@ public class CurrentPassport
         return items;
     }
 
-     public PassportItem findState(PassportState state)
+     @Nullable public PassportItem findState(PassportState state)
     {
         try (Unlocker ignored = lock()) {
             for (PassportItem item : history) {
@@ -336,7 +337,7 @@ public class CurrentPassport
         return null;
     }
 
-     public PassportItem findStateBackwards(PassportState state)
+     @Nullable public PassportItem findStateBackwards(PassportState state)
     {
         try (Unlocker ignored = lock()) {
             Iterator itr = history.descendingIterator();
@@ -414,7 +415,7 @@ public class CurrentPassport
         }
     }
 
-     @VisibleForTesting
+     @Nullable @VisibleForTesting
     public static CurrentPassport parseFromToString(String text)
     {
         CurrentPassport passport = null;
@@ -498,7 +499,7 @@ class CountingCurrentPassport extends CurrentPassport
         incrementStateCounter(state);
     }
 
-    private void incrementStateCounter(PassportState state)
+    private void incrementStateCounter(@Nullable PassportState state)
     {
         switch (state) {
             case IN_REQ_HEADERS_RECEIVED:

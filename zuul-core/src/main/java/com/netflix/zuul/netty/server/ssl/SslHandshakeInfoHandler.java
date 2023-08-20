@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
+import javax.annotation.Nullable;
 
 
 /**
@@ -53,7 +54,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     public static final AttributeKey<SslHandshakeInfo> ATTR_SSL_INFO = AttributeKey.newInstance("_ssl_handshake_info");
     private static final Logger logger = LoggerFactory.getLogger(SslHandshakeInfoHandler.class);
 
-    private final Registry spectatorRegistry;
+    @Nullable private final Registry spectatorRegistry;
     private final boolean isSSlFromIntermediary;
 
     public SslHandshakeInfoHandler(Registry spectatorRegistry, boolean isSSlFromIntermediary) {
@@ -170,7 +171,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void incrementCounters(
-            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.
             return;

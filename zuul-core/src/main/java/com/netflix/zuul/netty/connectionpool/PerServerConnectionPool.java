@@ -55,7 +55,7 @@ public class PerServerConnectionPool implements IConnectionPool
 
     private final DiscoveryResult server;
     private final SocketAddress serverAddr;
-    private final NettyClientConnectionFactory connectionFactory;
+    @Nullable private final NettyClientConnectionFactory connectionFactory;
     private final ConnectionPoolConfig config;
     private final IClientConfig niwsClientConfig;
 
@@ -81,7 +81,7 @@ public class PerServerConnectionPool implements IConnectionPool
     public PerServerConnectionPool(
             DiscoveryResult server,
             SocketAddress serverAddr,
-            NettyClientConnectionFactory connectionFactory,
+            @Nullable NettyClientConnectionFactory connectionFactory,
             PooledConnectionFactory pooledConnectionFactory,
             ConnectionPoolConfig config,
             IClientConfig niwsClientConfig,
@@ -175,7 +175,7 @@ public class PerServerConnectionPool implements IConnectionPool
         return promise;
     }
 
-     public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
+     @Nullable public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop)
     {
         PooledConnection conn;
         Deque<PooledConnection> connections = getPoolForEventLoop(eventLoop);

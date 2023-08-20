@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 @Singleton
@@ -201,7 +202,7 @@ public final class DynamicFilterLoader implements FilterLoader {
         return Collections.unmodifiableSortedSet(set);
     }
 
-     @Override
+     @Nullable @Override
     public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
         if (name == null || type == null) {
             return null;

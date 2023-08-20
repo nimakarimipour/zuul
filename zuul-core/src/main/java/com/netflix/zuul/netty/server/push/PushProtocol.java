@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import javax.annotation.Nullable;
 
 /**
  * Created by saroskar on 10/10/16.
@@ -118,7 +119,7 @@ public enum PushProtocol {
 
     };
 
-    public final void sendErrorAndClose(ChannelHandlerContext ctx, int statusCode, String reasonText) {
+    public final void sendErrorAndClose(@Nullable ChannelHandlerContext ctx, int statusCode, String reasonText) {
         final Object mesg = serverClosingConnectionMessage(statusCode, reasonText);
         ctx.writeAndFlush(mesg).addListener(ChannelFutureListener.CLOSE);
     }

@@ -21,12 +21,13 @@ import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Spectator;
 import com.netflix.spectator.api.Timer;
+import javax.annotation.Nullable;
 
 public final class SpectatorUtils {
     private SpectatorUtils() {
     }
 
-    public static Counter newCounter(String name, String id) {
+    public static Counter newCounter(String name, @Nullable String id) {
         return Spectator.globalRegistry().counter(name, "id", id);
     }
 

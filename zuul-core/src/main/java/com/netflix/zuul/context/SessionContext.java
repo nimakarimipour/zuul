@@ -126,7 +126,7 @@ import javax.annotation.Nullable;
      *
      * <p>This method exists for static analysis.
      */
-     @Override
+     @Nullable @Override
     public Object get(Object key) {
         return super.get(key);
     }
@@ -228,7 +228,7 @@ import javax.annotation.Nullable;
         return (SessionContext) super.clone();
     }
 
-    public String getString(String key)
+    @Nullable public String getString(String key)
     {
         return (String) get(key);
     }
@@ -271,7 +271,7 @@ import javax.annotation.Nullable;
         else remove(key);
     }
 
-    public String getUUID()
+    @Nullable public String getUUID()
     {
         return getString(KEY_UUID);
     }
@@ -283,7 +283,7 @@ import javax.annotation.Nullable;
     public void setStaticResponse(HttpResponseMessage response) {
         set(KEY_STATIC_RESPONSE, response);
     }
-    public HttpResponseMessage getStaticResponse() {
+    @Nullable public HttpResponseMessage getStaticResponse() {
         return (HttpResponseMessage) get(KEY_STATIC_RESPONSE);
     }
 
@@ -291,7 +291,7 @@ import javax.annotation.Nullable;
      * Gets the throwable that will be use in the Error endpoint.
      *
      */
-    public Throwable getError() {
+    @Nullable public Throwable getError() {
         return (Throwable) get("_error");
 
     }
@@ -304,7 +304,7 @@ import javax.annotation.Nullable;
 
     }
 
-    public String getErrorEndpoint() {
+    @Nullable public String getErrorEndpoint() {
         return (String) get("_error-endpoint");
     }
     public void setErrorEndpoint(String name) {
@@ -375,7 +375,7 @@ import javax.annotation.Nullable;
     /**
      * @return "routeHost" URL
      */
-    public URL getRouteHost() {
+    @Nullable public URL getRouteHost() {
         return (URL) get("routeHost");
     }
 
@@ -392,7 +392,7 @@ import javax.annotation.Nullable;
     /**
      * @return String that represents the filter execution history for the current request
      */
-    public StringBuilder getFilterExecutionSummary() {
+    @Nullable public StringBuilder getFilterExecutionSummary() {
         return (StringBuilder) get(KEY_FILTER_EXECS);
     }
 
@@ -450,7 +450,7 @@ import javax.annotation.Nullable;
      * returns the routeVIP; that is the Eureka "vip" of registered instances
      *
      */
-    public String getRouteVIP() {
+    @Nullable public String getRouteVIP() {
         return (String) get(KEY_VIP);
     }
 
@@ -466,7 +466,7 @@ import javax.annotation.Nullable;
         put(KEY_ENDPOINT, endpoint);
     }
 
-    public String getEndpoint()
+    @Nullable public String getEndpoint()
     {
         return (String) get(KEY_ENDPOINT);
     }
@@ -475,11 +475,11 @@ import javax.annotation.Nullable;
         getEventProperties().put(key, value);
     }
 
-    public Map<String, Object> getEventProperties() {
+    @Nullable public Map<String, Object> getEventProperties() {
         return (Map<String, Object>) this.get(KEY_EVENT_PROPS);
     }
 
-    public List<FilterError> getFilterErrors() {
+    @Nullable public List<FilterError> getFilterErrors() {
         return (List<FilterError>) get(KEY_FILTER_ERRORS);
     }
 
