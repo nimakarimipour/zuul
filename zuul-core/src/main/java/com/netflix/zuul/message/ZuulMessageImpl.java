@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
 
 
 /**
@@ -116,7 +117,7 @@ public class ZuulMessageImpl implements ZuulMessage
     }
 
      @Override
-    public void setBodyAsText(String bodyText) {
+    public void setBodyAsText(@Nullable String bodyText) {
         disposeBufferedBody();
         if (! Strings.isNullOrEmpty(bodyText)) {
             final ByteBuf content = Unpooled.copiedBuffer(bodyText.getBytes(Charsets.UTF_8));
@@ -129,7 +130,7 @@ public class ZuulMessageImpl implements ZuulMessage
     }
 
      @Override
-    public void setBody(byte[] body) {
+    public void setBody(@Nullable byte[] body) {
         disposeBufferedBody();
         if (body != null && body.length > 0) {
             final ByteBuf content = Unpooled.copiedBuffer(body);
@@ -141,13 +142,13 @@ public class ZuulMessageImpl implements ZuulMessage
         }
     }
 
-     @Override
+     @Nullable @Override
     public String getBodyAsText() {
         final byte[] body = getBody();
         return (body != null && body.length > 0) ? new String(getBody(), Charsets.UTF_8) : null;
     }
 
-     @Override
+     @Nullable @Override
     public byte[] getBody() {
         if (bodyChunks.size() == 0) {
             return null;

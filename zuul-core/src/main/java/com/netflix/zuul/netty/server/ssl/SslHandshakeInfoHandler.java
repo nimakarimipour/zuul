@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
+import javax.annotation.Nullable;
 
 
 /**
@@ -170,7 +171,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void incrementCounters(
-            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.
             return;

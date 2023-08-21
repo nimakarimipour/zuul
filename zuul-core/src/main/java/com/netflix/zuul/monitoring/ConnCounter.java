@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 /**
  * A counter for connection stats.  Not thread-safe.
@@ -61,7 +62,7 @@ public final class ConnCounter {
     private final Channel chan;
     private final Id metricBase;
 
-     private String lastCountKey;
+     @Nullable private String lastCountKey;
 
     private final Map<String, Gauge> counts = new HashMap<>();
 
