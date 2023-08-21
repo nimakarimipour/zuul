@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
@@ -108,7 +109,7 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
 
         static final Decoder INSTANCE = new Decoder();
 
-         @Override
+         @NullUnmarked @Override
         public SocketAddress apply(String input) {
             if (input == null || input.isEmpty()) {
                 throw new IllegalArgumentException("Invalid address");

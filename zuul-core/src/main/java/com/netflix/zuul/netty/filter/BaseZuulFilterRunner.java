@@ -66,6 +66,7 @@ import static io.perfmark.PerfMark.attachTag;
 import static io.perfmark.PerfMark.linkIn;
 import static io.perfmark.PerfMark.linkOut;
 import static io.perfmark.PerfMark.traceTask;
+import javax.annotation.Nullable;
 
 
 /**
@@ -76,7 +77,7 @@ import static io.perfmark.PerfMark.traceTask;
 public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends ZuulMessage> implements FilterRunner<I, O> {
 
     private final FilterUsageNotifier usageNotifier;
-    private final FilterRunner<O, ? extends ZuulMessage> nextStage;
+    @Nullable private final FilterRunner<O, ? extends ZuulMessage> nextStage;
 
     private final String RUNNING_FILTER_IDX_SESSION_CTX_KEY;
     private final String AWAITING_BODY_FLAG_SESSION_CTX_KEY;
@@ -88,7 +89,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     private final Id filterExcessiveTimerId;
 
     protected BaseZuulFilterRunner(FilterType filterType, FilterUsageNotifier usageNotifier,
-                                   FilterRunner<O, ?> nextStage, Registry registry) {
+                                   @Nullable FilterRunner<O, ?> nextStage, Registry registry) {
         this.usageNotifier = Preconditions.checkNotNull(usageNotifier, "filter usage notifier");
         this.nextStage = nextStage;
         this.RUNNING_FILTER_IDX_SESSION_CTX_KEY = filterType + "RunningFilterIndex";
@@ -102,7 +103,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
                 "channel handler context");
     }
 
-    public FilterRunner<O, ? extends ZuulMessage> getNextStage() {
+    @Nullable public FilterRunner<O, ? extends ZuulMessage> getNextStage() {
         return nextStage;
     }
 
@@ -198,7 +199,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         attachTag("uuid", inMesg, m -> m.getContext().getUUID());
     }
 
-     protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
+     @Nullable protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
         final long startTime = System.nanoTime();
         final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
         FilterChainResumer resumer = null;
@@ -340,7 +341,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     }
 
     protected void recordFilterCompletion(final ExecutionStatus status, final ZuulFilter<I, O> filter, long startTime,
-                                          final ZuulMessage zuulMesg, final ZuulMessage startSnapshot) {
+                                          final ZuulMessage zuulMesg, @Nullable final ZuulMessage startSnapshot) {
 
         final SessionContext zuulCtx = zuulMesg.getContext();
         final long execTimeNs = System.nanoTime() - startTime;
@@ -415,7 +416,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         private final I inMesg;
         private final ZuulFilter<I, O> filter;
         private final long startTime;
-        private ZuulMessage snapshot;
+        @Nullable private ZuulMessage snapshot;
         private AtomicBoolean concurrencyDecremented;
 
         private final AtomicReference<Link> onNextLinkOut = new AtomicReference<>();
@@ -423,7 +424,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
         private final AtomicReference<Link> onCompletedLinkOut = new AtomicReference<>();
 
         public FilterChainResumer(
-                I inMesg, ZuulFilter<I, O> filter, ZuulMessage snapshot, long startTime) {
+                I inMesg, ZuulFilter<I, O> filter, @Nullable ZuulMessage snapshot, long startTime) {
             this.inMesg = Preconditions.checkNotNull(inMesg, "input message");
             this.filter = Preconditions.checkNotNull(filter, "filter");
             this.snapshot = snapshot;

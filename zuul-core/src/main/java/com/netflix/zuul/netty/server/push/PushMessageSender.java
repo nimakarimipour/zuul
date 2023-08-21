@@ -45,6 +45,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
 
 
 /**
@@ -73,7 +74,7 @@ public abstract class PushMessageSender  extends SimpleChannelInboundHandler<Ful
 
 
     private void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponseStatus status,
-                                  PushUserAuth userAuth) {
+                                  @Nullable PushUserAuth userAuth) {
         final FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, status);
         resp.headers().add("Content-Length", "0");
         final ChannelFuture cf = ctx.channel().writeAndFlush(resp);
@@ -204,7 +205,7 @@ public abstract class PushMessageSender  extends SimpleChannelInboundHandler<Ful
         logger.warn("Push secure token verification failed");
     }
 
-    protected void logPushEvent(FullHttpRequest request, HttpResponseStatus status, PushUserAuth userAuth) {
+    protected void logPushEvent(FullHttpRequest request, HttpResponseStatus status, @Nullable PushUserAuth userAuth) {
         logger.debug("Push notification status: {}, auth: {}", status.code(), userAuth != null ? userAuth : "-");
     }
 

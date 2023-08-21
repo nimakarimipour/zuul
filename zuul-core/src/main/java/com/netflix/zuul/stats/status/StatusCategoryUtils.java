@@ -23,6 +23,7 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
@@ -33,12 +34,12 @@ import org.slf4j.LoggerFactory;
 public class StatusCategoryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(StatusCategoryUtils.class);
 
-     public static StatusCategory getStatusCategory(ZuulMessage msg) {
+     @Nullable public static StatusCategory getStatusCategory(ZuulMessage msg) {
         return getStatusCategory(msg.getContext());
     }
 
-    @Nullable
-    public static StatusCategory getStatusCategory(SessionContext ctx) {
+    @NullUnmarked @Nullable
+    public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
         return ctx.get(CommonContextKeys.STATUS_CATGEORY);
     }
 

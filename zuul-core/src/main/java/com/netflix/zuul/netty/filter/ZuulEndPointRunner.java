@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.concurrent.ThreadSafe;
 
 import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
@@ -121,7 +122,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         }
     }
 
-    @Override
+    @NullUnmarked @Override
     public void filter(final HttpRequestMessage zuulReq, final HttpContent chunk) {
         if (zuulReq.getContext().isCancelled()) {
             chunk.release();
@@ -205,7 +206,7 @@ public class ZuulEndPointRunner extends BaseZuulFilterRunner<HttpRequestMessage,
         return new ProxyEndpoint(zuulRequest, getChannelHandlerContext(zuulRequest), getNextStage(), MethodBinding.NO_OP_BINDING);
     }
 
-    protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(String endpointName) {
+    @Nullable protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(String endpointName) {
         return (Endpoint<I, O>) filterLoader.getFilterByNameAndType(endpointName, FilterType.ENDPOINT);
     }
 

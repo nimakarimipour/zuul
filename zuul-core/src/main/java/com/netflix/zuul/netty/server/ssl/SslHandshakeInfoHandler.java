@@ -41,6 +41,8 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
+import javax.annotation.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
@@ -61,13 +63,13 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
         this.isSSlFromIntermediary = isSSlFromIntermediary;
     }
 
-     @VisibleForTesting
+     @NullUnmarked @VisibleForTesting
     SslHandshakeInfoHandler() {
         spectatorRegistry = null;
         isSSlFromIntermediary = false;
     }
 
-     @Override
+     @NullUnmarked @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof SslHandshakeCompletionEvent) {
             try {
@@ -169,8 +171,8 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
         return clientAuth;
     }
 
-    private void incrementCounters(
-            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+    @NullUnmarked private void incrementCounters(
+            SslHandshakeCompletionEvent sslHandshakeCompletionEvent, @Nullable SslHandshakeInfo handshakeInfo) {
         if (spectatorRegistry == null) {
             // May be null for testing.
             return;

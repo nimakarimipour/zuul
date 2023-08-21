@@ -59,12 +59,14 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
 import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
+import javax.annotation.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
  * Created by saroskar on 2/26/17.
  */
- public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
+ @NullUnmarked public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
 
     private static final Registry NOOP_REGISTRY = new NoopRegistry();
 
@@ -77,7 +79,7 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
     private boolean closeConnection;
 
     //data
-     private HttpResponseMessage zuulResponse;
+     @Nullable private HttpResponseMessage zuulResponse;
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientResponseWriter.class);
 
@@ -279,7 +281,7 @@ import static com.netflix.netty.common.HttpLifecycleChannelHandler.StartEvent;
         }
     }
 
-    protected void completeMetrics(Channel channel, HttpResponseMessage zuulResponse) {
+    protected void completeMetrics(Channel channel, @Nullable HttpResponseMessage zuulResponse) {
         // override for recording complete metrics
     }
 

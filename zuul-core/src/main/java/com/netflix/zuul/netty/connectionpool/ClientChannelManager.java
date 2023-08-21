@@ -24,6 +24,7 @@ import io.netty.util.concurrent.Promise;
 
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 
 /**
  * User: michaels@netflix.com
@@ -46,7 +47,7 @@ public interface ClientChannelManager
 
     Promise<PooledConnection> acquire(
             EventLoop eventLoop,
-            Object key,
+            @Nullable Object key,
             CurrentPassport passport,
             AtomicReference<DiscoveryResult> selectedServer,
             AtomicReference<? super InetAddress> selectedHostAddr);

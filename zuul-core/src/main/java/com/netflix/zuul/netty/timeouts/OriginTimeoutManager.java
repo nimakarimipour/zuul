@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 
 /**
@@ -59,7 +60,7 @@ public class OriginTimeoutManager {
      * @param request    the request.
      * @param attemptNum the attempt number, starting at 1.
      */
-     public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
+     @NullUnmarked public Duration computeReadTimeout(HttpRequestMessage request, int attemptNum) {
         IClientConfig clientConfig = getRequestClientConfig(request);
         Long originTimeout = getOriginReadTimeout();
         Long requestTimeout = getRequestReadTimeout(clientConfig);

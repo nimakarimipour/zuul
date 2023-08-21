@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
+import javax.annotation.Nullable;
 
 /**
  * This class is one of the core classes in Zuul. It compiles, loads from a File, and checks if source code changed.
@@ -54,9 +55,9 @@ public interface FilterLoader {
     /**
      * Returns a sorted set of filters by the filterType specified.
      */
-    SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType);
+    @Nullable SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType);
 
-    ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type);
+    @Nullable ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type);
 
     Comparator<ZuulFilter<?, ?>> FILTER_COMPARATOR =
             Comparator.<ZuulFilter<?, ?>>comparingInt(ZuulFilter::filterOrder).thenComparing(ZuulFilter::filterName);

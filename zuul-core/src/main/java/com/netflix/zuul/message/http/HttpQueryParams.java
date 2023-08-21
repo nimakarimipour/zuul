@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.annotation.Nullable;
 
 
 /**
@@ -57,7 +58,7 @@ public class HttpQueryParams implements Cloneable
         trailingEquals = new HashMap<>();
     }
 
-    public static HttpQueryParams parse(String queryString) {
+    public static HttpQueryParams parse(@Nullable String queryString) {
         HttpQueryParams queryParams = new HttpQueryParams();
         if (queryString == null) {
             return queryParams;
@@ -110,7 +111,7 @@ public class HttpQueryParams implements Cloneable
      * Get the first value found for this key even if there are multiple. If none, then
      * return null.
      */
-     public String getFirst(String name)
+     @Nullable public String getFirst(String name)
     {
         List<String> values = delegate.get(name);
         if (values != null) {
