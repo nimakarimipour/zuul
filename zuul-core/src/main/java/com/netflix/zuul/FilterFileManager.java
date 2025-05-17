@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class FilterFileManager {
   private static final DynamicIntProperty FILE_PROCESSOR_TASKS_TIMEOUT_SECS =
       new DynamicIntProperty("zuul.filterloader.tasks.timeout", 120);
 
-  Thread poller;
+  @Nullable Thread poller;
   boolean bRunning = true;
 
   private final FilterFileManagerConfig config;

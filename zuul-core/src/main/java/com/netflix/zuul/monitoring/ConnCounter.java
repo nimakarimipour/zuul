@@ -26,6 +26,7 @@ import io.netty.util.AttributeKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public final class ConnCounter {
   private final Channel chan;
   private final Id metricBase;
 
-  private String lastCountKey;
+  @Nullable private String lastCountKey;
 
   private final Map<String, Gauge> counts = new HashMap<>();
 

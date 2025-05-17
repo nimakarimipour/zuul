@@ -21,21 +21,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 
 @Singleton
 public final class MutableFilterRegistry implements FilterRegistry {
   private final ConcurrentHashMap<String, ZuulFilter<?, ?>> filters = new ConcurrentHashMap<>();
 
-  
   @Override
   public ZuulFilter<?, ?> remove(String key) {
     return filters.remove(requireNonNull(key, "key"));
   }
 
   @Override
-  
   public ZuulFilter<?, ?> get(String key) {
     return filters.get(requireNonNull(key, "key"));
   }

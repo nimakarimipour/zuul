@@ -50,7 +50,7 @@ public final class ConnTimer {
   private final Channel chan;
   // TODO(carl-mastrangelo): make this changable.
   private final Id metricBase;
-   private final Id preciseMetricBase;
+  @Nullable private final Id preciseMetricBase;
 
   private final Map<String, Long> timings = new LinkedHashMap<>();
 

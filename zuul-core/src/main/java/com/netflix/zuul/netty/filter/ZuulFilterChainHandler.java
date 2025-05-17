@@ -46,6 +46,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import java.nio.channels.ClosedChannelException;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
 
   private final ZuulFilterChainRunner<HttpRequestMessage> requestFilterChain;
   private final ZuulFilterChainRunner<HttpResponseMessage> responseFilterChain;
-  private HttpRequestMessage zuulRequest;
+  @Nullable private HttpRequestMessage zuulRequest;
 
   private static final Logger LOG = LoggerFactory.getLogger(ZuulFilterChainHandler.class);
 
@@ -125,6 +126,7 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
     }
   }
 
+  @Nullable
   protected HttpRequestMessage getZuulRequest() {
     return zuulRequest;
   }

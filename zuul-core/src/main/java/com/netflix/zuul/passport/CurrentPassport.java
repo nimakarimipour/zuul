@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,6 +154,7 @@ public class CurrentPassport {
     ch.attr(CHANNEL_ATTR).set(null);
   }
 
+  @Nullable
   public PassportState getState() {
     try (Unlocker ignored = lock()) {
       PassportItem passportItem = history.peekLast();
@@ -305,6 +307,7 @@ public class CurrentPassport {
     return items;
   }
 
+  @Nullable
   public PassportItem findState(PassportState state) {
     try (Unlocker ignored = lock()) {
       for (PassportItem item : history) {
@@ -316,6 +319,7 @@ public class CurrentPassport {
     return null;
   }
 
+  @Nullable
   public PassportItem findStateBackwards(PassportState state) {
     try (Unlocker ignored = lock()) {
       Iterator itr = history.descendingIterator();
@@ -392,6 +396,7 @@ public class CurrentPassport {
     }
   }
 
+  @Nullable
   @VisibleForTesting
   public static CurrentPassport parseFromToString(String text) {
     CurrentPassport passport = null;
@@ -472,7 +477,7 @@ class CountingCurrentPassport extends CurrentPassport {
     incrementStateCounter(state);
   }
 
-  private void incrementStateCounter(PassportState state) {
+  private void incrementStateCounter(@Nullable PassportState state) {
     switch (state) {
       case IN_REQ_HEADERS_RECEIVED:
         IN_REQ_HEADERS_RECEIVED_CNT.increment();

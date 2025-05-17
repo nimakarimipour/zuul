@@ -20,11 +20,12 @@ import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import javax.annotation.Nullable;
 
 public class PassportStateListener implements GenericFutureListener {
   private final CurrentPassport passport;
   private final PassportState successState;
-  private final PassportState failState;
+  @Nullable private final PassportState failState;
 
   public PassportStateListener(CurrentPassport passport, PassportState successState) {
     this.passport = passport;

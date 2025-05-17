@@ -15,15 +15,18 @@
  */
 package com.netflix.zuul;
 
+import javax.annotation.Nullable;
+
 /**
  * Metadata about the Zuul instance/ application name and "stack"
  *
  * @author Mikey Cohen Date: 2/15/13 Time: 1:56 PM
  */
 public class ZuulApplicationInfo {
-  public static String applicationName;
-  public static String stack;
+  @Nullable public static String applicationName;
+  @Nullable public static String stack;
 
+  @Nullable
   public static String getApplicationName() {
     return applicationName;
   }
@@ -32,6 +35,7 @@ public class ZuulApplicationInfo {
     ZuulApplicationInfo.applicationName = applicationName;
   }
 
+  @Nullable
   public static String getStack() {
     return stack;
   }

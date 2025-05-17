@@ -18,11 +18,12 @@ package com.netflix.zuul.netty.server.push;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javax.annotation.Nullable;
 
 /** Author: Susheel Aroskar Date: 11/2/2018 */
 public class PushClientProtocolHandler extends ChannelInboundHandlerAdapter {
 
-  protected PushUserAuth authEvent;
+  @Nullable protected PushUserAuth authEvent;
 
   protected boolean isAuthenticated() {
     return (authEvent != null && authEvent.isSuccess());

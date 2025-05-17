@@ -30,6 +30,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.timeout.IdleStateEvent;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +168,7 @@ public class ConnectionPoolHandler extends ChannelDuplexHandler {
     }
   }
 
+  @Nullable
   private static String getConnectionHeader(CompleteEvent completeEvt) {
     HttpResponse response = completeEvt.getResponse();
     if (response != null) {

@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
@@ -198,6 +199,7 @@ public final class DynamicFilterLoader implements FilterLoader {
     return Collections.unmodifiableSortedSet(set);
   }
 
+  @Nullable
   @Override
   public ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type) {
     if (name == null || type == null) {

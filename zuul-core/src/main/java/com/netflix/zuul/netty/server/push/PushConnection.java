@@ -22,13 +22,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import javax.annotation.Nullable;
 
 /** Author: Susheel Aroskar Date: */
 public class PushConnection {
 
   private final PushProtocol pushProtocol;
   private final ChannelHandlerContext ctx;
-  private String secureToken;
+  @Nullable private String secureToken;
 
   // Token bucket implementation state.
   private double tkBktAllowance;
@@ -45,6 +46,7 @@ public class PushConnection {
     tkBktLastCheckTime = System.currentTimeMillis();
   }
 
+  @Nullable
   public String getSecureToken() {
     return secureToken;
   }

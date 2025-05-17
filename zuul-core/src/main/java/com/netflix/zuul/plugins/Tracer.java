@@ -20,6 +20,7 @@ import com.netflix.zuul.monitoring.TracerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 /**
  * Plugin to hook up Servo Tracers
@@ -64,6 +65,7 @@ public class Tracer extends TracerFactory {
     return (loadAddress() != null) ? loadAddress().getHostAddress() : "unknownHost";
   }
 
+  @Nullable
   private static InetAddress loadAddress() {
     try {
       return InetAddress.getLocalHost();

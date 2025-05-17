@@ -23,6 +23,7 @@ import com.netflix.zuul.message.http.HttpHeaderNames;
 import com.netflix.zuul.message.http.HttpRequestMessage;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /** User: michaels@netflix.com Date: 6/8/15 Time: 11:50 AM */
 public class ProxyUtils {
@@ -67,7 +68,8 @@ public class ProxyUtils {
     addXForwardedHeader(headers, HttpHeaderNames.X_FORWARDED_FOR, request.getClientIp());
   }
 
-  public static void addXForwardedHeader(Headers headers, HeaderName name, String latestValue) {
+  public static void addXForwardedHeader(
+      Headers headers, HeaderName name, @Nullable String latestValue) {
     if (OVERWRITE_XF_HEADERS.get()) {
       headers.set(name, latestValue);
     } else {

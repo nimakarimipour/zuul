@@ -70,9 +70,9 @@ public class ZuulEndPointRunner
     this.filterLoader = filterLoader;
   }
 
-  
+  @Nullable
   public static ZuulFilter<HttpRequestMessage, HttpResponseMessage> getEndpoint(
-       final HttpRequestMessage zuulReq) {
+      @Nullable final HttpRequestMessage zuulReq) {
     if (zuulReq != null) {
       return zuulReq.getContext().get(ZUUL_ENDPOINT);
     }
@@ -222,6 +222,7 @@ public class ZuulEndPointRunner
         MethodBinding.NO_OP_BINDING);
   }
 
+  @Nullable
   protected <I extends ZuulMessage, O extends ZuulMessage> Endpoint<I, O> getEndpointFilter(
       String endpointName) {
     return (Endpoint<I, O>) filterLoader.getFilterByNameAndType(endpointName, FilterType.ENDPOINT);

@@ -41,7 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
 
 /**
  * A collection of rejection related utilities useful for failing requests. These are tightly
@@ -69,7 +68,7 @@ public final class RejectionUtils {
       StatusCategory nfStatus,
       String reason,
       HttpRequest request,
-       Integer injectedLatencyMillis) {
+      Integer injectedLatencyMillis) {
     if (injectedLatencyMillis != null && injectedLatencyMillis > 0) {
       // Delay closing the connection for configured time.
       ctx.executor()
@@ -109,7 +108,7 @@ public final class RejectionUtils {
       StatusCategory nfStatus,
       String reason,
       HttpRequest request,
-       Integer injectedLatencyMillis,
+      Integer injectedLatencyMillis,
       HttpResponseStatus rejectedCode,
       String rejectedBody,
       Map<String, String> rejectionHeaders) {
@@ -171,7 +170,7 @@ public final class RejectionUtils {
       RejectionType rejectionType,
       StatusCategory nfStatus,
       String reason,
-       Integer injectedLatencyMillis,
+      Integer injectedLatencyMillis,
       HttpResponseStatus rejectedCode,
       String rejectedBody,
       Map<String, String> rejectionHeaders)
@@ -232,7 +231,7 @@ public final class RejectionUtils {
       StatusCategory nfStatus,
       String reason,
       HttpRequest request,
-       Integer injectedLatencyMillis,
+      Integer injectedLatencyMillis,
       HttpResponseStatus rejectedCode,
       String rejectedBody) {
     reject(
@@ -267,7 +266,7 @@ public final class RejectionUtils {
       StatusCategory nfStatus,
       String reason,
       HttpRequest request,
-       Integer injectedLatencyMillis,
+      Integer injectedLatencyMillis,
       HttpResponseStatus rejectedCode,
       String rejectedBody,
       Map<String, String> rejectionHeaders) {

@@ -80,7 +80,7 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
     UDS,
     ;
 
-     private final Supplier<? extends InetAddress> addressSupplier;
+    @Nullable private final Supplier<? extends InetAddress> addressSupplier;
 
     BindType() {
       addressSupplier = null;

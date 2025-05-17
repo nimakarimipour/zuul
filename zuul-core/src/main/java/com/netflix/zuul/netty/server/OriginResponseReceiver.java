@@ -48,13 +48,14 @@ import io.netty.util.ReferenceCountUtil;
 import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
 import java.io.IOException;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Created by saroskar on 1/18/17. */
 public class OriginResponseReceiver extends ChannelDuplexHandler {
 
-  private volatile ProxyEndpoint edgeProxy;
+  @Nullable private volatile ProxyEndpoint edgeProxy;
 
   private static final Logger LOG = LoggerFactory.getLogger(OriginResponseReceiver.class);
   private static final AttributeKey<Throwable> SSL_HANDSHAKE_UNSUCCESS_FROM_ORIGIN_THROWABLE =

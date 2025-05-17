@@ -15,13 +15,15 @@
  */
 package com.netflix.zuul.exception;
 
+import javax.annotation.Nullable;
+
 /**
  * All handled exceptions in Zuul are ZuulExceptions
  *
  * @author Mikey Cohen Date: 10/20/11 Time: 4:33 PM
  */
 public class ZuulException extends RuntimeException {
-  private String errorCause;
+  @Nullable private String errorCause;
   private int statusCode = 500;
   private boolean shouldLogAsError = true;
 
@@ -47,7 +49,7 @@ public class ZuulException extends RuntimeException {
     this(sMessage, errorCause, false);
   }
 
-  public ZuulException(String sMessage, String errorCause, boolean noStackTrace) {
+  public ZuulException(String sMessage, @Nullable String errorCause, boolean noStackTrace) {
     super(sMessage, null, noStackTrace, !noStackTrace);
     this.errorCause = errorCause;
   }
@@ -87,6 +89,7 @@ public class ZuulException extends RuntimeException {
     return shouldLogAsError;
   }
 
+  @Nullable
   public String getErrorCause() {
     return errorCause;
   }

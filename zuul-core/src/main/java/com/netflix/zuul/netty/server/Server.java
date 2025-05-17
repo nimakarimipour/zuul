@@ -31,6 +31,7 @@ import com.netflix.spectator.api.patterns.PolledMeter;
 import com.netflix.zuul.Attrs;
 import com.netflix.zuul.monitoring.ConnCounter;
 import com.netflix.zuul.monitoring.ConnTimer;
+import com.uber.nullaway.annotations.Initializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufAllocatorMetric;
@@ -381,6 +382,7 @@ public class Server {
       Runtime.getRuntime().addShutdownHook(jvmShutdownHook);
     }
 
+    @Initializer
     private void initializeTransport() {
       // TODO - try our own impl of ChooserFactory that load-balances across the eventloops using
       // leastconns algo?

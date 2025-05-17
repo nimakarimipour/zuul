@@ -57,6 +57,7 @@ import io.netty.handler.codec.http2.HttpConversionUtil;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.ReferenceCountUtil;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
   private boolean closeConnection;
 
   // data
-  private HttpResponseMessage zuulResponse;
+  @Nullable private HttpResponseMessage zuulResponse;
 
   private static final Logger LOG = LoggerFactory.getLogger(ClientResponseWriter.class);
 
@@ -286,7 +287,7 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
     }
   }
 
-  protected void completeMetrics(Channel channel, HttpResponseMessage zuulResponse) {
+  protected void completeMetrics(Channel channel, @Nullable HttpResponseMessage zuulResponse) {
     // override for recording complete metrics
   }
 

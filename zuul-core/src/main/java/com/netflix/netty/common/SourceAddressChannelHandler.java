@@ -28,7 +28,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import javax.annotation.Nullable;
 
 /**
  * Stores the source IP address as an attribute of the channel. This has the advantage of allowing
@@ -127,7 +126,6 @@ public final class SourceAddressChannelHandler extends ChannelInboundHandlerAdap
 
   /** Returns the String form of a socket address, or {@code null} if there isn't one. */
   @VisibleForTesting
-  
   static String getHostAddress(InetSocketAddress socketAddress) {
     InetAddress address = socketAddress.getAddress();
     if (address instanceof Inet6Address) {

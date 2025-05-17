@@ -57,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,6 +204,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     attachTag("uuid", inMesg, m -> m.getContext().getUUID());
   }
 
+  @Nullable
   protected final O filter(final ZuulFilter<I, O> filter, final I inMesg) {
     final long startTime = System.nanoTime();
     final ZuulMessage snapshot = inMesg.getContext().debugRouting() ? inMesg.clone() : null;
@@ -377,7 +379,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
       final ZuulFilter<I, O> filter,
       long startTime,
       final ZuulMessage zuulMesg,
-      final ZuulMessage startSnapshot) {
+      @Nullable final ZuulMessage startSnapshot) {
 
     final SessionContext zuulCtx = zuulMesg.getContext();
     final long execTimeNs = System.nanoTime() - startTime;
@@ -465,7 +467,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     private final I inMesg;
     private final ZuulFilter<I, O> filter;
     private final long startTime;
-    private ZuulMessage snapshot;
+    @Nullable private ZuulMessage snapshot;
     private AtomicBoolean concurrencyDecremented;
 
     private final AtomicReference<Link> onNextLinkOut = new AtomicReference<>();
@@ -473,7 +475,7 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     private final AtomicReference<Link> onCompletedLinkOut = new AtomicReference<>();
 
     public FilterChainResumer(
-        I inMesg, ZuulFilter<I, O> filter, ZuulMessage snapshot, long startTime) {
+        I inMesg, ZuulFilter<I, O> filter, @Nullable ZuulMessage snapshot, long startTime) {
       this.inMesg = Preconditions.checkNotNull(inMesg, "input message");
       this.filter = Preconditions.checkNotNull(filter, "filter");
       this.snapshot = snapshot;

@@ -36,6 +36,7 @@ import io.netty.util.AttributeKey;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import org.slf4j.Logger;
@@ -198,7 +199,8 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
   }
 
   private void incrementCounters(
-      SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+      SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
+      @Nullable SslHandshakeInfo handshakeInfo) {
     if (spectatorRegistry == null) {
       // May be null for testing.
       return;

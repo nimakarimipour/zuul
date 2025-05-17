@@ -38,7 +38,7 @@ public class PushConnectionRegistry {
     secureTokenGenerator = new SecureRandom();
   }
 
-  
+  @Nullable
   public PushConnection get(final String clientId) {
     return clientPushConnectionMap.get(clientId);
   }

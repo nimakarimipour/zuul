@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents the context between client and origin server for the duration of the dedicated
@@ -128,7 +127,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
 
   /** Returns the value in the context, or {@code null} if absent. */
   @SuppressWarnings("unchecked")
-  
   public <T> T get(Key<T> key) {
     return (T) typedMap.get(Objects.requireNonNull(key, "key"));
   }
@@ -160,7 +158,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
    * key. Unlike {@link #put(String, Object)}, this will never return a null value if the key is
    * present in the map.
    */
-  
   @CanIgnoreReturnValue
   public <T> T put(Key<T> key, T value) {
     Objects.requireNonNull(key, "key");

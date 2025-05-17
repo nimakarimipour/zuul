@@ -37,6 +37,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.ReferenceCountUtil;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public abstract class PushMessageSender extends SimpleChannelInboundHandler<Full
       ChannelHandlerContext ctx,
       FullHttpRequest request,
       HttpResponseStatus status,
-      PushUserAuth userAuth) {
+      @Nullable PushUserAuth userAuth) {
     final FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, status);
     resp.headers().add("Content-Length", "0");
     final ChannelFuture cf = ctx.channel().writeAndFlush(resp);
@@ -200,7 +201,7 @@ public abstract class PushMessageSender extends SimpleChannelInboundHandler<Full
   }
 
   protected void logPushEvent(
-      FullHttpRequest request, HttpResponseStatus status, PushUserAuth userAuth) {
+      FullHttpRequest request, HttpResponseStatus status, @Nullable PushUserAuth userAuth) {
     logger.debug(
         "Push notification status: {}, auth: {}", status.code(), userAuth != null ? userAuth : "-");
   }

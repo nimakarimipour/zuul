@@ -29,6 +29,7 @@ import com.netflix.zuul.discovery.SimpleMetaInfo;
 import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import io.netty.handler.timeout.ReadTimeoutException;
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLHandshakeException;
 
 /** User: michaels@netflix.com Date: 9/2/14 Time: 2:52 PM */
@@ -38,17 +39,17 @@ public class RequestAttempt {
   private int attempt;
   private int status;
   private long duration;
-  private String cause;
-  private String error;
-  private String exceptionType;
-  private String app;
-  private String asg;
-  private String instanceId;
-  private String host;
+  @Nullable private String cause;
+  @Nullable private String error;
+  @Nullable private String exceptionType;
+  @Nullable private String app;
+  @Nullable private String asg;
+  @Nullable private String instanceId;
+  @Nullable private String host;
   private int port;
-  private String vip;
-  private String region;
-  private String availabilityZone;
+  @Nullable private String vip;
+  @Nullable private String region;
+  @Nullable private String availabilityZone;
   private long readTimeout;
   private int connectTimeout;
   private int maxRetries;
@@ -159,6 +160,7 @@ public class RequestAttempt {
     return attempt;
   }
 
+  @Nullable
   public String getVip() {
     return vip;
   }
@@ -171,22 +173,27 @@ public class RequestAttempt {
     return this.duration;
   }
 
+  @Nullable
   public String getError() {
     return error;
   }
 
+  @Nullable
   public String getApp() {
     return app;
   }
 
+  @Nullable
   public String getAsg() {
     return asg;
   }
 
+  @Nullable
   public String getInstanceId() {
     return instanceId;
   }
 
+  @Nullable
   public String getHost() {
     return host;
   }
@@ -195,14 +202,17 @@ public class RequestAttempt {
     return port;
   }
 
+  @Nullable
   public String getRegion() {
     return region;
   }
 
+  @Nullable
   public String getAvailabilityZone() {
     return availabilityZone;
   }
 
+  @Nullable
   public String getExceptionType() {
     return exceptionType;
   }
@@ -341,7 +351,8 @@ public class RequestAttempt {
     return root;
   }
 
-  private static ObjectNode putNullableAttribute(ObjectNode node, String name, String value) {
+  private static ObjectNode putNullableAttribute(
+      ObjectNode node, String name, @Nullable String value) {
     if (value != null) {
       node.put(name, value);
     }

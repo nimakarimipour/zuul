@@ -29,6 +29,7 @@ import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 
 /**
  * Netty Origin interface for integrating cleanly with the ProxyEndpoint state management class.
@@ -77,6 +78,7 @@ public interface NettyOrigin extends InstrumentedOrigin {
   RequestAttempt newRequestAttempt(
       final DiscoveryResult server, final SessionContext zuulCtx, int attemptNum);
 
+  @Nullable
   String getIpAddrFromServer(DiscoveryResult server);
 
   IClientConfig getClientConfig();

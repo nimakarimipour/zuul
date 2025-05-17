@@ -37,6 +37,7 @@ import com.netflix.zuul.FilterUsageNotifier;
 import com.netflix.zuul.RequestCompleteHandler;
 import com.netflix.zuul.context.SessionContextDecorator;
 import com.netflix.zuul.netty.ratelimiting.NullChannelHandlerProvider;
+import com.uber.nullaway.annotations.Initializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -46,7 +47,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +103,7 @@ public abstract class BaseServerStartup {
     return server;
   }
 
+  @Initializer
   @Inject
   public void init() throws Exception {
     ChannelGroup clientChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -353,7 +354,7 @@ public abstract class BaseServerStartup {
   }
 
   protected final void logAddrConfigured(
-      SocketAddress socketAddress,  ServerSslConfig serverSslConfig) {
+      SocketAddress socketAddress, ServerSslConfig serverSslConfig) {
     String msg = "Configured address: " + socketAddress;
     if (serverSslConfig != null) {
       msg = msg + " with SSL config: " + serverSslConfig;
@@ -362,7 +363,7 @@ public abstract class BaseServerStartup {
   }
 
   protected final void logAddrConfigured(
-      SocketAddress socketAddress,  AsyncMapping<String, SslContext> sniMapping) {
+      SocketAddress socketAddress, AsyncMapping<String, SslContext> sniMapping) {
     String msg = "Configured address: " + socketAddress;
     if (sniMapping != null) {
       msg = msg + " with SNI config: " + sniMapping;
@@ -370,8 +371,7 @@ public abstract class BaseServerStartup {
     LOG.info(msg);
   }
 
-  protected final void logSecureAddrConfigured(
-      SocketAddress socketAddress,  Object securityConfig) {
+  protected final void logSecureAddrConfigured(SocketAddress socketAddress, Object securityConfig) {
     LOG.info("Configured address: {} with security config {}", socketAddress, securityConfig);
   }
 }

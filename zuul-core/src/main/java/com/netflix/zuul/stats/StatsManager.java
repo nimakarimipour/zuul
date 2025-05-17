@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +77,20 @@ public class StatsManager {
    * @param statusCode
    * @return the RouteStatusCodeMonitor for the given route and status code
    */
+  @Nullable
   public RouteStatusCodeMonitor getRouteStatusCodeMonitor(String route, int statusCode) {
     Map<Integer, RouteStatusCodeMonitor> map = routeStatusMap.get(route);
     if (map == null) return null;
     return map.get(statusCode);
   }
 
+  @Nullable
   @VisibleForTesting
   NamedCountingMonitor getHostMonitor(String host) {
     return this.hostCounterMap.get(hostKey(host));
   }
 
+  @Nullable
   @VisibleForTesting
   NamedCountingMonitor getProtocolMonitor(String proto) {
     return this.protocolCounterMap.get(protocolKey(proto));

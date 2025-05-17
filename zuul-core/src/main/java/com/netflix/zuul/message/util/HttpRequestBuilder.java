@@ -24,6 +24,7 @@ import com.netflix.zuul.message.http.HttpRequestMessageImpl;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Builder for a zuul http request. *exclusively* for use in unit tests.
@@ -53,7 +54,7 @@ public final class HttpRequestBuilder {
   private String clientIp;
   private String scheme;
   private int port;
-  private String serverName;
+  @Nullable private String serverName;
   private boolean isBuilt;
 
   public HttpRequestBuilder(SessionContext context) {

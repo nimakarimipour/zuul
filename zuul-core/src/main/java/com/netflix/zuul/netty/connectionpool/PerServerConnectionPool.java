@@ -168,6 +168,7 @@ public class PerServerConnectionPool implements IConnectionPool {
     return promise;
   }
 
+  @Nullable
   public PooledConnection tryGettingFromConnectionPool(EventLoop eventLoop) {
     PooledConnection conn;
     Deque<PooledConnection> connections = getPoolForEventLoop(eventLoop);
@@ -390,7 +391,7 @@ public class PerServerConnectionPool implements IConnectionPool {
     return connsInUse.get();
   }
 
-  
+  @Nullable
   private static InetAddress getSelectedHostString(SocketAddress addr) {
     if (addr instanceof InetSocketAddress) {
       return ((InetSocketAddress) addr).getAddress();

@@ -97,7 +97,7 @@ public class OriginTimeoutManager {
   }
 
   /** This method makes the assumption that the timeout is a numeric value */
-  
+  @Nullable
   private Long getRequestReadTimeout(IClientConfig clientConfig) {
     return Optional.ofNullable(clientConfig.get(CommonClientConfigKey.ReadTimeout))
         .map(Long::valueOf)
@@ -105,7 +105,7 @@ public class OriginTimeoutManager {
   }
 
   /** This method makes the assumption that the timeout is a numeric value */
-  
+  @Nullable
   private Long getOriginReadTimeout() {
     return Optional.ofNullable(origin.getClientConfig().get(CommonClientConfigKey.ReadTimeout))
         .map(Long::valueOf)

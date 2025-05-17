@@ -109,7 +109,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +133,7 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
   /* Individual request related state */
   protected final HttpRequestMessage zuulRequest;
   protected final SessionContext context;
-   protected final NettyOrigin origin;
+  protected final NettyOrigin origin;
   protected final RequestAttempts requestAttempts;
   protected final CurrentPassport passport;
   protected final NettyRequestAttemptFactory requestAttemptFactory;
@@ -1065,7 +1064,6 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
    * <p>Note: this method gets called in the constructor so if overloading it or any methods called
    * within, you cannot rely on your own constructor parameters.
    */
-  
   protected NettyOrigin getOrigin(HttpRequestMessage request) {
     SessionContext context = request.getContext();
     OriginManager<NettyOrigin> originManager =
@@ -1130,7 +1128,6 @@ public class ProxyEndpoint extends SyncZuulFilterAdapter<HttpRequestMessage, Htt
    *
    * @return {@code null} if unused.
    */
-  
   protected OriginName injectCustomOriginName(HttpRequestMessage request) {
     // override for custom vip injection
     return null;

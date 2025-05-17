@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,16 +85,16 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
   private String clientIp;
   private String scheme;
   private int port;
-  private String serverName;
+  @Nullable private String serverName;
   private SocketAddress clientRemoteAddress;
 
-  private HttpRequestInfo inboundRequest = null;
-  private Cookies parsedCookies = null;
+  @Nullable private HttpRequestInfo inboundRequest = null;
+  @Nullable private Cookies parsedCookies = null;
 
   // These attributes are populated only if immutable=true.
-  private String reconstructedUri = null;
-  private String pathAndQuery = null;
-  private String infoForLogging = null;
+  @Nullable private String reconstructedUri = null;
+  @Nullable private String pathAndQuery = null;
+  @Nullable private String infoForLogging = null;
 
   private static final SocketAddress UNDEFINED_CLIENT_DEST_ADDRESS =
       new SocketAddress() {
@@ -113,7 +114,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
       String clientIp,
       String scheme,
       int port,
-      String serverName) {
+      @Nullable String serverName) {
     this(
         context,
         protocol,
@@ -139,7 +140,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
       String clientIp,
       String scheme,
       int port,
-      String serverName,
+      @Nullable String serverName,
       SocketAddress clientRemoteAddress,
       boolean immutable) {
     this.immutable = immutable;
@@ -226,11 +227,13 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
     message.runBufferedBodyContentThroughFilter(filter);
   }
 
+  @Nullable
   @Override
   public String getBodyAsText() {
     return message.getBodyAsText();
   }
 
+  @Nullable
   @Override
   public byte[] getBody() {
     return message.getBody();
@@ -358,6 +361,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
     this.port = port;
   }
 
+  @Nullable
   @Override
   public String getServerName() {
     return serverName;
@@ -464,6 +468,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
     inboundRequest = copyRequestInfo();
   }
 
+  @Nullable
   @Override
   public HttpRequestInfo getInboundRequest() {
     return inboundRequest;
@@ -507,6 +512,7 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
    * <p>The Host header may contain port, but in this method we strip it out for consistency - use
    * the getOriginalPort method for that.
    */
+  @Nullable
   @Override
   public String getOriginalHost() {
     try {
@@ -516,8 +522,10 @@ public class HttpRequestMessageImpl implements HttpRequestMessage {
     }
   }
 
+  @Nullable
   @VisibleForTesting
-  static String getOriginalHost(Headers headers, String serverName) throws URISyntaxException {
+  static String getOriginalHost(Headers headers, @Nullable String serverName)
+      throws URISyntaxException {
     String xForwardedHost = headers.getFirst(HttpHeaderNames.X_FORWARDED_HOST);
     if (xForwardedHost != null) {
       return xForwardedHost;

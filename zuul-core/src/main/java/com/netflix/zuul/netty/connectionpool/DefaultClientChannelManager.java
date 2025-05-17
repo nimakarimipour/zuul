@@ -33,6 +33,7 @@ import com.netflix.zuul.origins.OriginName;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.resolver.Resolver;
 import com.netflix.zuul.resolver.ResolverListener;
+import com.uber.nullaway.annotations.Initializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -189,6 +190,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
         SpectatorUtils.newGauge(METRIC_PREFIX + "_inUse", metricId, new AtomicInteger());
   }
 
+  @Initializer
   @Override
   public void init() {
     // Load channel initializer and conn factory.
@@ -365,7 +367,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
   @Override
   public Promise<PooledConnection> acquire(
       EventLoop eventLoop,
-       Object key,
+      @Nullable Object key,
       CurrentPassport passport,
       AtomicReference<DiscoveryResult> selectedServer,
       AtomicReference<? super InetAddress> selectedHostAddr) {
@@ -507,8 +509,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
   }
 
   @VisibleForTesting
-  static SocketAddress pickAddressInternal(
-      ResolverResult chosenServer,  OriginName originName) {
+  static SocketAddress pickAddressInternal(ResolverResult chosenServer, OriginName originName) {
     String rawHost;
     int port;
     rawHost = chosenServer.getHost();

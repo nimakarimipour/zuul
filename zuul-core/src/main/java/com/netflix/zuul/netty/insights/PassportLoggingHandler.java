@@ -36,6 +36,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +149,7 @@ public class PassportLoggingHandler extends ChannelInboundHandlerAdapter {
     return req.getPath().equals("/healthcheck");
   }
 
-  protected String getRequestId(Channel channel, SessionContext ctx) {
+  protected String getRequestId(Channel channel, @Nullable SessionContext ctx) {
     return ctx == null ? "-" : ctx.getUUID();
   }
 }

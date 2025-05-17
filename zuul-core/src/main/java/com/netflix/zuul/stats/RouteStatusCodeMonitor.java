@@ -22,7 +22,6 @@ import com.netflix.spectator.api.patterns.PolledMeter;
 import com.netflix.zuul.stats.monitoring.NamedCount;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
 
 /**
  * counter for per route/status code counting
@@ -36,7 +35,7 @@ public class RouteStatusCodeMonitor implements NamedCount {
 
   private final AtomicLong count = new AtomicLong();
 
-  public RouteStatusCodeMonitor( String route, int statusCode) {
+  public RouteStatusCodeMonitor(String route, int statusCode) {
     if (route == null) {
       route = "";
     }

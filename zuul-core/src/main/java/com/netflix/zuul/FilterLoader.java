@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
+import javax.annotation.Nullable;
 
 /**
  * This class is one of the core classes in Zuul. It compiles, loads from a File, and checks if
@@ -51,8 +52,10 @@ public interface FilterLoader {
   ZuulFilter<?, ?> putFilterForClassName(String className) throws Exception;
 
   /** Returns a sorted set of filters by the filterType specified. */
+  @Nullable
   SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType);
 
+  @Nullable
   ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type);
 
   Comparator<ZuulFilter<?, ?>> FILTER_COMPARATOR =
