@@ -20,23 +20,20 @@ import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
 
 /**
- * This needs to be inserted in the pipeline after the Http2 Codex, but before any h2-&gt;h1 conversion.
+ * This needs to be inserted in the pipeline after the Http2 Codex, but before any h2-&gt;h1
+ * conversion.
  *
- * User: michaels@netflix.com
- * Date: 2/8/17
- * Time: 9:58 AM
+ * <p>User: michaels@netflix.com Date: 2/8/17 Time: 9:58 AM
  */
 @ChannelHandler.Sharable
-public class Http2ConnectionExpiryHandler extends AbstrHttpConnectionExpiryHandler
-{
-    public Http2ConnectionExpiryHandler(int maxRequests, int maxRequestsUnderBrownout, int maxExpiry)
-    {
-        super(ConnectionCloseType.DELAYED_GRACEFUL, maxRequestsUnderBrownout, maxRequests, maxExpiry);
-    }
+public class Http2ConnectionExpiryHandler extends AbstrHttpConnectionExpiryHandler {
+  public Http2ConnectionExpiryHandler(
+      int maxRequests, int maxRequestsUnderBrownout, int maxExpiry) {
+    super(ConnectionCloseType.DELAYED_GRACEFUL, maxRequestsUnderBrownout, maxRequests, maxExpiry);
+  }
 
-    @Override
-    protected boolean isResponseHeaders(Object msg)
-    {
-        return msg instanceof Http2HeadersFrame;
-    }
+  @Override
+  protected boolean isResponseHeaders(Object msg) {
+    return msg instanceof Http2HeadersFrame;
+  }
 }

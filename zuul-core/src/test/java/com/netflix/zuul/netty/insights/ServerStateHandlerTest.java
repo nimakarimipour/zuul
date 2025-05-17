@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.DefaultRegistry;
-import com.netflix.spectator.api.Gauge;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.netty.insights.ServerStateHandler.InboundHandler;
@@ -33,70 +32,69 @@ import org.junit.jupiter.api.Test;
 
 class ServerStateHandlerTest {
 
-    private Registry registry;
-    private Id currentConnsId;
-    private Id connectsId;
-    private Id errorsId;
-    private Id closesId;
+  private Registry registry;
+  private Id currentConnsId;
+  private Id connectsId;
+  private Id errorsId;
+  private Id closesId;
 
-    final String listener = "test-conn-throttled";
+  final String listener = "test-conn-throttled";
 
-    @BeforeEach
-    void init() {
-        registry = new DefaultRegistry();
-        currentConnsId = registry.createId("server.connections.current").withTags("id", listener);
-        connectsId = registry.createId("server.connections.connect").withTags("id", listener);
-        closesId = registry.createId("server.connections.close").withTags("id", listener);
-        errorsId = registry.createId("server.connections.errors").withTags("id", listener);
-    }
+  @BeforeEach
+  void init() {
+    registry = new DefaultRegistry();
+    currentConnsId = registry.createId("server.connections.current").withTags("id", listener);
+    connectsId = registry.createId("server.connections.connect").withTags("id", listener);
+    closesId = registry.createId("server.connections.close").withTags("id", listener);
+    errorsId = registry.createId("server.connections.errors").withTags("id", listener);
+  }
 
-    @Test
-    void verifyConnMetrics() {
+  @Test
+  void verifyConnMetrics() {
 
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        channel.pipeline().addLast(new DummyChannelHandler());
-        channel.pipeline().addLast(new InboundHandler(registry, listener));
+    final EmbeddedChannel channel = new EmbeddedChannel();
+    channel.pipeline().addLast(new DummyChannelHandler());
+    channel.pipeline().addLast(new InboundHandler(registry, listener));
 
-        final Counter connects = (Counter) registry.get(connectsId);
-        final Counter closes = (Counter) registry.get(closesId);
-        final Counter errors = (Counter) registry.get(errorsId);
+    final Counter connects = (Counter) registry.get(connectsId);
+    final Counter closes = (Counter) registry.get(closesId);
+    final Counter errors = (Counter) registry.get(errorsId);
 
-        // Connects X 3
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    // Connects X 3
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
 
-        assertEquals(3, connects.count());
+    assertEquals(3, connects.count());
 
-        // Closes X 1
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelInactive();
+    // Closes X 1
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelInactive();
 
-        assertEquals(3, connects.count());
-        assertEquals(1, closes.count());
-        assertEquals(0, errors.count());
-    }
+    assertEquals(3, connects.count());
+    assertEquals(1, closes.count());
+    assertEquals(0, errors.count());
+  }
 
-    @Test
-    void setPassportStateOnConnect() {
+  @Test
+  void setPassportStateOnConnect() {
 
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        channel.pipeline().addLast(new DummyChannelHandler());
-        channel.pipeline().addLast(new InboundHandler(registry, listener));
+    final EmbeddedChannel channel = new EmbeddedChannel();
+    channel.pipeline().addLast(new DummyChannelHandler());
+    channel.pipeline().addLast(new InboundHandler(registry, listener));
 
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
 
-        assertEquals(PassportState.SERVER_CH_ACTIVE, CurrentPassport.fromChannel(channel).getState());
-    }
+    assertEquals(PassportState.SERVER_CH_ACTIVE, CurrentPassport.fromChannel(channel).getState());
+  }
 
-    @Test
-    void setPassportStateOnDisconnect() {
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        channel.pipeline().addLast(new DummyChannelHandler());
-        channel.pipeline().addLast(new InboundHandler(registry, listener));
+  @Test
+  void setPassportStateOnDisconnect() {
+    final EmbeddedChannel channel = new EmbeddedChannel();
+    channel.pipeline().addLast(new DummyChannelHandler());
+    channel.pipeline().addLast(new InboundHandler(registry, listener));
 
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelInactive();
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelInactive();
 
-        assertEquals(PassportState.SERVER_CH_INACTIVE, CurrentPassport.fromChannel(channel).getState());
-    }
-
+    assertEquals(PassportState.SERVER_CH_INACTIVE, CurrentPassport.fromChannel(channel).getState());
+  }
 }

@@ -27,74 +27,68 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 
-/**
- * User: Mike Smith
- * Date: 9/24/16
- * Time: 2:41 PM
- */
+/** User: Mike Smith Date: 9/24/16 Time: 2:41 PM */
 public final class PassportStateHttpClientHandler {
 
-    private static CurrentPassport passport(ChannelHandlerContext ctx)
-    {
-        return CurrentPassport.fromChannel(ctx.channel());
-    }
+  private static CurrentPassport passport(ChannelHandlerContext ctx) {
+    return CurrentPassport.fromChannel(ctx.channel());
+  }
 
-    public static final class InboundHandler extends ChannelInboundHandlerAdapter
-    {
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
-        {
-            try {
-                CurrentPassport passport = passport(ctx);
+  public static final class InboundHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+      try {
+        CurrentPassport passport = passport(ctx);
 
-                if (msg instanceof HttpResponse) {
-                    passport.add(PassportState.IN_RESP_HEADERS_RECEIVED);
-                }
-
-                if (msg instanceof LastHttpContent) {
-                    passport.add(PassportState.IN_RESP_LAST_CONTENT_RECEIVED);
-                }
-                else if (msg instanceof HttpContent) {
-                    passport.add(PassportState.IN_RESP_CONTENT_RECEIVED);
-                }
-            }
-            finally {
-                super.channelRead(ctx, msg);
-            }
+        if (msg instanceof HttpResponse) {
+          passport.add(PassportState.IN_RESP_HEADERS_RECEIVED);
         }
-    }
 
-    public static final class OutboundHandler extends ChannelOutboundHandlerAdapter
-    {
-        @Override
-        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception
-        {
-            try {
-                CurrentPassport passport = passport(ctx);
-
-                if (msg instanceof HttpRequest) {
-                    passport.add(PassportState.OUT_REQ_HEADERS_SENDING);
-                    promise.addListener(new PassportStateListener(passport, 
-                            PassportState.OUT_REQ_HEADERS_SENT,
-                            PassportState.OUT_REQ_HEADERS_ERROR_SENDING));
-                }
-                
-                if (msg instanceof LastHttpContent) {
-                    passport.add(PassportState.OUT_REQ_LAST_CONTENT_SENDING);
-                    promise.addListener(new PassportStateListener(passport, 
-                            PassportState.OUT_REQ_LAST_CONTENT_SENT,
-                            PassportState.OUT_REQ_LAST_CONTENT_ERROR_SENDING));
-                }
-                else if (msg instanceof HttpContent) {
-                    passport.add(PassportState.OUT_REQ_CONTENT_SENDING);
-                    promise.addListener(new PassportStateListener(passport, 
-                            PassportState.OUT_REQ_CONTENT_SENT,
-                            PassportState.OUT_REQ_CONTENT_ERROR_SENDING));
-                }
-            }
-            finally {
-                super.write(ctx, msg, promise);
-            }
+        if (msg instanceof LastHttpContent) {
+          passport.add(PassportState.IN_RESP_LAST_CONTENT_RECEIVED);
+        } else if (msg instanceof HttpContent) {
+          passport.add(PassportState.IN_RESP_CONTENT_RECEIVED);
         }
+      } finally {
+        super.channelRead(ctx, msg);
+      }
     }
+  }
+
+  public static final class OutboundHandler extends ChannelOutboundHandlerAdapter {
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)
+        throws Exception {
+      try {
+        CurrentPassport passport = passport(ctx);
+
+        if (msg instanceof HttpRequest) {
+          passport.add(PassportState.OUT_REQ_HEADERS_SENDING);
+          promise.addListener(
+              new PassportStateListener(
+                  passport,
+                  PassportState.OUT_REQ_HEADERS_SENT,
+                  PassportState.OUT_REQ_HEADERS_ERROR_SENDING));
+        }
+
+        if (msg instanceof LastHttpContent) {
+          passport.add(PassportState.OUT_REQ_LAST_CONTENT_SENDING);
+          promise.addListener(
+              new PassportStateListener(
+                  passport,
+                  PassportState.OUT_REQ_LAST_CONTENT_SENT,
+                  PassportState.OUT_REQ_LAST_CONTENT_ERROR_SENDING));
+        } else if (msg instanceof HttpContent) {
+          passport.add(PassportState.OUT_REQ_CONTENT_SENDING);
+          promise.addListener(
+              new PassportStateListener(
+                  passport,
+                  PassportState.OUT_REQ_CONTENT_SENT,
+                  PassportState.OUT_REQ_CONTENT_ERROR_SENDING));
+        }
+      } finally {
+        super.write(ctx, msg, promise);
+      }
+    }
+  }
 }

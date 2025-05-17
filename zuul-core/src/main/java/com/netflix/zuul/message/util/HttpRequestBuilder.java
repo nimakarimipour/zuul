@@ -28,89 +28,101 @@ import java.util.Objects;
 /**
  * Builder for a zuul http request. *exclusively* for use in unit tests.
  *
- * For default values initialized in the constructor:
+ * <p>For default values initialized in the constructor:
+ *
  * <pre>
  * {@code new HttpRequestBuilder(context).withDefaults();}
- *</pre>
+ * </pre>
  *
  * For overrides :
+ *
  * <pre>
  * {@code new HttpRequestBuilder(context).withHeaders(httpHeaders).withQueryParams(requestParams).build();}
  * </pre>
+ *
  * @author Argha C
  * @since 5/11/21
  */
 public final class HttpRequestBuilder {
-    private SessionContext sessionContext;
-    private String protocol;
-    private String method;
-    private String path;
-    private HttpQueryParams queryParams;
-    private Headers headers;
-    private String clientIp;
-    private String scheme;
-    private int port;
-    private String serverName;
-    private boolean isBuilt;
+  private SessionContext sessionContext;
+  private String protocol;
+  private String method;
+  private String path;
+  private HttpQueryParams queryParams;
+  private Headers headers;
+  private String clientIp;
+  private String scheme;
+  private int port;
+  private String serverName;
+  private boolean isBuilt;
 
-    public HttpRequestBuilder(SessionContext context) {
-        sessionContext = Objects.requireNonNull(context);
-        protocol = HttpVersion.HTTP_1_1.text();
-        method = "get";
-        path = "/";
-        queryParams = new HttpQueryParams();
-        headers = new Headers();
-        clientIp = "::1";
-        scheme = "https";
-        port = 443;
-        isBuilt = false;
-    }
+  public HttpRequestBuilder(SessionContext context) {
+    sessionContext = Objects.requireNonNull(context);
+    protocol = HttpVersion.HTTP_1_1.text();
+    method = "get";
+    path = "/";
+    queryParams = new HttpQueryParams();
+    headers = new Headers();
+    clientIp = "::1";
+    scheme = "https";
+    port = 443;
+    isBuilt = false;
+  }
 
-    /**
-     * Builds a request with basic defaults
-     *
-     * @return `HttpRequestMessage`
-     */
-    public HttpRequestMessage withDefaults() {
-        return build();
-    }
+  /**
+   * Builds a request with basic defaults
+   *
+   * @return `HttpRequestMessage`
+   */
+  public HttpRequestMessage withDefaults() {
+    return build();
+  }
 
-    public HttpRequestBuilder withHost(String hostName) {
-        serverName = Objects.requireNonNull(hostName);
-        return this;
-    }
+  public HttpRequestBuilder withHost(String hostName) {
+    serverName = Objects.requireNonNull(hostName);
+    return this;
+  }
 
-    public HttpRequestBuilder withHeaders(Headers requestHeaders) {
-        headers = Objects.requireNonNull(requestHeaders);
-        return this;
-    }
+  public HttpRequestBuilder withHeaders(Headers requestHeaders) {
+    headers = Objects.requireNonNull(requestHeaders);
+    return this;
+  }
 
-    public HttpRequestBuilder withQueryParams(HttpQueryParams requestParams) {
-        this.queryParams =  Objects.requireNonNull(requestParams);
-        return this;
-    }
+  public HttpRequestBuilder withQueryParams(HttpQueryParams requestParams) {
+    this.queryParams = Objects.requireNonNull(requestParams);
+    return this;
+  }
 
-    public HttpRequestBuilder withMethod(HttpMethod httpMethod) {
-        method = Objects.requireNonNull(httpMethod).name();
-        return this;
-    }
+  public HttpRequestBuilder withMethod(HttpMethod httpMethod) {
+    method = Objects.requireNonNull(httpMethod).name();
+    return this;
+  }
 
-    public HttpRequestBuilder withUri(String uri) {
-        path = Objects.requireNonNull(uri);
-        return this;
-    }
+  public HttpRequestBuilder withUri(String uri) {
+    path = Objects.requireNonNull(uri);
+    return this;
+  }
 
-    /**
-     * Used to build a request with overriden values
-     *
-     * @return `HttpRequestMessage`
-     */
-    public HttpRequestMessage build() {
-        if (isBuilt) {
-            throw new IllegalStateException("Builder must only be invoked once!");
-        }
-        isBuilt = true;
-        return new HttpRequestMessageImpl(sessionContext, protocol, method, path, queryParams, headers, clientIp, scheme, port,
-                serverName);
+  /**
+   * Used to build a request with overriden values
+   *
+   * @return `HttpRequestMessage`
+   */
+  public HttpRequestMessage build() {
+    if (isBuilt) {
+      throw new IllegalStateException("Builder must only be invoked once!");
     }
+    isBuilt = true;
+    return new HttpRequestMessageImpl(
+        sessionContext,
+        protocol,
+        method,
+        path,
+        queryParams,
+        headers,
+        clientIp,
+        scheme,
+        port,
+        serverName);
+  }
 }

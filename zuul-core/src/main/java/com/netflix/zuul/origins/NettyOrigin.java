@@ -18,8 +18,8 @@ package com.netflix.zuul.origins;
 
 import com.netflix.client.config.IClientConfig;
 import com.netflix.spectator.api.Registry;
-import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.context.SessionContext;
+import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.netty.connectionpool.PooledConnection;
@@ -27,47 +27,59 @@ import com.netflix.zuul.niws.RequestAttempt;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Netty Origin interface for integrating cleanly with the ProxyEndpoint state management class.
  *
- * Author: Arthur Gonigberg
- * Date: November 29, 2017
+ * <p>Author: Arthur Gonigberg Date: November 29, 2017
  */
 public interface NettyOrigin extends InstrumentedOrigin {
 
-    Promise<PooledConnection> connectToOrigin(final HttpRequestMessage zuulReq, EventLoop eventLoop,
-                                              int attemptNumber, CurrentPassport passport,
-                                              AtomicReference<DiscoveryResult> chosenServer,
-                                              AtomicReference<? super InetAddress> chosenHostAddr);
+  Promise<PooledConnection> connectToOrigin(
+      final HttpRequestMessage zuulReq,
+      EventLoop eventLoop,
+      int attemptNumber,
+      CurrentPassport passport,
+      AtomicReference<DiscoveryResult> chosenServer,
+      AtomicReference<? super InetAddress> chosenHostAddr);
 
-    int getMaxRetriesForRequest(SessionContext context);
+  int getMaxRetriesForRequest(SessionContext context);
 
-    void onRequestExecutionStart(final HttpRequestMessage zuulReq);
+  void onRequestExecutionStart(final HttpRequestMessage zuulReq);
 
-    void onRequestStartWithServer(final HttpRequestMessage zuulReq, final DiscoveryResult discoveryResult, int attemptNum);
+  void onRequestStartWithServer(
+      final HttpRequestMessage zuulReq, final DiscoveryResult discoveryResult, int attemptNum);
 
-    void onRequestExceptionWithServer(final HttpRequestMessage zuulReq, final DiscoveryResult discoveryResult,
-                                      final int attemptNum, Throwable t);
+  void onRequestExceptionWithServer(
+      final HttpRequestMessage zuulReq,
+      final DiscoveryResult discoveryResult,
+      final int attemptNum,
+      Throwable t);
 
-    void onRequestExecutionSuccess(final HttpRequestMessage zuulReq, final HttpResponseMessage zuulResp,
-                                   final DiscoveryResult discoveryResult, final int attemptNum);
+  void onRequestExecutionSuccess(
+      final HttpRequestMessage zuulReq,
+      final HttpResponseMessage zuulResp,
+      final DiscoveryResult discoveryResult,
+      final int attemptNum);
 
-    void onRequestExecutionFailed(final HttpRequestMessage zuulReq, final DiscoveryResult discoveryResult,
-                                  final int attemptNum, Throwable t);
+  void onRequestExecutionFailed(
+      final HttpRequestMessage zuulReq,
+      final DiscoveryResult discoveryResult,
+      final int attemptNum,
+      Throwable t);
 
-    void recordFinalError(final HttpRequestMessage requestMsg, final Throwable throwable);
+  void recordFinalError(final HttpRequestMessage requestMsg, final Throwable throwable);
 
-    void recordFinalResponse(final HttpResponseMessage resp);
+  void recordFinalResponse(final HttpResponseMessage resp);
 
-    RequestAttempt newRequestAttempt(final DiscoveryResult server, final SessionContext zuulCtx, int attemptNum);
+  RequestAttempt newRequestAttempt(
+      final DiscoveryResult server, final SessionContext zuulCtx, int attemptNum);
 
-    String getIpAddrFromServer(DiscoveryResult server);
+  String getIpAddrFromServer(DiscoveryResult server);
 
-    IClientConfig getClientConfig();
+  IClientConfig getClientConfig();
 
-    Registry getSpectatorRegistry();
+  Registry getSpectatorRegistry();
 }

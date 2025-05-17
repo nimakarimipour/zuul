@@ -21,32 +21,32 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 public final class RequestRejectedEvent {
-    private final HttpRequest request;
-    private final StatusCategory nfStatus;
-    private final HttpResponseStatus httpStatus;
-    private final String reason;
+  private final HttpRequest request;
+  private final StatusCategory nfStatus;
+  private final HttpResponseStatus httpStatus;
+  private final String reason;
 
-    public RequestRejectedEvent(
-            HttpRequest request, StatusCategory nfStatus, HttpResponseStatus httpStatus, String reason) {
-        this.request = request;
-        this.nfStatus = nfStatus;
-        this.httpStatus = httpStatus;
-        this.reason = reason;
-    }
+  public RequestRejectedEvent(
+      HttpRequest request, StatusCategory nfStatus, HttpResponseStatus httpStatus, String reason) {
+    this.request = request;
+    this.nfStatus = nfStatus;
+    this.httpStatus = httpStatus;
+    this.reason = reason;
+  }
 
-    public HttpRequest request() {
-        return request;
-    }
+  public HttpRequest request() {
+    return request;
+  }
 
-    public StatusCategory getNfStatus() {
-        return nfStatus;
-    }
+  public StatusCategory getNfStatus() {
+    return nfStatus;
+  }
 
-    public HttpResponseStatus getHttpStatus() {
-        return httpStatus;
-    }
+  public HttpResponseStatus getHttpStatus() {
+    return httpStatus;
+  }
 
-    public String getReason() {
-        return reason;
-    }
+  public String getReason() {
+    return reason;
+  }
 }

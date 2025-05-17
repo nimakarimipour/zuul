@@ -21,32 +21,30 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for {@link RouteStatusCodeMonitor}.
- */
+/** Unit tests for {@link RouteStatusCodeMonitor}. */
 class RouteStatusCodeMonitorTest {
-    @Test
-    void testUpdateStats() {
-        RouteStatusCodeMonitor sd = new RouteStatusCodeMonitor("test", 200);
-        assertEquals("test", sd.route);
-        sd.update();
-        assertEquals(1, sd.getCount());
-        sd.update();
-        assertEquals(2, sd.getCount());
-    }
+  @Test
+  void testUpdateStats() {
+    RouteStatusCodeMonitor sd = new RouteStatusCodeMonitor("test", 200);
+    assertEquals("test", sd.route);
+    sd.update();
+    assertEquals(1, sd.getCount());
+    sd.update();
+    assertEquals(2, sd.getCount());
+  }
 
-    @Test
-    void testEquals() {
-        RouteStatusCodeMonitor sd = new RouteStatusCodeMonitor("test", 200);
-        RouteStatusCodeMonitor sd1 = new RouteStatusCodeMonitor("test", 200);
-        RouteStatusCodeMonitor sd2 = new RouteStatusCodeMonitor("test1", 200);
-        RouteStatusCodeMonitor sd3 = new RouteStatusCodeMonitor("test", 201);
+  @Test
+  void testEquals() {
+    RouteStatusCodeMonitor sd = new RouteStatusCodeMonitor("test", 200);
+    RouteStatusCodeMonitor sd1 = new RouteStatusCodeMonitor("test", 200);
+    RouteStatusCodeMonitor sd2 = new RouteStatusCodeMonitor("test1", 200);
+    RouteStatusCodeMonitor sd3 = new RouteStatusCodeMonitor("test", 201);
 
-        assertEquals(sd, sd1);
-        assertEquals(sd1, sd);
-        assertEquals(sd, sd);
-        assertNotEquals(sd, sd2);
-        assertNotEquals(sd, sd3);
-        assertNotEquals(sd2, sd3);
-    }
+    assertEquals(sd, sd1);
+    assertEquals(sd1, sd);
+    assertEquals(sd, sd);
+    assertNotEquals(sd, sd2);
+    assertNotEquals(sd, sd3);
+    assertNotEquals(sd2, sd3);
+  }
 }

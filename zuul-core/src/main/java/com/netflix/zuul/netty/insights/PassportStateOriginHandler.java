@@ -22,77 +22,73 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-
 import java.net.SocketAddress;
 
-/**
- * User: Mike Smith
- * Date: 9/24/16
- * Time: 2:41 PM
- */
+/** User: Mike Smith Date: 9/24/16 Time: 2:41 PM */
 public final class PassportStateOriginHandler {
-    private static CurrentPassport passport(ChannelHandlerContext ctx)
-    {
-        return CurrentPassport.fromChannel(ctx.channel());
+  private static CurrentPassport passport(ChannelHandlerContext ctx) {
+    return CurrentPassport.fromChannel(ctx.channel());
+  }
+
+  public static final class InboundHandler extends ChannelInboundHandlerAdapter {
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_ACTIVE);
+      super.channelActive(ctx);
     }
 
-    public static final class InboundHandler extends ChannelInboundHandlerAdapter {
-
-        @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_ACTIVE);
-            super.channelActive(ctx);
-        }
-
-        @Override
-        public void channelInactive(ChannelHandlerContext ctx) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_INACTIVE);
-            super.channelInactive(ctx);
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_EXCEPTION);
-            super.exceptionCaught(ctx, cause);
-        }
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_INACTIVE);
+      super.channelInactive(ctx);
     }
 
-    public static final class OutboundHandler extends ChannelOutboundHandlerAdapter {
-
-        @Override
-        public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_DISCONNECT);
-            super.disconnect(ctx, promise);
-        }
-
-        @Override
-        public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_CLOSE);
-            super.close(ctx, promise);
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
-        {
-            passport(ctx).add(PassportState.ORIGIN_CH_EXCEPTION);
-            super.exceptionCaught(ctx, cause);
-        }
-
-        @Override
-        public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception
-        {
-            // We would prefer to set this passport state here, but if we do then it will be run _after_ the http request
-            // has actually been written to the channel. Because another listener is added before this one.
-            // So instead we have to add this listener in the PerServerConnectionPool.handleConnectCompletion() method instead.
-            //passport.add(PassportState.ORIGIN_CH_CONNECTING);
-            //promise.addListener(new PassportStateListener(passport, PassportState.ORIGIN_CH_CONNECTED));
-            
-            super.connect(ctx, remoteAddress, localAddress, promise);
-        }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_EXCEPTION);
+      super.exceptionCaught(ctx, cause);
     }
+  }
+
+  public static final class OutboundHandler extends ChannelOutboundHandlerAdapter {
+
+    @Override
+    public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_DISCONNECT);
+      super.disconnect(ctx, promise);
+    }
+
+    @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_CLOSE);
+      super.close(ctx, promise);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+      passport(ctx).add(PassportState.ORIGIN_CH_EXCEPTION);
+      super.exceptionCaught(ctx, cause);
+    }
+
+    @Override
+    public void connect(
+        ChannelHandlerContext ctx,
+        SocketAddress remoteAddress,
+        SocketAddress localAddress,
+        ChannelPromise promise)
+        throws Exception {
+      // We would prefer to set this passport state here, but if we do then it will be run _after_
+      // the http request
+      // has actually been written to the channel. Because another listener is added before this
+      // one.
+      // So instead we have to add this listener in the
+      // PerServerConnectionPool.handleConnectCompletion() method instead.
+      // passport.add(PassportState.ORIGIN_CH_CONNECTING);
+      // promise.addListener(new PassportStateListener(passport,
+      // PassportState.ORIGIN_CH_CONNECTED));
+
+      super.connect(ctx, remoteAddress, localAddress, promise);
+    }
+  }
 }

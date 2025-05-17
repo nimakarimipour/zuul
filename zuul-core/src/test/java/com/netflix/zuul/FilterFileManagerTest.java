@@ -23,7 +23,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,41 +30,35 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Tests for {@link FilterFileManager}.
- */
+/** Tests for {@link FilterFileManager}. */
 @ExtendWith(MockitoExtension.class)
 class FilterFileManagerTest {
-    @Mock
-    private File nonGroovyFile;
-    @Mock
-    private File groovyFile;
-    @Mock
-    private File directory;
-    @Mock
-    private FilterLoader filterLoader;
+  @Mock private File nonGroovyFile;
+  @Mock private File groovyFile;
+  @Mock private File directory;
+  @Mock private FilterLoader filterLoader;
 
-    @BeforeEach
-    void before() {
-        MockitoAnnotations.initMocks(this);
-    }
+  @BeforeEach
+  void before() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-    @Test
-    void testFileManagerInit() throws Exception {
-        FilterFileManager.FilterFileManagerConfig config =
-                new FilterFileManager.FilterFileManagerConfig(
-                        new String[]{"test", "test1"},
-                        new String[]{"com.netflix.blah.SomeFilter"},
-                        1,
-                        (dir, name) -> false);
-        FilterFileManager manager = new FilterFileManager(config, filterLoader);
+  @Test
+  void testFileManagerInit() throws Exception {
+    FilterFileManager.FilterFileManagerConfig config =
+        new FilterFileManager.FilterFileManagerConfig(
+            new String[] {"test", "test1"},
+            new String[] {"com.netflix.blah.SomeFilter"},
+            1,
+            (dir, name) -> false);
+    FilterFileManager manager = new FilterFileManager(config, filterLoader);
 
-        manager = spy(manager);
-        doNothing().when(manager).manageFiles();
+    manager = spy(manager);
+    doNothing().when(manager).manageFiles();
 
-        manager.init();
-        verify(manager, atLeast(1)).manageFiles();
-        verify(manager, times(1)).startPoller();
-        assertNotNull(manager.poller);
-    }
+    manager.init();
+    verify(manager, atLeast(1)).manageFiles();
+    verify(manager, times(1)).startPoller();
+    assertNotNull(manager.poller);
+  }
 }

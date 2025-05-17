@@ -22,27 +22,25 @@ import java.util.function.BiConsumer;
 /**
  * Utility used for binding context variables or thread variables, depending on requirements.
  *
- * Author: Arthur Gonigberg
- * Date: November 29, 2017
+ * <p>Author: Arthur Gonigberg Date: November 29, 2017
  */
 public class MethodBinding<T> {
-    private final BiConsumer<Runnable, T> boundMethod;
-    private final Callable<T> bindingContextExtractor;
+  private final BiConsumer<Runnable, T> boundMethod;
+  private final Callable<T> bindingContextExtractor;
 
-    public static MethodBinding<?> NO_OP_BINDING = new MethodBinding<>((r, t) -> {}, () -> null);
+  public static MethodBinding<?> NO_OP_BINDING = new MethodBinding<>((r, t) -> {}, () -> null);
 
-    public MethodBinding(BiConsumer<Runnable, T> boundMethod, Callable<T> bindingContextExtractor) {
-        this.boundMethod = boundMethod;
-        this.bindingContextExtractor = bindingContextExtractor;
+  public MethodBinding(BiConsumer<Runnable, T> boundMethod, Callable<T> bindingContextExtractor) {
+    this.boundMethod = boundMethod;
+    this.bindingContextExtractor = bindingContextExtractor;
+  }
+
+  public void bind(Runnable method) throws Exception {
+    T bindingContext = bindingContextExtractor.call();
+    if (bindingContext == null) {
+      method.run();
+    } else {
+      boundMethod.accept(method, bindingContext);
     }
-
-    public void bind(Runnable method) throws Exception {
-        T bindingContext = bindingContextExtractor.call();
-        if (bindingContext == null) {
-            method.run();
-        }
-        else {
-            boundMethod.accept(method, bindingContext);
-        }
-    }
+  }
 }

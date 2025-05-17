@@ -23,33 +23,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Unit tests for {@link ErrorStatsData}.
- */
+/** Unit tests for {@link ErrorStatsData}. */
 @ExtendWith(MockitoExtension.class)
 class ErrorStatsDataTest {
 
-    @Test
-    void testUpdateStats() {
-        ErrorStatsData sd = new ErrorStatsData("route", "test");
-        sd.update();
-        assertEquals(1, sd.getCount());
-        sd.update();
-        assertEquals(2, sd.getCount());
-    }
+  @Test
+  void testUpdateStats() {
+    ErrorStatsData sd = new ErrorStatsData("route", "test");
+    sd.update();
+    assertEquals(1, sd.getCount());
+    sd.update();
+    assertEquals(2, sd.getCount());
+  }
 
+  @Test
+  void testEquals() {
+    ErrorStatsData sd = new ErrorStatsData("route", "test");
+    ErrorStatsData sd1 = new ErrorStatsData("route", "test");
+    ErrorStatsData sd2 = new ErrorStatsData("route", "test1");
+    ErrorStatsData sd3 = new ErrorStatsData("route", "test");
 
-    @Test
-    void testEquals() {
-        ErrorStatsData sd = new ErrorStatsData("route", "test");
-        ErrorStatsData sd1 = new ErrorStatsData("route", "test");
-        ErrorStatsData sd2 = new ErrorStatsData("route", "test1");
-        ErrorStatsData sd3 = new ErrorStatsData("route", "test");
-
-        assertEquals(sd, sd1);
-        assertEquals(sd1, sd);
-        assertEquals(sd, sd);
-        assertNotEquals(sd, sd2);
-        assertNotEquals(sd2, sd3);
-    }
+    assertEquals(sd, sd1);
+    assertEquals(sd1, sd);
+    assertEquals(sd, sd);
+    assertNotEquals(sd, sd2);
+    assertNotEquals(sd2, sd3);
+  }
 }

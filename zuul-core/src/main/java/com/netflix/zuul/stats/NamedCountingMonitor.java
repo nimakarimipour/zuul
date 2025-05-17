@@ -20,7 +20,6 @@ import com.netflix.spectator.api.Spectator;
 import com.netflix.spectator.api.patterns.PolledMeter;
 import com.netflix.zuul.stats.monitoring.MonitorRegistry;
 import com.netflix.zuul.stats.monitoring.NamedCount;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -30,44 +29,38 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class NamedCountingMonitor implements NamedCount {
 
+  private final String name;
 
-    private final String name;
+  private final AtomicLong count = new AtomicLong();
 
-    private final AtomicLong count = new AtomicLong();
+  public NamedCountingMonitor(String name) {
+    this.name = name;
+    Registry registry = Spectator.globalRegistry();
+    PolledMeter.using(registry)
+        .withId(registry.createId("zuul.ErrorStatsData", "ID", name))
+        .monitorValue(this, NamedCountingMonitor::getCount);
+  }
 
-    public NamedCountingMonitor(String name) {
-        this.name = name;
-        Registry registry = Spectator.globalRegistry();
-        PolledMeter.using(registry)
-                .withId(registry.createId("zuul.ErrorStatsData", "ID", name))
-                .monitorValue(this, NamedCountingMonitor::getCount);
-    }
+  /** registers this objects */
+  public NamedCountingMonitor register() {
+    MonitorRegistry.getInstance().registerObject(this);
+    return this;
+  }
 
-    /**
-     * registers this objects
-     */
-    public NamedCountingMonitor register() {
-        MonitorRegistry.getInstance().registerObject(this);
-        return this;
-    }
+  /** increments the counter */
+  public long increment() {
+    return this.count.incrementAndGet();
+  }
 
-    /**
-     * increments the counter
-     */
-    public long increment() {
-        return this.count.incrementAndGet();
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return the current count
-     */
-    public long getCount() {
-        return this.count.get();
-    }
-
+  /**
+   * @return the current count
+   */
+  public long getCount() {
+    return this.count.get();
+  }
 }

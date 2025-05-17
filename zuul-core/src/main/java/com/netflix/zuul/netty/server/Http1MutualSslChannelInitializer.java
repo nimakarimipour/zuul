@@ -16,82 +16,75 @@
 
 package com.netflix.zuul.netty.server;
 
+import com.netflix.netty.common.channel.config.ChannelConfig;
+import com.netflix.netty.common.channel.config.CommonChannelConfigKeys;
 import com.netflix.zuul.netty.ssl.SslContextFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
-import com.netflix.netty.common.channel.config.ChannelConfig;
-import com.netflix.netty.common.channel.config.CommonChannelConfigKeys;
-
 import javax.net.ssl.SSLException;
 
-/**
- * User: michaels@netflix.com
- * Date: 1/31/17
- * Time: 11:43 PM
- */
-public class Http1MutualSslChannelInitializer extends BaseZuulChannelInitializer
-{
-    private final SslContextFactory sslContextFactory;
-    private final SslContext sslContext;
-    private final boolean isSSlFromIntermediary;
+/** User: michaels@netflix.com Date: 1/31/17 Time: 11:43 PM */
+public class Http1MutualSslChannelInitializer extends BaseZuulChannelInitializer {
+  private final SslContextFactory sslContextFactory;
+  private final SslContext sslContext;
+  private final boolean isSSlFromIntermediary;
 
-    /**
-     * Use {@link #Http1MutualSslChannelInitializer(String, ChannelConfig, ChannelConfig, ChannelGroup)} instead.
-     */
-    @Deprecated
-    public Http1MutualSslChannelInitializer(
-            int port,
-            ChannelConfig channelConfig,
-            ChannelConfig channelDependencies,
-            ChannelGroup channels) {
-        this(String.valueOf(port), channelConfig, channelDependencies, channels);
+  /**
+   * Use {@link #Http1MutualSslChannelInitializer(String, ChannelConfig, ChannelConfig,
+   * ChannelGroup)} instead.
+   */
+  @Deprecated
+  public Http1MutualSslChannelInitializer(
+      int port,
+      ChannelConfig channelConfig,
+      ChannelConfig channelDependencies,
+      ChannelGroup channels) {
+    this(String.valueOf(port), channelConfig, channelDependencies, channels);
+  }
+
+  public Http1MutualSslChannelInitializer(
+      String metricId,
+      ChannelConfig channelConfig,
+      ChannelConfig channelDependencies,
+      ChannelGroup channels) {
+    super(metricId, channelConfig, channelDependencies, channels);
+
+    this.isSSlFromIntermediary = channelConfig.get(CommonChannelConfigKeys.isSSlFromIntermediary);
+
+    this.sslContextFactory = channelConfig.get(CommonChannelConfigKeys.sslContextFactory);
+    try {
+      sslContext = sslContextFactory.createBuilderForServer().build();
+    } catch (SSLException e) {
+      throw new RuntimeException("Error configuring SslContext!", e);
     }
 
-    public Http1MutualSslChannelInitializer(
-            String metricId,
-            ChannelConfig channelConfig,
-            ChannelConfig channelDependencies,
-            ChannelGroup channels) {
-        super(metricId, channelConfig, channelDependencies, channels);
+    // Enable TLS Session Tickets support.
+    sslContextFactory.enableSessionTickets(sslContext);
 
-        this.isSSlFromIntermediary = channelConfig.get(CommonChannelConfigKeys.isSSlFromIntermediary);
+    // Setup metrics tracking the OpenSSL stats.
+    sslContextFactory.configureOpenSslStatsMetrics(sslContext, metricId);
+  }
 
-        this.sslContextFactory = channelConfig.get(CommonChannelConfigKeys.sslContextFactory);
-        try {
-            sslContext = sslContextFactory.createBuilderForServer().build();
-        }
-        catch (SSLException e) {
-            throw new RuntimeException("Error configuring SslContext!", e);
-        }
+  @Override
+  protected void initChannel(Channel ch) throws Exception {
+    SslHandler sslHandler = sslContext.newHandler(ch.alloc());
+    sslHandler.engine().setEnabledProtocols(sslContextFactory.getProtocols());
 
-        // Enable TLS Session Tickets support.
-        sslContextFactory.enableSessionTickets(sslContext);
+    // Configure our pipeline of ChannelHandlerS.
+    ChannelPipeline pipeline = ch.pipeline();
 
-        // Setup metrics tracking the OpenSSL stats.
-        sslContextFactory.configureOpenSslStatsMetrics(sslContext, metricId);
-    }
-
-    @Override
-    protected void initChannel(Channel ch) throws Exception
-    {
-        SslHandler sslHandler = sslContext.newHandler(ch.alloc());
-        sslHandler.engine().setEnabledProtocols(sslContextFactory.getProtocols());
-
-        // Configure our pipeline of ChannelHandlerS.
-        ChannelPipeline pipeline = ch.pipeline();
-
-        storeChannel(ch);
-        addTimeoutHandlers(pipeline);
-        addPassportHandler(pipeline);
-        addTcpRelatedHandlers(pipeline);
-        pipeline.addLast("ssl", sslHandler);
-        addSslInfoHandlers(pipeline, isSSlFromIntermediary);
-        addSslClientCertChecks(pipeline);
-        addHttp1Handlers(pipeline);
-        addHttpRelatedHandlers(pipeline);
-        addZuulHandlers(pipeline);
-    }
+    storeChannel(ch);
+    addTimeoutHandlers(pipeline);
+    addPassportHandler(pipeline);
+    addTcpRelatedHandlers(pipeline);
+    pipeline.addLast("ssl", sslHandler);
+    addSslInfoHandlers(pipeline, isSSlFromIntermediary);
+    addSslClientCertChecks(pipeline);
+    addHttp1Handlers(pipeline);
+    addHttpRelatedHandlers(pipeline);
+    addZuulHandlers(pipeline);
+  }
 }

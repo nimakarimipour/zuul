@@ -17,24 +17,19 @@
 package com.netflix.zuul.origins;
 
 import com.netflix.zuul.message.http.HttpRequestMessage;
-import javax.annotation.Nullable;
 
-/**
- * User: michaels@netflix.com
- * Date: 10/8/14
- * Time: 6:15 PM
- */
+/** User: michaels@netflix.com Date: 10/8/14 Time: 6:15 PM */
 public interface InstrumentedOrigin extends Origin {
 
-    double getErrorPercentage();
+  double getErrorPercentage();
 
-    double getErrorAllPercentage();
+  double getErrorAllPercentage();
 
-    void adjustRetryPolicyIfNeeded(HttpRequestMessage zuulRequest);
+  void adjustRetryPolicyIfNeeded(HttpRequestMessage zuulRequest);
 
-    void preRequestChecks(HttpRequestMessage zuulRequest);
+  void preRequestChecks(HttpRequestMessage zuulRequest);
 
-    void recordSuccessResponse();
+  void recordSuccessResponse();
 
-    void recordProxyRequestEnd();
+  void recordProxyRequestEnd();
 }

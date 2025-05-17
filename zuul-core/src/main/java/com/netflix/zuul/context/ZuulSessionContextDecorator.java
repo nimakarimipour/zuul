@@ -24,63 +24,62 @@ import com.netflix.zuul.origins.OriginManager;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
  * Base Session Context Decorator
  *
- * Author: Arthur Gonigberg
- * Date: November 21, 2017
+ * <p>Author: Arthur Gonigberg Date: November 21, 2017
  */
 @Singleton
 public class ZuulSessionContextDecorator implements SessionContextDecorator {
 
-    private static final UUIDFactory UUID_FACTORY = new ConcurrentUUIDFactory();
+  private static final UUIDFactory UUID_FACTORY = new ConcurrentUUIDFactory();
 
-    private final OriginManager originManager;
+  private final OriginManager originManager;
 
-    @Inject
-    public ZuulSessionContextDecorator(OriginManager originManager) {
-        this.originManager = originManager;
+  @Inject
+  public ZuulSessionContextDecorator(OriginManager originManager) {
+    this.originManager = originManager;
+  }
+
+  @Override
+  public SessionContext decorate(SessionContext ctx) {
+    // TODO split out commons parts from BaseSessionContextDecorator
+
+    ChannelHandlerContext nettyCtx =
+        (ChannelHandlerContext) ctx.get(CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT);
+    if (nettyCtx == null) {
+      return null;
     }
 
-    @Override
-    public SessionContext decorate(SessionContext ctx) {
-        // TODO split out commons parts from BaseSessionContextDecorator
+    Channel channel = nettyCtx.channel();
 
-        ChannelHandlerContext nettyCtx = (ChannelHandlerContext) ctx.get(CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT);
-        if (nettyCtx == null) {
-            return null;
-        }
+    // set injected origin manager
+    ctx.put(CommonContextKeys.ORIGIN_MANAGER, originManager);
 
-        Channel channel = nettyCtx.channel();
+    // TODO
+    /*        // The throttle result info.
+    ThrottleResult throttleResult = channel.attr(HttpRequestThrottleChannelHandler.ATTR_THROTTLE_RESULT).get();
+    ctx.set(CommonContextKeys.THROTTLE_RESULT, throttleResult);*/
 
-        // set injected origin manager
-        ctx.put(CommonContextKeys.ORIGIN_MANAGER, originManager);
+    // Add a container for request attempts info.
+    ctx.put(CommonContextKeys.REQUEST_ATTEMPTS, new RequestAttempts());
 
-        // TODO
-/*        // The throttle result info.
-        ThrottleResult throttleResult = channel.attr(HttpRequestThrottleChannelHandler.ATTR_THROTTLE_RESULT).get();
-        ctx.set(CommonContextKeys.THROTTLE_RESULT, throttleResult);*/
+    // Providers for getting the size of read/written request and response body sizes from channel.
+    ctx.put(
+        CommonContextKeys.REQ_BODY_SIZE_PROVIDER,
+        HttpBodySizeRecordingChannelHandler.getCurrentInboundBodySize(channel));
+    ctx.put(
+        CommonContextKeys.RESP_BODY_SIZE_PROVIDER,
+        HttpBodySizeRecordingChannelHandler.getCurrentOutboundBodySize(channel));
 
-        // Add a container for request attempts info.
-        ctx.put(CommonContextKeys.REQUEST_ATTEMPTS, new RequestAttempts());
+    CurrentPassport passport = CurrentPassport.fromChannel(channel);
+    ctx.put(CommonContextKeys.PASSPORT, passport);
 
-        // Providers for getting the size of read/written request and response body sizes from channel.
-        ctx.put(
-                CommonContextKeys.REQ_BODY_SIZE_PROVIDER,
-                HttpBodySizeRecordingChannelHandler.getCurrentInboundBodySize(channel));
-        ctx.put(
-                CommonContextKeys.RESP_BODY_SIZE_PROVIDER,
-                HttpBodySizeRecordingChannelHandler.getCurrentOutboundBodySize(channel));
+    ctx.setUUID(UUID_FACTORY.generateRandomUuid().toString());
 
-        CurrentPassport passport = CurrentPassport.fromChannel(channel);
-        ctx.put(CommonContextKeys.PASSPORT, passport);
-
-        ctx.setUUID(UUID_FACTORY.generateRandomUuid().toString());
-
-        return ctx;
-    }
+    return ctx;
+  }
 }

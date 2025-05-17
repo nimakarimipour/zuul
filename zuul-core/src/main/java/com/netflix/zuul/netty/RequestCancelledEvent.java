@@ -16,11 +16,5 @@
 
 package com.netflix.zuul.netty;
 
-/**
- * User: michaels@netflix.com
- * Date: 4/13/17
- * Time: 6:09 PM
- */
-public class RequestCancelledEvent
-{
-}
+/** User: michaels@netflix.com Date: 4/13/17 Time: 6:09 PM */
+public class RequestCancelledEvent {}

@@ -39,97 +39,116 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: michaels@netflix.com
- * Date: 2/28/17
- * Time: 5:41 PM
- */
+/** User: michaels@netflix.com Date: 2/28/17 Time: 5:41 PM */
 @ChannelHandler.Sharable
-public class PassportLoggingHandler extends ChannelInboundHandlerAdapter
-{
-    private static final Logger LOG = LoggerFactory.getLogger(PassportLoggingHandler.class);
+public class PassportLoggingHandler extends ChannelInboundHandlerAdapter {
+  private static final Logger LOG = LoggerFactory.getLogger(PassportLoggingHandler.class);
 
-    private static final CachedDynamicLongProperty WARN_REQ_PROCESSING_TIME_NS = new CachedDynamicLongProperty("zuul.passport.log.request.time.threshold",
-            1000 * 1000 * 1000); // 1000 ms
-    private static final CachedDynamicLongProperty WARN_RESP_PROCESSING_TIME_NS = new CachedDynamicLongProperty("zuul.passport.log.response.time.threshold",
-            1000 * 1000 * 1000); // 1000 ms
+  private static final CachedDynamicLongProperty WARN_REQ_PROCESSING_TIME_NS =
+      new CachedDynamicLongProperty(
+          "zuul.passport.log.request.time.threshold", 1000 * 1000 * 1000); // 1000 ms
+  private static final CachedDynamicLongProperty WARN_RESP_PROCESSING_TIME_NS =
+      new CachedDynamicLongProperty(
+          "zuul.passport.log.response.time.threshold", 1000 * 1000 * 1000); // 1000 ms
 
-    private final Counter incompleteProxySessionCounter;
+  private final Counter incompleteProxySessionCounter;
 
-    public PassportLoggingHandler(Registry spectatorRegistry)
-    {
-        incompleteProxySessionCounter = spectatorRegistry.counter("server.http.session.incomplete");
-    }
+  public PassportLoggingHandler(Registry spectatorRegistry) {
+    incompleteProxySessionCounter = spectatorRegistry.counter("server.http.session.incomplete");
+  }
 
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
-    {
+  @Override
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    try {
+      super.userEventTriggered(ctx, evt);
+    } finally {
+      if (evt instanceof HttpLifecycleChannelHandler.CompleteEvent) {
         try {
-            super.userEventTriggered(ctx, evt);
+          logPassport(ctx.channel());
+        } catch (Exception e) {
+          LOG.error("Error logging passport info after request completed!", e);
         }
-        finally {
-            if (evt instanceof HttpLifecycleChannelHandler.CompleteEvent) {
-                try {
-                    logPassport(ctx.channel());
-                }
-                catch(Exception e) {
-                    LOG.error("Error logging passport info after request completed!", e);
-                }
-            }
-        }
+      }
+    }
+  }
+
+  private void logPassport(Channel channel) {
+    // Collect attributes.
+    CurrentPassport passport = CurrentPassport.fromChannel(channel);
+    HttpRequestMessage request = ClientRequestReceiver.getRequestFromChannel(channel);
+    HttpResponseMessage response = ClientRequestReceiver.getResponseFromChannel(channel);
+    SessionContext ctx = request == null ? null : request.getContext();
+
+    String topLevelRequestId = getRequestId(channel, ctx);
+
+    // Do some debug logging of the Passport.
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+          "State after complete. , current-server-conns = {}, current-http-reqs = {}, status = {}, nfstatus = {}, toplevelid = {}, req = {}, passport = {}",
+          ConnCounter.from(channel).getCurrentActiveConns(),
+          HttpMetricsChannelHandler.getInflightRequestCountFromChannel(channel),
+          (response == null ? getRequestId(channel, ctx) : response.getStatus()),
+          String.valueOf(StatusCategoryUtils.getStatusCategory(ctx)),
+          topLevelRequestId,
+          request.getInfoForLogging(),
+          String.valueOf(passport));
     }
 
-    private void logPassport(Channel channel)
-    {
-        // Collect attributes.
-        CurrentPassport passport = CurrentPassport.fromChannel(channel);
-        HttpRequestMessage request = ClientRequestReceiver.getRequestFromChannel(channel);
-        HttpResponseMessage response = ClientRequestReceiver.getResponseFromChannel(channel);
-        SessionContext ctx = request == null ? null : request.getContext();
+    // Some logging of session states if certain criteria match:
+    if (LOG.isInfoEnabled()) {
+      if (passport.wasProxyAttempt()) {
 
-        String topLevelRequestId = getRequestId(channel, ctx);
-
-        // Do some debug logging of the Passport.
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("State after complete. , current-server-conns = {}, current-http-reqs = {}, status = {}, nfstatus = {}, toplevelid = {}, req = {}, passport = {}", ConnCounter.from(channel).getCurrentActiveConns(), HttpMetricsChannelHandler.getInflightRequestCountFromChannel(channel), (response == null ? getRequestId(channel, ctx) : response.getStatus()), String.valueOf(StatusCategoryUtils.getStatusCategory(ctx)), topLevelRequestId, request.getInfoForLogging(), String.valueOf(passport));
+        if (passport.findStateBackwards(PassportState.OUT_RESP_LAST_CONTENT_SENDING) == null) {
+          incompleteProxySessionCounter.increment();
+          LOG.info(
+              "Incorrect final state! toplevelid = {}, {}",
+              topLevelRequestId,
+              ChannelUtils.channelInfoForLogging(channel));
         }
+      }
 
-        // Some logging of session states if certain criteria match:
-        if (LOG.isInfoEnabled()) {
-            if (passport.wasProxyAttempt()) {
-
-                if (passport.findStateBackwards(PassportState.OUT_RESP_LAST_CONTENT_SENDING) == null) {
-                    incompleteProxySessionCounter.increment();
-                    LOG.info("Incorrect final state! toplevelid = {}, {}", topLevelRequestId, ChannelUtils.channelInfoForLogging(channel));
-                }
-            }
-
-            if (! passport.wasProxyAttempt()) {
-                if (ctx != null && !isHealthcheckRequest(request)) {
-                    // Why did we fail to attempt to proxy this request?
-                    RequestAttempts attempts = RequestAttempts.getFromSessionContext(ctx);
-                    LOG.debug("State after complete. , context-error = {}, current-http-reqs = {}, toplevelid = {}, req = {}, attempts = {}, passport = {}", String.valueOf(ctx.getError()), HttpMetricsChannelHandler.getInflightRequestCountFromChannel(channel), topLevelRequestId, request.getInfoForLogging(), String.valueOf(attempts), String.valueOf(passport));
-                }
-            }
-
-            StartAndEnd inReqToOutResp = passport.findFirstStartAndLastEndStates(PassportState.IN_REQ_HEADERS_RECEIVED, PassportState.OUT_REQ_LAST_CONTENT_SENT);
-            if (passport.calculateTimeBetween(inReqToOutResp) > WARN_REQ_PROCESSING_TIME_NS.get()) {
-                LOG.info("Request processing took longer than threshold! toplevelid = {}, {}", topLevelRequestId, ChannelUtils.channelInfoForLogging(channel));
-            }
-
-            StartAndEnd inRespToOutResp = passport.findLastStartAndFirstEndStates(PassportState.IN_RESP_HEADERS_RECEIVED, PassportState.OUT_RESP_LAST_CONTENT_SENT);
-            if (passport.calculateTimeBetween(inRespToOutResp)
-                    > WARN_RESP_PROCESSING_TIME_NS.get()) {
-                LOG.info("Response processing took longer than threshold! toplevelid = {}, {}", topLevelRequestId, ChannelUtils.channelInfoForLogging(channel));
-            }
+      if (!passport.wasProxyAttempt()) {
+        if (ctx != null && !isHealthcheckRequest(request)) {
+          // Why did we fail to attempt to proxy this request?
+          RequestAttempts attempts = RequestAttempts.getFromSessionContext(ctx);
+          LOG.debug(
+              "State after complete. , context-error = {}, current-http-reqs = {}, toplevelid = {}, req = {}, attempts = {}, passport = {}",
+              String.valueOf(ctx.getError()),
+              HttpMetricsChannelHandler.getInflightRequestCountFromChannel(channel),
+              topLevelRequestId,
+              request.getInfoForLogging(),
+              String.valueOf(attempts),
+              String.valueOf(passport));
         }
-    }
+      }
 
-    protected boolean isHealthcheckRequest(HttpRequestMessage req) {
-        return req.getPath().equals("/healthcheck");
-    }
+      StartAndEnd inReqToOutResp =
+          passport.findFirstStartAndLastEndStates(
+              PassportState.IN_REQ_HEADERS_RECEIVED, PassportState.OUT_REQ_LAST_CONTENT_SENT);
+      if (passport.calculateTimeBetween(inReqToOutResp) > WARN_REQ_PROCESSING_TIME_NS.get()) {
+        LOG.info(
+            "Request processing took longer than threshold! toplevelid = {}, {}",
+            topLevelRequestId,
+            ChannelUtils.channelInfoForLogging(channel));
+      }
 
-    protected String getRequestId(Channel channel, SessionContext ctx) {
-        return ctx == null ? "-" : ctx.getUUID();
+      StartAndEnd inRespToOutResp =
+          passport.findLastStartAndFirstEndStates(
+              PassportState.IN_RESP_HEADERS_RECEIVED, PassportState.OUT_RESP_LAST_CONTENT_SENT);
+      if (passport.calculateTimeBetween(inRespToOutResp) > WARN_RESP_PROCESSING_TIME_NS.get()) {
+        LOG.info(
+            "Response processing took longer than threshold! toplevelid = {}, {}",
+            topLevelRequestId,
+            ChannelUtils.channelInfoForLogging(channel));
+      }
     }
+  }
+
+  protected boolean isHealthcheckRequest(HttpRequestMessage req) {
+    return req.getPath().equals("/healthcheck");
+  }
+
+  protected String getRequestId(Channel channel, SessionContext ctx) {
+    return ctx == null ? "-" : ctx.getUUID();
+  }
 }

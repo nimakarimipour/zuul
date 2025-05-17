@@ -32,41 +32,45 @@ import org.junit.jupiter.api.Test;
 
 class HAProxyMessageChannelHandlerTest {
 
-    @Test
-    void setClientDestPortForHAPM() {
-        EmbeddedChannel channel = new EmbeddedChannel();
-        // This is normally done by Server.
-        channel.attr(Server.CONN_DIMENSIONS).set(Attrs.newInstance());
-        // This is to emulate `ElbProxyProtocolChannelHandler`
-        channel.pipeline()
-                .addLast(HAProxyMessageDecoder.class.getSimpleName(), new HAProxyMessageDecoder())
-                .addLast(HAProxyMessageChannelHandler.class.getSimpleName(), new HAProxyMessageChannelHandler());
+  @Test
+  void setClientDestPortForHAPM() {
+    EmbeddedChannel channel = new EmbeddedChannel();
+    // This is normally done by Server.
+    channel.attr(Server.CONN_DIMENSIONS).set(Attrs.newInstance());
+    // This is to emulate `ElbProxyProtocolChannelHandler`
+    channel
+        .pipeline()
+        .addLast(HAProxyMessageDecoder.class.getSimpleName(), new HAProxyMessageDecoder())
+        .addLast(
+            HAProxyMessageChannelHandler.class.getSimpleName(), new HAProxyMessageChannelHandler());
 
-        ByteBuf buf = Unpooled.wrappedBuffer(
-                "PROXY TCP4 192.168.0.1 124.123.111.111 10008 443\r\n".getBytes(StandardCharsets.US_ASCII));
-        channel.writeInbound(buf);
+    ByteBuf buf =
+        Unpooled.wrappedBuffer(
+            "PROXY TCP4 192.168.0.1 124.123.111.111 10008 443\r\n"
+                .getBytes(StandardCharsets.US_ASCII));
+    channel.writeInbound(buf);
 
-        Object result = channel.readInbound();
-        assertNull(result);
+    Object result = channel.readInbound();
+    assertNull(result);
 
-        InetSocketAddress destAddress = channel
-                .attr(SourceAddressChannelHandler.ATTR_PROXY_PROTOCOL_DESTINATION_ADDRESS).get();
+    InetSocketAddress destAddress =
+        channel.attr(SourceAddressChannelHandler.ATTR_PROXY_PROTOCOL_DESTINATION_ADDRESS).get();
 
-        InetSocketAddress srcAddress = (InetSocketAddress) channel.attr(SourceAddressChannelHandler.ATTR_REMOTE_ADDR)
-                .get();
+    InetSocketAddress srcAddress =
+        (InetSocketAddress) channel.attr(SourceAddressChannelHandler.ATTR_REMOTE_ADDR).get();
 
-        assertEquals("124.123.111.111", destAddress.getHostString());
-        assertEquals(443, destAddress.getPort());
+    assertEquals("124.123.111.111", destAddress.getHostString());
+    assertEquals(443, destAddress.getPort());
 
-        assertEquals("192.168.0.1", srcAddress.getHostString());
-        assertEquals(10008, srcAddress.getPort());
+    assertEquals("192.168.0.1", srcAddress.getHostString());
+    assertEquals(10008, srcAddress.getPort());
 
-        Attrs attrs = channel.attr(Server.CONN_DIMENSIONS).get();
-        Integer port = HAProxyMessageChannelHandler.HAPM_DEST_PORT.get(attrs);
-        assertEquals(443, port.intValue());
-        String sourceIpVersion = HAProxyMessageChannelHandler.HAPM_SRC_IP_VERSION.get(attrs);
-        assertEquals("v4", sourceIpVersion);
-        String destIpVersion = HAProxyMessageChannelHandler.HAPM_DEST_IP_VERSION.get(attrs);
-        assertEquals("v4", destIpVersion);
-    }
+    Attrs attrs = channel.attr(Server.CONN_DIMENSIONS).get();
+    Integer port = HAProxyMessageChannelHandler.HAPM_DEST_PORT.get(attrs);
+    assertEquals(443, port.intValue());
+    String sourceIpVersion = HAProxyMessageChannelHandler.HAPM_SRC_IP_VERSION.get(attrs);
+    assertEquals("v4", sourceIpVersion);
+    String destIpVersion = HAProxyMessageChannelHandler.HAPM_DEST_IP_VERSION.get(attrs);
+    assertEquals("v4", destIpVersion);
+  }
 }

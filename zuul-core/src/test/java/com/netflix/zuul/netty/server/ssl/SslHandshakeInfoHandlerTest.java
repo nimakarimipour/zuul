@@ -19,12 +19,10 @@ package com.netflix.zuul.netty.server.ssl;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
@@ -33,40 +31,43 @@ import java.nio.channels.ClosedChannelException;
 import javax.net.ssl.SSLEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for {@link SslHandshakeInfoHandler}.
- */
+/** Unit tests for {@link SslHandshakeInfoHandler}. */
 class SslHandshakeInfoHandlerTest {
 
-    @Test
-    void sslEarlyHandshakeFailure() throws Exception {
-        EmbeddedChannel clientChannel = new EmbeddedChannel();
-        SSLEngine clientEngine = SslContextBuilder.forClient().build().newEngine(clientChannel.alloc());
-        clientChannel.pipeline().addLast(new SslHandler(clientEngine));
+  @Test
+  void sslEarlyHandshakeFailure() throws Exception {
+    EmbeddedChannel clientChannel = new EmbeddedChannel();
+    SSLEngine clientEngine = SslContextBuilder.forClient().build().newEngine(clientChannel.alloc());
+    clientChannel.pipeline().addLast(new SslHandler(clientEngine));
 
-        EmbeddedChannel serverChannel = new EmbeddedChannel();
-        SelfSignedCertificate cert = new SelfSignedCertificate("localhorse");
-        SSLEngine serverEngine = SslContextBuilder.forServer(cert.key(), cert.cert()).build()
-                .newEngine(serverChannel.alloc());
+    EmbeddedChannel serverChannel = new EmbeddedChannel();
+    SelfSignedCertificate cert = new SelfSignedCertificate("localhorse");
+    SSLEngine serverEngine =
+        SslContextBuilder.forServer(cert.key(), cert.cert())
+            .build()
+            .newEngine(serverChannel.alloc());
 
-        serverChannel.pipeline().addLast(new ChannelOutboundHandlerAdapter() {
-            @Override
-            public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+    serverChannel
+        .pipeline()
+        .addLast(
+            new ChannelOutboundHandlerAdapter() {
+              @Override
+              public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
                 // Simulate an early closure form the client.
                 ReferenceCountUtil.safeRelease(msg);
                 promise.setFailure(new ClosedChannelException());
-            }
-        });
-        serverChannel.pipeline().addLast(new SslHandler(serverEngine));
-        serverChannel.pipeline().addLast(new SslHandshakeInfoHandler());
+              }
+            });
+    serverChannel.pipeline().addLast(new SslHandler(serverEngine));
+    serverChannel.pipeline().addLast(new SslHandshakeInfoHandler());
 
-        Object clientHello = clientChannel.readOutbound();
-        assertNotNull(clientHello);
-        ReferenceCountUtil.retain(clientHello);
+    Object clientHello = clientChannel.readOutbound();
+    assertNotNull(clientHello);
+    ReferenceCountUtil.retain(clientHello);
 
-        serverChannel.writeInbound(clientHello);
+    serverChannel.writeInbound(clientHello);
 
-        // Assert that the handler removes itself from the pipeline, since it was torn down.
-        assertNull(serverChannel.pipeline().context(SslHandshakeInfoHandler.class));
-    }
+    // Assert that the handler removes itself from the pipeline, since it was torn down.
+    assertNull(serverChannel.pipeline().context(SslHandshakeInfoHandler.class));
+  }
 }

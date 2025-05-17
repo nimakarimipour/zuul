@@ -16,26 +16,24 @@
 
 package com.netflix.zuul.filters.passport;
 
+import static com.netflix.zuul.filters.FilterType.OUTBOUND;
+
 import com.netflix.zuul.Filter;
 import com.netflix.zuul.filters.FilterType;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.passport.PassportState;
 
-import static com.netflix.zuul.filters.FilterType.OUTBOUND;
-
-/**
- * Created by saroskar on 3/14/17.
- */
+/** Created by saroskar on 3/14/17. */
 @Filter(order = 0, type = OUTBOUND)
-public final class OutboundPassportStampingFilter extends PassportStampingFilter<HttpResponseMessage> {
+public final class OutboundPassportStampingFilter
+    extends PassportStampingFilter<HttpResponseMessage> {
 
-    public OutboundPassportStampingFilter(PassportState stamp) {
-        super(stamp);
-    }
+  public OutboundPassportStampingFilter(PassportState stamp) {
+    super(stamp);
+  }
 
-    @Override
-    public FilterType filterType() {
-        return OUTBOUND;
-    }
-
+  @Override
+  public FilterType filterType() {
+    return OUTBOUND;
+  }
 }

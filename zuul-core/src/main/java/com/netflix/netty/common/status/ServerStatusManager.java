@@ -18,27 +18,20 @@ package com.netflix.netty.common.status;
 
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.appinfo.InstanceInfo;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-
-/**
- * User: michaels@netflix.com
- * Date: 7/6/17
- * Time: 3:37 PM
- */
+/** User: michaels@netflix.com Date: 7/6/17 Time: 3:37 PM */
 @Singleton
-public class ServerStatusManager
-{
-    private final ApplicationInfoManager applicationInfoManager;
+public class ServerStatusManager {
+  private final ApplicationInfoManager applicationInfoManager;
 
-    @Inject
-    public ServerStatusManager(ApplicationInfoManager applicationInfoManager) {
-        this.applicationInfoManager = applicationInfoManager;
-    }
+  @Inject
+  public ServerStatusManager(ApplicationInfoManager applicationInfoManager) {
+    this.applicationInfoManager = applicationInfoManager;
+  }
 
-    public void localStatus(InstanceInfo.InstanceStatus status) {
-        applicationInfoManager.setInstanceStatus(status);
-    }
+  public void localStatus(InstanceInfo.InstanceStatus status) {
+    applicationInfoManager.setInstanceStatus(status);
+  }
 }

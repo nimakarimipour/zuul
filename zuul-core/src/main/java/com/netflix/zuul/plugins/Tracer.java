@@ -24,53 +24,51 @@ import java.util.concurrent.TimeUnit;
 /**
  * Plugin to hook up Servo Tracers
  *
- * @author Mikey Cohen
- *         Date: 4/10/13
- *         Time: 4:51 PM
+ * @author Mikey Cohen Date: 4/10/13 Time: 4:51 PM
  */
 public class Tracer extends TracerFactory {
 
+  @Override
+  public com.netflix.zuul.monitoring.Tracer startMicroTracer(String name) {
+    return new SpectatorTracer(name);
+  }
+
+  class SpectatorTracer implements com.netflix.zuul.monitoring.Tracer {
+
+    private String name;
+    private final long start;
+
+    private SpectatorTracer(String name) {
+      this.name = name;
+      start = System.nanoTime();
+    }
+
     @Override
-
-    public com.netflix.zuul.monitoring.Tracer startMicroTracer(String name) {
-        return new SpectatorTracer(name);
+    public void stopAndLog() {
+      Spectator.globalRegistry()
+          .timer(name, "hostname", getHostName(), "ip", getIp())
+          .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
     }
 
-    class SpectatorTracer implements com.netflix.zuul.monitoring.Tracer {
-
-        private String name;
-        private final long start;
-
-        private SpectatorTracer(String name) {
-            this.name = name;
-            start = System.nanoTime();
-        }
-
-        @Override
-        public void stopAndLog() {
-            Spectator.globalRegistry().timer(name, "hostname", getHostName(), "ip", getIp())
-                    .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-
-        @Override
-        public void setName(String name) {
-            this.name = name;
-        }
+    @Override
+    public void setName(String name) {
+      this.name = name;
     }
+  }
 
-    private static String getHostName() {
-        return (loadAddress() != null) ? loadAddress().getHostName() : "unkownHost";
-    }
+  private static String getHostName() {
+    return (loadAddress() != null) ? loadAddress().getHostName() : "unkownHost";
+  }
 
-    private static String getIp() {
-        return (loadAddress() != null) ? loadAddress().getHostAddress() : "unknownHost";
-    }
+  private static String getIp() {
+    return (loadAddress() != null) ? loadAddress().getHostAddress() : "unknownHost";
+  }
 
-    private static InetAddress loadAddress() {
-        try {
-            return InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            return null;
-        }
+  private static InetAddress loadAddress() {
+    try {
+      return InetAddress.getLocalHost();
+    } catch (UnknownHostException e) {
+      return null;
     }
+  }
 }

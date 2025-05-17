@@ -16,42 +16,42 @@
 
 package com.netflix.zuul;
 
-/**
- * Categorization of filters.
- */
+/** Categorization of filters. */
 public enum FilterCategory {
+  ABUSE(
+      "abuse",
+      "Abuse detection and protection filters, such as rate-limiting, malicious request detection, geo-blocking"),
+  ACCESS("access", "Authentication and authorization filters"),
+  ADMIN("admin", "Admin only filters providing operational support"),
+  CHAOS("chaos", "Failure injection testing and resilience support"),
+  CONTEXT_DECORATOR("context-decorator", "Decorate context based on request and detected client"),
+  HEALTHCHECK("healthcheck", "Support for healthcheck endpoints"),
+  HTTP("http", "Filter operating on HTTP request/response protocol features"),
+  ORIGIN("origin", "Origin connectivity filters"),
+  OBSERVABILITY("observability", "Filters providing observability features"),
+  OVERLOAD(
+      "overload", "Filters to respond on the server being in an overloaded state such as brownout"),
+  ROUTING("routing", "Filters which make routing decisions"),
+  ;
 
-    ABUSE("abuse", "Abuse detection and protection filters, such as rate-limiting, malicious request detection, geo-blocking"),
-    ACCESS("access", "Authentication and authorization filters"),
-    ADMIN("admin", "Admin only filters providing operational support"),
-    CHAOS("chaos", "Failure injection testing and resilience support"),
-    CONTEXT_DECORATOR("context-decorator", "Decorate context based on request and detected client"),
-    HEALTHCHECK("healthcheck", "Support for healthcheck endpoints"),
-    HTTP("http", "Filter operating on HTTP request/response protocol features"),
-    ORIGIN("origin", "Origin connectivity filters"),
-    OBSERVABILITY("observability", "Filters providing observability features"),
-    OVERLOAD("overload", "Filters to respond on the server being in an overloaded state such as brownout"),
-    ROUTING("routing", "Filters which make routing decisions"),
-    ;
-    
-    private final String code;
-    private final String description;
+  private final String code;
+  private final String description;
 
-    FilterCategory(String code, String description) {
-        this.code = code;
-        this.description = description;
-    }
+  FilterCategory(String code, String description) {
+    this.code = code;
+    this.description = description;
+  }
 
-    public String getCode() {
-        return code;
-    }
+  public String getCode() {
+    return code;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    @Override
-    public String toString() {
-        return code;
-    }
+  @Override
+  public String toString() {
+    return code;
+  }
 }

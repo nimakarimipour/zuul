@@ -14,7 +14,6 @@
  *      limitations under the License.
  */
 
-
 package com.netflix.zuul.origins;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,56 +22,55 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 class OriginNameTest {
-    @Test
-    void getAuthority() {
-        OriginName trusted = OriginName.fromVipAndApp("woodly-doodly", "westerndigital");
+  @Test
+  void getAuthority() {
+    OriginName trusted = OriginName.fromVipAndApp("woodly-doodly", "westerndigital");
 
-        assertEquals("westerndigital", trusted.getAuthority());
-    }
+    assertEquals("westerndigital", trusted.getAuthority());
+  }
 
-    @Test
-    void getMetrics() {
-        OriginName trusted = OriginName.fromVipAndApp("WOODLY-doodly", "westerndigital");
+  @Test
+  void getMetrics() {
+    OriginName trusted = OriginName.fromVipAndApp("WOODLY-doodly", "westerndigital");
 
-        assertEquals("woodly-doodly", trusted.getMetricId());
-        assertEquals("WOODLY-doodly", trusted.getNiwsClientName());
-    }
+    assertEquals("woodly-doodly", trusted.getMetricId());
+    assertEquals("WOODLY-doodly", trusted.getNiwsClientName());
+  }
 
+  @Test
+  void equals() {
+    OriginName name1 = OriginName.fromVipAndApp("woodly-doodly", "westerndigital");
+    OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "westerndigital", "woodly-doodly");
 
-    @Test
-    void equals() {
-        OriginName name1 = OriginName.fromVipAndApp("woodly-doodly", "westerndigital");
-        OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "westerndigital", "woodly-doodly");
+    assertEquals(name1, name2);
+    assertEquals(name1.hashCode(), name2.hashCode());
+  }
 
-        assertEquals(name1, name2);
-        assertEquals(name1.hashCode(), name2.hashCode());
-    }
+  @Test
+  @SuppressWarnings("deprecation")
+  void equals_legacy_niws() {
+    OriginName name1 = OriginName.fromVip("woodly-doodly", "westerndigital");
+    OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "woodly", "westerndigital");
 
-    @Test
-    @SuppressWarnings("deprecation")
-    void equals_legacy_niws() {
-        OriginName name1 = OriginName.fromVip("woodly-doodly", "westerndigital");
-        OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "woodly", "westerndigital");
+    assertEquals(name1, name2);
+    assertEquals(name1.hashCode(), name2.hashCode());
+  }
 
-        assertEquals(name1, name2);
-        assertEquals(name1.hashCode(), name2.hashCode());
-    }
+  @Test
+  void equals_legacy() {
+    OriginName name1 = OriginName.fromVip("woodly-doodly");
+    OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "woodly", "woodly-doodly");
 
-    @Test
-    void equals_legacy() {
-        OriginName name1 = OriginName.fromVip("woodly-doodly");
-        OriginName name2 = OriginName.fromVipAndApp("woodly-doodly", "woodly", "woodly-doodly");
+    assertEquals(name1, name2);
+    assertEquals(name1.hashCode(), name2.hashCode());
+  }
 
-        assertEquals(name1, name2);
-        assertEquals(name1.hashCode(), name2.hashCode());
-    }
-
-    @Test
-    void noNull() {
-        assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp(null, "app"));
-        assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", null));
-        assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp(null, "app", "niws"));
-        assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", null, "niws"));
-        assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", "app", null));
-    }
+  @Test
+  void noNull() {
+    assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp(null, "app"));
+    assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", null));
+    assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp(null, "app", "niws"));
+    assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", null, "niws"));
+    assertThrows(NullPointerException.class, () -> OriginName.fromVipAndApp("vip", "app", null));
+  }
 }

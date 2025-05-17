@@ -40,76 +40,80 @@ import java.util.function.Consumer;
 /**
  * Http2 Or Http Handler
  *
- * Author: Arthur Gonigberg
- * Date: December 15, 2017
+ * <p>Author: Arthur Gonigberg Date: December 15, 2017
  */
 public class Http2OrHttpHandler extends ApplicationProtocolNegotiationHandler {
-    public static final AttributeKey<String> PROTOCOL_NAME = AttributeKey.valueOf("protocol_name");
+  public static final AttributeKey<String> PROTOCOL_NAME = AttributeKey.valueOf("protocol_name");
 
-    private static final DynamicHttp2FrameLogger FRAME_LOGGER = new DynamicHttp2FrameLogger(LogLevel.DEBUG, Http2FrameCodec.class);
+  private static final DynamicHttp2FrameLogger FRAME_LOGGER =
+      new DynamicHttp2FrameLogger(LogLevel.DEBUG, Http2FrameCodec.class);
 
-    private final ChannelHandler http2StreamHandler;
-    private final int maxConcurrentStreams;
-    private final int initialWindowSize;
-    private final long maxHeaderTableSize;
-    private final long maxHeaderListSize;
-    private final Consumer<ChannelPipeline> addHttpHandlerFn;
+  private final ChannelHandler http2StreamHandler;
+  private final int maxConcurrentStreams;
+  private final int initialWindowSize;
+  private final long maxHeaderTableSize;
+  private final long maxHeaderListSize;
+  private final Consumer<ChannelPipeline> addHttpHandlerFn;
 
+  public Http2OrHttpHandler(
+      ChannelHandler http2StreamHandler,
+      ChannelConfig channelConfig,
+      Consumer<ChannelPipeline> addHttpHandlerFn) {
+    super(ApplicationProtocolNames.HTTP_1_1);
+    this.http2StreamHandler = http2StreamHandler;
+    this.maxConcurrentStreams = channelConfig.get(CommonChannelConfigKeys.maxConcurrentStreams);
+    this.initialWindowSize = channelConfig.get(CommonChannelConfigKeys.initialWindowSize);
+    this.maxHeaderTableSize = channelConfig.get(CommonChannelConfigKeys.maxHttp2HeaderTableSize);
+    this.maxHeaderListSize = channelConfig.get(CommonChannelConfigKeys.maxHttp2HeaderListSize);
+    this.addHttpHandlerFn = addHttpHandlerFn;
+  }
 
-    public Http2OrHttpHandler(ChannelHandler http2StreamHandler, ChannelConfig channelConfig,
-                              Consumer<ChannelPipeline> addHttpHandlerFn) {
-        super(ApplicationProtocolNames.HTTP_1_1);
-        this.http2StreamHandler = http2StreamHandler;
-        this.maxConcurrentStreams = channelConfig.get(CommonChannelConfigKeys.maxConcurrentStreams);
-        this.initialWindowSize = channelConfig.get(CommonChannelConfigKeys.initialWindowSize);
-        this.maxHeaderTableSize = channelConfig.get(CommonChannelConfigKeys.maxHttp2HeaderTableSize);
-        this.maxHeaderListSize = channelConfig.get(CommonChannelConfigKeys.maxHttp2HeaderListSize);
-        this.addHttpHandlerFn = addHttpHandlerFn;
+  @Override
+  protected void configurePipeline(ChannelHandlerContext ctx, String protocol) throws Exception {
+    if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
+      ctx.channel().attr(PROTOCOL_NAME).set("HTTP/2");
+      configureHttp2(ctx.pipeline());
+      return;
+    }
+    if (ApplicationProtocolNames.HTTP_1_1.equals(protocol)) {
+      ctx.channel().attr(PROTOCOL_NAME).set("HTTP/1.1");
+      configureHttp1(ctx.pipeline());
+      return;
     }
 
-    @Override
-    protected void configurePipeline(ChannelHandlerContext ctx, String protocol) throws Exception {
-        if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
-            ctx.channel().attr(PROTOCOL_NAME).set("HTTP/2");
-            configureHttp2(ctx.pipeline());
-            return;
-        }
-        if (ApplicationProtocolNames.HTTP_1_1.equals(protocol)) {
-            ctx.channel().attr(PROTOCOL_NAME).set("HTTP/1.1");
-            configureHttp1(ctx.pipeline());
-            return;
-        }
+    throw new IllegalStateException("unknown protocol: " + protocol);
+  }
 
-        throw new IllegalStateException("unknown protocol: " + protocol);
-    }
+  private void configureHttp2(ChannelPipeline pipeline) {
 
-    private void configureHttp2(ChannelPipeline pipeline) {
+    // setup the initial stream settings for the server to use.
+    Http2Settings settings =
+        new Http2Settings()
+            .maxConcurrentStreams(maxConcurrentStreams)
+            .initialWindowSize(initialWindowSize)
+            .headerTableSize(maxHeaderTableSize)
+            .maxHeaderListSize(maxHeaderListSize);
 
-        // setup the initial stream settings for the server to use.
-        Http2Settings settings = new Http2Settings()
-                .maxConcurrentStreams(maxConcurrentStreams)
-                .initialWindowSize(initialWindowSize)
-                .headerTableSize(maxHeaderTableSize)
-                .maxHeaderListSize(maxHeaderListSize);
+    Http2FrameCodec frameCodec =
+        Http2FrameCodecBuilder.forServer()
+            .frameLogger(FRAME_LOGGER)
+            .initialSettings(settings)
+            .validateHeaders(true)
+            .build();
+    Http2Connection conn = frameCodec.connection();
+    // Use the uniform byte distributor until https://github.com/netty/netty/issues/10525 is fixed.
+    conn.remote()
+        .flowController(
+            new DefaultHttp2RemoteFlowController(conn, new UniformStreamByteDistributor(conn)));
 
-        Http2FrameCodec frameCodec = Http2FrameCodecBuilder.forServer()
-                .frameLogger(FRAME_LOGGER)
-                .initialSettings(settings)
-                .validateHeaders(true)
-                .build();
-        Http2Connection conn = frameCodec.connection();
-        // Use the uniform byte distributor until https://github.com/netty/netty/issues/10525 is fixed.
-        conn.remote().flowController(
-                new DefaultHttp2RemoteFlowController(conn, new UniformStreamByteDistributor(conn)));
+    Http2MultiplexHandler multiplexHandler = new Http2MultiplexHandler(http2StreamHandler);
 
-        Http2MultiplexHandler multiplexHandler = new Http2MultiplexHandler(http2StreamHandler);
+    // The frame codec MUST be in the pipeline.
+    pipeline.addBefore("codec_placeholder", /* name= */ null, frameCodec);
+    pipeline.replace("codec_placeholder", HTTP_CODEC_HANDLER_NAME, multiplexHandler);
+  }
 
-        // The frame codec MUST be in the pipeline.
-        pipeline.addBefore("codec_placeholder", /* name= */ null, frameCodec);
-        pipeline.replace("codec_placeholder", HTTP_CODEC_HANDLER_NAME, multiplexHandler);
-    }
-
-    private void configureHttp1(ChannelPipeline pipeline) {
-        addHttpHandlerFn.accept(pipeline);
-    }
+  private void configureHttp1(ChannelPipeline pipeline) {
+    addHttpHandlerFn.accept(pipeline);
+  }
 }

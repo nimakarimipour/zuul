@@ -20,76 +20,74 @@ import com.google.common.base.Stopwatch;
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.exception.ErrorType;
 import com.netflix.zuul.exception.OutboundErrorType;
-
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * @author michaels
  */
 public class BasicRequestStat implements RequestStat {
 
-    private volatile boolean isFinished;
-    private volatile Stopwatch stopwatch;
+  private volatile boolean isFinished;
+  private volatile Stopwatch stopwatch;
 
-    public BasicRequestStat() {
-        this.isFinished = false;
-        this.stopwatch = Stopwatch.createStarted();
+  public BasicRequestStat() {
+    this.isFinished = false;
+    this.stopwatch = Stopwatch.createStarted();
+  }
+
+  @Override
+  public RequestStat server(DiscoveryResult server) {
+    return this;
+  }
+
+  @Override
+  public boolean isFinished() {
+    return isFinished;
+  }
+
+  @Override
+  public long duration() {
+    long ms = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+    return ms > 0 ? ms : 0;
+  }
+
+  @Override
+  public void serviceUnavailable() {
+    failAndSetErrorCode(OutboundErrorType.SERVICE_UNAVAILABLE);
+  }
+
+  @Override
+  public void generalError() {
+    failAndSetErrorCode(OutboundErrorType.OTHER);
+  }
+
+  @Override
+  public void failAndSetErrorCode(ErrorType error) {
+    // override to implement metric tracking
+  }
+
+  @Override
+  public void updateWithHttpStatusCode(int httpStatusCode) {
+    // override to implement metric tracking
+  }
+
+  @Override
+  public void finalAttempt(boolean finalAttempt) {}
+
+  @Override
+  public boolean finishIfNotAlready() {
+    if (isFinished) {
+      return false;
     }
+    stopwatch.stop();
 
-    @Override
-    public RequestStat server(DiscoveryResult server) {
-        return this;
-    }
+    publishMetrics();
 
-    @Override
-    public boolean isFinished() {
-        return isFinished;
-    }
+    isFinished = true;
+    return true;
+  }
 
-    @Override
-    public long duration() {
-        long ms = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-        return ms > 0 ? ms : 0;
-    }
-
-    @Override
-    public void serviceUnavailable() {
-        failAndSetErrorCode(OutboundErrorType.SERVICE_UNAVAILABLE);
-    }
-
-    @Override
-    public void generalError() {
-        failAndSetErrorCode(OutboundErrorType.OTHER);
-    }
-
-    @Override
-    public void failAndSetErrorCode(ErrorType error) {
-        // override to implement metric tracking
-    }
-
-    @Override
-    public void updateWithHttpStatusCode(int httpStatusCode) {
-        // override to implement metric tracking
-    }
-
-    @Override
-    public void finalAttempt(boolean finalAttempt) {}
-
-    @Override
-    public boolean finishIfNotAlready() {
-        if (isFinished) {
-            return false;
-        }
-        stopwatch.stop();
-
-        publishMetrics();
-
-        isFinished = true;
-        return true;
-    }
-
-    protected void publishMetrics() {
-        // override to publish metrics here
-    }
+  protected void publishMetrics() {
+    // override to publish metrics here
+  }
 }

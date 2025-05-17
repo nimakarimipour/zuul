@@ -50,7 +50,7 @@ public class DynamicServerResolver implements Resolver<DiscoveryResult> {
     }
 
     @Override
-    public DiscoveryResult resolve(@Nullable Object key) {
+    public DiscoveryResult resolve( Object key) {
         final Server server = loadBalancer.chooseServer(key);
         return server!= null ? new DiscoveryResult((DiscoveryEnabledServer) server, loadBalancer.getLoadBalancerStats()) : DiscoveryResult.EMPTY;
     }

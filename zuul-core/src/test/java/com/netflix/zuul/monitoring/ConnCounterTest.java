@@ -28,46 +28,45 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.jupiter.api.Test;
 
 class ConnCounterTest {
-    @Test
-    void record() {
-        EmbeddedChannel chan = new EmbeddedChannel();
-        Attrs attrs = Attrs.newInstance();
-        chan.attr(Server.CONN_DIMENSIONS).set(attrs);
-        Registry registry = new DefaultRegistry();
-        ConnCounter counter = ConnCounter.install(chan, registry, registry.createId("foo"));
+  @Test
+  void record() {
+    EmbeddedChannel chan = new EmbeddedChannel();
+    Attrs attrs = Attrs.newInstance();
+    chan.attr(Server.CONN_DIMENSIONS).set(attrs);
+    Registry registry = new DefaultRegistry();
+    ConnCounter counter = ConnCounter.install(chan, registry, registry.createId("foo"));
 
-        counter.increment("start");
-        counter.increment("middle");
-        Attrs.newKey("bar").put(attrs, "baz");
-        counter.increment("end");
+    counter.increment("start");
+    counter.increment("middle");
+    Attrs.newKey("bar").put(attrs, "baz");
+    counter.increment("end");
 
-        Gauge meter1 = registry.gauge(registry.createId("foo.start", "from", "nascent"));
-        assertNotNull(meter1);
-        assertEquals(1, meter1.value(), 0);
+    Gauge meter1 = registry.gauge(registry.createId("foo.start", "from", "nascent"));
+    assertNotNull(meter1);
+    assertEquals(1, meter1.value(), 0);
 
-        Gauge meter2 = registry.gauge(registry.createId("foo.middle", "from", "start"));
-        assertNotNull(meter2);
-        assertEquals(1, meter2.value(), 0);
+    Gauge meter2 = registry.gauge(registry.createId("foo.middle", "from", "start"));
+    assertNotNull(meter2);
+    assertEquals(1, meter2.value(), 0);
 
-        Gauge meter3 = registry.gauge(registry.createId("foo.end", "from", "middle", "bar", "baz"));
-        assertNotNull(meter3);
-        assertEquals(1, meter3.value(), 0);
-    }
+    Gauge meter3 = registry.gauge(registry.createId("foo.end", "from", "middle", "bar", "baz"));
+    assertNotNull(meter3);
+    assertEquals(1, meter3.value(), 0);
+  }
 
-    @Test
-    void activeConnsCount() {
-        EmbeddedChannel channel = new EmbeddedChannel();
-        Attrs attrs = Attrs.newInstance();
-        channel.attr(Server.CONN_DIMENSIONS).set(attrs);
-        Registry registry = new DefaultRegistry();
+  @Test
+  void activeConnsCount() {
+    EmbeddedChannel channel = new EmbeddedChannel();
+    Attrs attrs = Attrs.newInstance();
+    channel.attr(Server.CONN_DIMENSIONS).set(attrs);
+    Registry registry = new DefaultRegistry();
 
-        ConnCounter.install(channel, registry, registry.createId("foo"));
+    ConnCounter.install(channel, registry, registry.createId("foo"));
 
-        // Dedup increments
-        ConnCounter.from(channel).increment("active");
-        ConnCounter.from(channel).increment("active");
+    // Dedup increments
+    ConnCounter.from(channel).increment("active");
+    ConnCounter.from(channel).increment("active");
 
-
-        assertEquals(1, ConnCounter.from(channel).getCurrentActiveConns(), 0);
-    }
+    assertEquals(1, ConnCounter.from(channel).getCurrentActiveConns(), 0);
+  }
 }

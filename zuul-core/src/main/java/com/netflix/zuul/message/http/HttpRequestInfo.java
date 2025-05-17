@@ -20,62 +20,57 @@ import com.netflix.zuul.message.Headers;
 import com.netflix.zuul.message.ZuulMessage;
 import java.util.Optional;
 
-/**
- * User: Mike Smith
- * Date: 7/15/15
- * Time: 1:18 PM
- */
-public interface HttpRequestInfo extends ZuulMessage
-{
-    String getProtocol();
+/** User: Mike Smith Date: 7/15/15 Time: 1:18 PM */
+public interface HttpRequestInfo extends ZuulMessage {
+  String getProtocol();
 
-    String getMethod();
+  String getMethod();
 
-    String getPath();
+  String getPath();
 
-    HttpQueryParams getQueryParams();
+  HttpQueryParams getQueryParams();
 
-    String getPathAndQuery();
+  String getPathAndQuery();
 
-    Headers getHeaders();
+  Headers getHeaders();
 
-    String getClientIp();
+  String getClientIp();
 
-    String getScheme();
+  String getScheme();
 
-    int getPort();
+  int getPort();
 
-    String getServerName();
+  String getServerName();
 
-    int getMaxBodySize();
+  int getMaxBodySize();
 
-    String getInfoForLogging();
+  String getInfoForLogging();
 
-    String getOriginalHost();
+  String getOriginalHost();
 
-    String getOriginalScheme();
+  String getOriginalScheme();
 
-    String getOriginalProtocol();
+  String getOriginalProtocol();
 
-    int getOriginalPort();
+  int getOriginalPort();
 
-    /**
-     * Reflects the actual destination port that the client intended to communicate with,
-     * in preference to the port Zuul was listening on. In the case where proxy protocol is
-     * enabled, this should reflect the destination IP encoded in the TCP payload by the load balancer.
-     */
-    default Optional<Integer> getClientDestinationPort() {
-        throw new UnsupportedOperationException();
-    }
+  /**
+   * Reflects the actual destination port that the client intended to communicate with, in
+   * preference to the port Zuul was listening on. In the case where proxy protocol is enabled, this
+   * should reflect the destination IP encoded in the TCP payload by the load balancer.
+   */
+  default Optional<Integer> getClientDestinationPort() {
+    throw new UnsupportedOperationException();
+  }
 
-    String reconstructURI();
+  String reconstructURI();
 
-    /** Parse and lazily cache the request cookies. */
-    Cookies parseCookies();
+  /** Parse and lazily cache the request cookies. */
+  Cookies parseCookies();
 
-    /**
-     * Force parsing/re-parsing of the cookies. May want to do this if headers
-     * have been mutated since cookies were first parsed.
-     */
-    Cookies reParseCookies();
+  /**
+   * Force parsing/re-parsing of the cookies. May want to do this if headers have been mutated since
+   * cookies were first parsed.
+   */
+  Cookies reParseCookies();
 }

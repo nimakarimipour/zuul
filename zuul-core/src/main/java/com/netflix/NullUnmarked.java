@@ -1,4 +1,3 @@
 package com.netflix;
 
-public @interface NullUnmarked {
-}
+public @interface NullUnmarked {}

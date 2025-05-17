@@ -18,38 +18,35 @@ package com.netflix.zuul.origins;
 
 import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.context.SessionContext;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Basic Netty Origin Manager that most apps can use. This can also serve as a useful template for creating more
- * complex origin managers.
+ * Basic Netty Origin Manager that most apps can use. This can also serve as a useful template for
+ * creating more complex origin managers.
  *
- * Author: Arthur Gonigberg
- * Date: November 30, 2017
+ * <p>Author: Arthur Gonigberg Date: November 30, 2017
  */
 @Singleton
 public class BasicNettyOriginManager implements OriginManager<BasicNettyOrigin> {
 
-    private final Registry registry;
-    private final ConcurrentHashMap<OriginName, BasicNettyOrigin> originMappings;
+  private final Registry registry;
+  private final ConcurrentHashMap<OriginName, BasicNettyOrigin> originMappings;
 
-    @Inject
-    public BasicNettyOriginManager(Registry registry) {
-        this.registry = registry;
-        this.originMappings = new ConcurrentHashMap<>();
-    }
+  @Inject
+  public BasicNettyOriginManager(Registry registry) {
+    this.registry = registry;
+    this.originMappings = new ConcurrentHashMap<>();
+  }
 
-    @Override
-    public BasicNettyOrigin getOrigin(OriginName originName, String uri, SessionContext ctx) {
-        return originMappings.computeIfAbsent(originName, n -> createOrigin(originName, uri, ctx));
-    }
+  @Override
+  public BasicNettyOrigin getOrigin(OriginName originName, String uri, SessionContext ctx) {
+    return originMappings.computeIfAbsent(originName, n -> createOrigin(originName, uri, ctx));
+  }
 
-    @Override
-    public BasicNettyOrigin createOrigin(
-            OriginName originName, String uri, SessionContext ctx) {
-        return new BasicNettyOrigin(originName, registry);
-    }
+  @Override
+  public BasicNettyOrigin createOrigin(OriginName originName, String uri, SessionContext ctx) {
+    return new BasicNettyOrigin(originName, registry);
+  }
 }

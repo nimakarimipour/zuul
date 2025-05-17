@@ -16,11 +16,5 @@
 
 package com.netflix.netty.common;
 
-/**
- * User: michaels@netflix.com
- * Date: 5/24/16
- * Time: 1:04 PM
- */
-public class RequestResponseCompleteEvent
-{
-}
+/** User: michaels@netflix.com Date: 5/24/16 Time: 1:04 PM */
+public class RequestResponseCompleteEvent {}

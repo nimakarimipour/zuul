@@ -19,33 +19,35 @@ package com.netflix.zuul.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for {@link VipUtils}.
- */
+/** Unit tests for {@link VipUtils}. */
 class VipUtilsTest {
-    @Test
-    void testGetVIPPrefix() {
-        assertThrows(NullPointerException.class, () -> {
-            assertEquals("api-test", VipUtils.getVIPPrefix("api-test.netflix.net:7001"));
-            assertEquals("api-test", VipUtils.getVIPPrefix("api-test.netflix.net"));
-            assertEquals("api-test", VipUtils.getVIPPrefix("api-test:7001"));
-            assertEquals("api-test", VipUtils.getVIPPrefix("api-test"));
-            assertEquals("", VipUtils.getVIPPrefix(""));
-            VipUtils.getVIPPrefix(null);
+  @Test
+  void testGetVIPPrefix() {
+    assertThrows(
+        NullPointerException.class,
+        () -> {
+          assertEquals("api-test", VipUtils.getVIPPrefix("api-test.netflix.net:7001"));
+          assertEquals("api-test", VipUtils.getVIPPrefix("api-test.netflix.net"));
+          assertEquals("api-test", VipUtils.getVIPPrefix("api-test:7001"));
+          assertEquals("api-test", VipUtils.getVIPPrefix("api-test"));
+          assertEquals("", VipUtils.getVIPPrefix(""));
+          VipUtils.getVIPPrefix(null);
         });
-    }
+  }
 
-    @Test
-    void testExtractAppNameFromVIP() {
-        assertThrows(NullPointerException.class, () -> {
-            assertEquals("api", VipUtils.extractUntrustedAppNameFromVIP("api-test.netflix.net:7001"));
-            assertEquals("api", VipUtils.extractUntrustedAppNameFromVIP("api-test-blah.netflix.net:7001"));
-            assertEquals("api", VipUtils.extractUntrustedAppNameFromVIP("api"));
-            assertEquals("", VipUtils.extractUntrustedAppNameFromVIP(""));
-            VipUtils.extractUntrustedAppNameFromVIP(null);
+  @Test
+  void testExtractAppNameFromVIP() {
+    assertThrows(
+        NullPointerException.class,
+        () -> {
+          assertEquals("api", VipUtils.extractUntrustedAppNameFromVIP("api-test.netflix.net:7001"));
+          assertEquals(
+              "api", VipUtils.extractUntrustedAppNameFromVIP("api-test-blah.netflix.net:7001"));
+          assertEquals("api", VipUtils.extractUntrustedAppNameFromVIP("api"));
+          assertEquals("", VipUtils.extractUntrustedAppNameFromVIP(""));
+          VipUtils.extractUntrustedAppNameFromVIP(null);
         });
-    }
+  }
 }

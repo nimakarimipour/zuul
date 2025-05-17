@@ -18,21 +18,15 @@ package com.netflix.netty.common;
 
 import io.netty.handler.codec.http.HttpResponse;
 
-/**
- * User: michaels@netflix.com
- * Date: 2/8/17
- * Time: 9:58 AM
- */
-public class Http1ConnectionExpiryHandler extends AbstrHttpConnectionExpiryHandler
-{
-    public Http1ConnectionExpiryHandler(int maxRequests, int maxRequestsUnderBrownout, int maxExpiry)
-    {
-        super(ConnectionCloseType.GRACEFUL, maxRequestsUnderBrownout, maxRequests, maxExpiry);
-    }
+/** User: michaels@netflix.com Date: 2/8/17 Time: 9:58 AM */
+public class Http1ConnectionExpiryHandler extends AbstrHttpConnectionExpiryHandler {
+  public Http1ConnectionExpiryHandler(
+      int maxRequests, int maxRequestsUnderBrownout, int maxExpiry) {
+    super(ConnectionCloseType.GRACEFUL, maxRequestsUnderBrownout, maxRequests, maxExpiry);
+  }
 
-    @Override
-    protected boolean isResponseHeaders(Object msg)
-    {
-        return msg instanceof HttpResponse;
-    }
+  @Override
+  protected boolean isResponseHeaders(Object msg) {
+    return msg instanceof HttpResponse;
+  }
 }

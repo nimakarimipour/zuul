@@ -17,27 +17,28 @@
 package com.netflix.netty.common.throttle;
 
 /**
- * Indicates a rejection type for DoS protection.  While similar, rejection is distinct from throttling in that
- * throttling is intended for non-malicious traffic.
+ * Indicates a rejection type for DoS protection. While similar, rejection is distinct from
+ * throttling in that throttling is intended for non-malicious traffic.
  */
 public enum RejectionType {
-    // "It's not you, it's me."
+  // "It's not you, it's me."
 
-    /**
-     * Indicates that the request should not be allowed.  An HTTP response will be generated as a result.
-     */
-    REJECT,
+  /**
+   * Indicates that the request should not be allowed. An HTTP response will be generated as a
+   * result.
+   */
+  REJECT,
 
-    /**
-     * Indicates that the connection should be closed, not allowing the request to proceed.  No HTTP response will be
-     * returned.
-     */
-    CLOSE,
+  /**
+   * Indicates that the connection should be closed, not allowing the request to proceed. No HTTP
+   * response will be returned.
+   */
+  CLOSE,
 
-    /**
-     * Allows the request to proceed, followed by closing the connection.  This is typically used in conjunction with
-     * throttling handling, where the response may need to be handled by the filter chain.  It is not expected that the
-     * request will be proxied.
-     */
-    ALLOW_THEN_CLOSE;
+  /**
+   * Allows the request to proceed, followed by closing the connection. This is typically used in
+   * conjunction with throttling handling, where the response may need to be handled by the filter
+   * chain. It is not expected that the request will be proxied.
+   */
+  ALLOW_THEN_CLOSE;
 }

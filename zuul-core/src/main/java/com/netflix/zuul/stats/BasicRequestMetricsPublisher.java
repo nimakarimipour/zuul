@@ -18,16 +18,11 @@ package com.netflix.zuul.stats;
 
 import com.netflix.zuul.context.SessionContext;
 
-/**
- * User: michaels@netflix.com
- * Date: 6/4/15
- * Time: 4:22 PM
- */
-public class BasicRequestMetricsPublisher implements RequestMetricsPublisher
-{
-    @Override
-    public void collectAndPublish(SessionContext context) {
-        // Record metrics here.
+/** User: michaels@netflix.com Date: 6/4/15 Time: 4:22 PM */
+public class BasicRequestMetricsPublisher implements RequestMetricsPublisher {
+  @Override
+  public void collectAndPublish(SessionContext context) {
+    // Record metrics here.
 
-    }
+  }
 }

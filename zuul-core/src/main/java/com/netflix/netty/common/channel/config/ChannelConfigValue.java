@@ -16,29 +16,21 @@
 
 package com.netflix.netty.common.channel.config;
 
-/**
- * User: michaels@netflix.com
- * Date: 2/8/17
- * Time: 6:41 PM
- */
-public class ChannelConfigValue<T>
-{
-    private final ChannelConfigKey<T> key;
-    private final T value;
+/** User: michaels@netflix.com Date: 2/8/17 Time: 6:41 PM */
+public class ChannelConfigValue<T> {
+  private final ChannelConfigKey<T> key;
+  private final T value;
 
-    public ChannelConfigValue(ChannelConfigKey<T> key, T value)
-    {
-        this.key = key;
-        this.value = value;
-    }
+  public ChannelConfigValue(ChannelConfigKey<T> key, T value) {
+    this.key = key;
+    this.value = value;
+  }
 
-    public ChannelConfigKey<T> key()
-    {
-        return key;
-    }
+  public ChannelConfigKey<T> key() {
+    return key;
+  }
 
-    public T value()
-    {
-        return value;
-    }
+  public T value() {
+    return value;
+  }
 }

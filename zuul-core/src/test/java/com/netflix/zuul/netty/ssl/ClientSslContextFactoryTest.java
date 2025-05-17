@@ -21,23 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-
-/**
- * Tests for {@link ClientSslContextFactory}.
- */
+/** Tests for {@link ClientSslContextFactory}. */
 class ClientSslContextFactoryTest {
 
-    @Test
-    void enableTls13() {
-        String[] protos = ClientSslContextFactory.maybeAddTls13(true, "TLSv1.2");
+  @Test
+  void enableTls13() {
+    String[] protos = ClientSslContextFactory.maybeAddTls13(true, "TLSv1.2");
 
-        assertEquals(Arrays.asList("TLSv1.3", "TLSv1.2"), Arrays.asList(protos));
-    }
+    assertEquals(Arrays.asList("TLSv1.3", "TLSv1.2"), Arrays.asList(protos));
+  }
 
-    @Test
-    void disableTls13() {
-        String[] protos = ClientSslContextFactory.maybeAddTls13(false, "TLSv1.2");
+  @Test
+  void disableTls13() {
+    String[] protos = ClientSslContextFactory.maybeAddTls13(false, "TLSv1.2");
 
-        assertEquals(Arrays.asList("TLSv1.2"), Arrays.asList(protos));
-    }
+    assertEquals(Arrays.asList("TLSv1.2"), Arrays.asList(protos));
+  }
 }

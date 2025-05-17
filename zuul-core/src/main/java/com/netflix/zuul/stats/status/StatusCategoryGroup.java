@@ -19,11 +19,10 @@ package com.netflix.zuul.stats.status;
 /**
  * Status Category Group
  *
- * Author: Arthur Gonigberg
- * Date: December 20, 2017
+ * <p>Author: Arthur Gonigberg Date: December 20, 2017
  */
 public interface StatusCategoryGroup {
-    int getId();
+  int getId();
 
-    String name();
+  String name();
 }

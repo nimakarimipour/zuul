@@ -17,6 +17,7 @@
 package com.netflix.zuul.netty.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -32,137 +33,140 @@ import io.netty.incubator.channel.uring.IOUring;
 import io.netty.incubator.channel.uring.IOUringSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.internal.PlatformDependent;
-
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.awaitility.Awaitility.await;
 
 /*
 
-      Goals of this test:
-      1) verify that the server starts
-      2) verify that the server is listening on 2 ports
-      3) verify that the correct number of IOUringSocketChannel's are initialized
-      4) verify that the server stops
+     Goals of this test:
+     1) verify that the server starts
+     2) verify that the server is listening on 2 ports
+     3) verify that the correct number of IOUringSocketChannel's are initialized
+     4) verify that the server stops
 
- */
+*/
 @Disabled
 class IoUringTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IoUringTest.class);
-    private static final boolean IS_OS_LINUX = "linux".equals(PlatformDependent.normalizedOs());
+  private static final Logger LOGGER = LoggerFactory.getLogger(IoUringTest.class);
+  private static final boolean IS_OS_LINUX = "linux".equals(PlatformDependent.normalizedOs());
 
-    @BeforeEach
-    void beforeTest() {
-        final AbstractConfiguration config = ConfigurationManager.getConfigInstance();
-        config.setProperty("zuul.server.netty.socket.force_io_uring", "true");
-        config.setProperty("zuul.server.netty.socket.force_nio", "false");
+  @BeforeEach
+  void beforeTest() {
+    final AbstractConfiguration config = ConfigurationManager.getConfigInstance();
+    config.setProperty("zuul.server.netty.socket.force_io_uring", "true");
+    config.setProperty("zuul.server.netty.socket.force_nio", "false");
+  }
+
+  @Test
+  void testIoUringServer() throws Exception {
+    LOGGER.info("IOUring.isAvailable: {}", IOUring.isAvailable());
+    LOGGER.info("IS_OS_LINUX: {}", IS_OS_LINUX);
+
+    if (IS_OS_LINUX) {
+      exerciseIoUringServer();
     }
+  }
 
-    @Test
-    void testIoUringServer() throws Exception {
-        LOGGER.info("IOUring.isAvailable: {}", IOUring.isAvailable());
-        LOGGER.info("IS_OS_LINUX: {}", IS_OS_LINUX);
+  private void exerciseIoUringServer() throws Exception {
+    IOUring.ensureAvailability();
 
-        if (IS_OS_LINUX) {
-            exerciseIoUringServer();
-        }
-    }
+    ServerStatusManager ssm = mock(ServerStatusManager.class);
 
-    private void exerciseIoUringServer() throws Exception {
-        IOUring.ensureAvailability();
+    Map<NamedSocketAddress, ChannelInitializer<?>> initializers = new HashMap<>();
 
-        ServerStatusManager ssm = mock(ServerStatusManager.class);
+    final List<IOUringSocketChannel> ioUringChannels =
+        Collections.synchronizedList(new ArrayList<IOUringSocketChannel>());
 
-        Map<NamedSocketAddress, ChannelInitializer<?>> initializers = new HashMap<>();
-
-        final List<IOUringSocketChannel> ioUringChannels = Collections.synchronizedList(new ArrayList<IOUringSocketChannel>());
-
-        ChannelInitializer<Channel> init = new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(Channel ch) {
-                LOGGER.info("Channel: {}, isActive={}, isOpen={}", ch.getClass().getName(), ch.isActive(), ch.isOpen());
-                if (ch instanceof IOUringSocketChannel) {
-                    ioUringChannels.add((IOUringSocketChannel) ch);
-                }
+    ChannelInitializer<Channel> init =
+        new ChannelInitializer<Channel>() {
+          @Override
+          protected void initChannel(Channel ch) {
+            LOGGER.info(
+                "Channel: {}, isActive={}, isOpen={}",
+                ch.getClass().getName(),
+                ch.isActive(),
+                ch.isOpen());
+            if (ch instanceof IOUringSocketChannel) {
+              ioUringChannels.add((IOUringSocketChannel) ch);
             }
+          }
         };
-        initializers.put(new NamedSocketAddress("test", new InetSocketAddress(0)), init);
-        // The port to channel map keys on the port, post bind. This should be unique even if InetAddress is same
-        initializers.put(new NamedSocketAddress("test2", new InetSocketAddress( 0)), init);
+    initializers.put(new NamedSocketAddress("test", new InetSocketAddress(0)), init);
+    // The port to channel map keys on the port, post bind. This should be unique even if
+    // InetAddress is same
+    initializers.put(new NamedSocketAddress("test2", new InetSocketAddress(0)), init);
 
-        ClientConnectionsShutdown ccs =
-                new ClientConnectionsShutdown(
-                        new DefaultChannelGroup(GlobalEventExecutor.INSTANCE),
-                        GlobalEventExecutor.INSTANCE,
-                                /* discoveryClient= */ null);
-        EventLoopGroupMetrics elgm = new EventLoopGroupMetrics(Spectator.globalRegistry());
-        EventLoopConfig elc = new EventLoopConfig() {
-            @Override
-            public int eventLoopCount() {
-                return 1;
-            }
+    ClientConnectionsShutdown ccs =
+        new ClientConnectionsShutdown(
+            new DefaultChannelGroup(GlobalEventExecutor.INSTANCE),
+            GlobalEventExecutor.INSTANCE,
+            /* discoveryClient= */ null);
+    EventLoopGroupMetrics elgm = new EventLoopGroupMetrics(Spectator.globalRegistry());
+    EventLoopConfig elc =
+        new EventLoopConfig() {
+          @Override
+          public int eventLoopCount() {
+            return 1;
+          }
 
-            @Override
-            public int acceptorCount() {
-                return 1;
-            }
+          @Override
+          public int acceptorCount() {
+            return 1;
+          }
         };
-        Server s = new Server(new NoopRegistry(), ssm, initializers, ccs, elgm, elc);
-        s.start();
+    Server s = new Server(new NoopRegistry(), ssm, initializers, ccs, elgm, elc);
+    s.start();
 
-        List<NamedSocketAddress> addresses = s.getListeningAddresses();
-        assertEquals(2, addresses.size());
+    List<NamedSocketAddress> addresses = s.getListeningAddresses();
+    assertEquals(2, addresses.size());
 
-        addresses.forEach(address -> {
-            assertTrue(address.unwrap() instanceof InetSocketAddress);
-            InetSocketAddress inetAddress = ((InetSocketAddress) address.unwrap());
-            assertNotEquals(0, inetAddress.getPort());
-            checkConnection(inetAddress.getPort());
+    addresses.forEach(
+        address -> {
+          assertTrue(address.unwrap() instanceof InetSocketAddress);
+          InetSocketAddress inetAddress = ((InetSocketAddress) address.unwrap());
+          assertNotEquals(0, inetAddress.getPort());
+          checkConnection(inetAddress.getPort());
         });
 
-        await()
-                .atMost(1, SECONDS)
-                .until(() -> ioUringChannels.size() == 2);
+    await().atMost(1, SECONDS).until(() -> ioUringChannels.size() == 2);
 
-        s.stop();
+    s.stop();
 
-        assertEquals(2, ioUringChannels.size());
+    assertEquals(2, ioUringChannels.size());
 
-        for (IOUringSocketChannel ch : ioUringChannels) {
-            assertTrue(ch.isShutdown(), "isShutdown");
-        }
+    for (IOUringSocketChannel ch : ioUringChannels) {
+      assertTrue(ch.isShutdown(), "isShutdown");
     }
+  }
 
-    private static void checkConnection(final int port) {
-        LOGGER.info("checkConnection port {}", port);
-        Socket sock = null;
-        try {
-            InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1", port);
-            sock = new Socket();
-            sock.setSoTimeout(100);
-            sock.connect(socketAddress, 100);
-            OutputStream out = sock.getOutputStream();
-            out.write("Hello".getBytes(StandardCharsets.UTF_8));
-            out.flush();
-            out.close();
-        } catch (Exception exception) {
-            fail("checkConnection failed. port=" + port + " " + exception);
-        } finally {
-            try {
-                sock.close();
-            }
-            catch (Exception ignored) {
-            }
-        }
+  private static void checkConnection(final int port) {
+    LOGGER.info("checkConnection port {}", port);
+    Socket sock = null;
+    try {
+      InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1", port);
+      sock = new Socket();
+      sock.setSoTimeout(100);
+      sock.connect(socketAddress, 100);
+      OutputStream out = sock.getOutputStream();
+      out.write("Hello".getBytes(StandardCharsets.UTF_8));
+      out.flush();
+      out.close();
+    } catch (Exception exception) {
+      fail("checkConnection failed. port=" + port + " " + exception);
+    } finally {
+      try {
+        sock.close();
+      } catch (Exception ignored) {
+      }
     }
+  }
 }

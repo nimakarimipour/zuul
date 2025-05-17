@@ -26,37 +26,37 @@ import javax.inject.Singleton;
 
 @Singleton
 public final class MutableFilterRegistry implements FilterRegistry {
-    private final ConcurrentHashMap<String, ZuulFilter<?, ?>> filters = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ZuulFilter<?, ?>> filters = new ConcurrentHashMap<>();
 
-    @Nullable
-    @Override
-    public ZuulFilter<?, ?> remove(String key) {
-        return filters.remove(requireNonNull(key, "key"));
-    }
+  
+  @Override
+  public ZuulFilter<?, ?> remove(String key) {
+    return filters.remove(requireNonNull(key, "key"));
+  }
 
-    @Override
-    @Nullable
-    public ZuulFilter<?, ?> get(String key) {
-        return filters.get(requireNonNull(key, "key"));
-    }
+  @Override
+  
+  public ZuulFilter<?, ?> get(String key) {
+    return filters.get(requireNonNull(key, "key"));
+  }
 
-    @Override
-    public void put(String key, ZuulFilter<?, ?> filter) {
-        filters.putIfAbsent(requireNonNull(key, "key"), requireNonNull(filter, "filter"));
-    }
+  @Override
+  public void put(String key, ZuulFilter<?, ?> filter) {
+    filters.putIfAbsent(requireNonNull(key, "key"), requireNonNull(filter, "filter"));
+  }
 
-    @Override
-    public int size() {
-        return filters.size();
-    }
+  @Override
+  public int size() {
+    return filters.size();
+  }
 
-    @Override
-    public Collection<ZuulFilter<?, ?>> getAllFilters() {
-        return Collections.unmodifiableList(new ArrayList<>(filters.values()));
-    }
+  @Override
+  public Collection<ZuulFilter<?, ?>> getAllFilters() {
+    return Collections.unmodifiableList(new ArrayList<>(filters.values()));
+  }
 
-    @Override
-    public boolean isMutable() {
-        return true;
-    }
+  @Override
+  public boolean isMutable() {
+    return true;
+  }
 }

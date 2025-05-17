@@ -33,31 +33,31 @@ import org.junit.jupiter.api.Test;
 
 class MaxInboundConnectionsHandlerTest {
 
-    private Registry registry = new DefaultRegistry();
-    private String listener = "test-throttled";
-    private Id counterId;
+  private Registry registry = new DefaultRegistry();
+  private String listener = "test-throttled";
+  private Id counterId;
 
-    @BeforeEach
-    void setup() {
-        counterId = registry.createId("server.connections.throttled").withTags("id", listener);
-    }
+  @BeforeEach
+  void setup() {
+    counterId = registry.createId("server.connections.throttled").withTags("id", listener);
+  }
 
-    @Test
-    void verifyPassportStateAndAttrs() {
+  @Test
+  void verifyPassportStateAndAttrs() {
 
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        channel.pipeline().addLast(new DummyChannelHandler());
-        channel.pipeline().addLast(new MaxInboundConnectionsHandler(registry, listener, 1));
+    final EmbeddedChannel channel = new EmbeddedChannel();
+    channel.pipeline().addLast(new DummyChannelHandler());
+    channel.pipeline().addLast(new MaxInboundConnectionsHandler(registry, listener, 1));
 
-        // Fire twice to increment current conns. count
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
-        channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    // Fire twice to increment current conns. count
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
+    channel.pipeline().context(DummyChannelHandler.class).fireChannelActive();
 
-        final Counter throttledCount = (Counter) registry.get(counterId);
+    final Counter throttledCount = (Counter) registry.get(counterId);
 
-        assertEquals(1, throttledCount.count());
-        assertEquals(PassportState.SERVER_CH_THROTTLING, CurrentPassport.fromChannel(channel).getState());
-        assertTrue(channel.attr(ATTR_CH_THROTTLED).get());
-
-    }
+    assertEquals(1, throttledCount.count());
+    assertEquals(
+        PassportState.SERVER_CH_THROTTLING, CurrentPassport.fromChannel(channel).getState());
+    assertTrue(channel.attr(ATTR_CH_THROTTLED).get());
+  }
 }

@@ -26,68 +26,64 @@ import javax.annotation.Nullable;
 
 /**
  * counter for per route/status code counting
- * @author Mikey Cohen
- * Date: 2/3/12
- * Time: 3:04 PM
+ *
+ * @author Mikey Cohen Date: 2/3/12 Time: 3:04 PM
  */
 public class RouteStatusCodeMonitor implements NamedCount {
-    private final String routeCode;
-    @VisibleForTesting
-    final String route;
-    private final int statusCode;
+  private final String routeCode;
+  @VisibleForTesting final String route;
+  private final int statusCode;
 
-    private final AtomicLong count = new AtomicLong();
+  private final AtomicLong count = new AtomicLong();
 
-    public RouteStatusCodeMonitor(@Nullable String route, int statusCode) {
-        if (route == null) {
-            route = "";
-        }
-        this.route = route;
-        this.statusCode = statusCode;
-        this.routeCode = route + "_" + statusCode;
-        Registry registry = Spectator.globalRegistry();
-        PolledMeter.using(registry)
-                .withId(registry.createId("zuul.RouteStatusCodeMonitor", "ID", routeCode))
-                .monitorValue(this, RouteStatusCodeMonitor::getCount);
+  public RouteStatusCodeMonitor( String route, int statusCode) {
+    if (route == null) {
+      route = "";
+    }
+    this.route = route;
+    this.statusCode = statusCode;
+    this.routeCode = route + "_" + statusCode;
+    Registry registry = Spectator.globalRegistry();
+    PolledMeter.using(registry)
+        .withId(registry.createId("zuul.RouteStatusCodeMonitor", "ID", routeCode))
+        .monitorValue(this, RouteStatusCodeMonitor::getCount);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    RouteStatusCodeMonitor statsData = (RouteStatusCodeMonitor) o;
+
+    if (statusCode != statsData.statusCode) {
+      return false;
+    }
+    if (!Objects.equals(route, statsData.route)) {
+      return false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    return true;
+  }
 
-        RouteStatusCodeMonitor statsData = (RouteStatusCodeMonitor) o;
+  @Override
+  public int hashCode() {
+    int result = route != null ? route.hashCode() : 0;
+    result = 31 * result + statusCode;
+    return result;
+  }
 
-        if (statusCode != statsData.statusCode) {
-            return false;
-        }
-        if (!Objects.equals(route, statsData.route)) {
-            return false;
-        }
+  @Override
+  public String getName() {
+    return routeCode;
+  }
 
-        return true;
-    }
+  public long getCount() {
+    return count.get();
+  }
 
-    @Override
-    public int hashCode() {
-        int result = route != null ? route.hashCode() : 0;
-        result = 31 * result + statusCode;
-        return result;
-    }
-
-    @Override
-    public String getName() {
-        return routeCode;
-    }
-
-    public long getCount() {
-        return count.get();
-    }
-
-    /**
-     * increment the count
-     */
-    public void update() {
-        count.incrementAndGet();
-    }
+  /** increment the count */
+  public void update() {
+    count.incrementAndGet();
+  }
 }

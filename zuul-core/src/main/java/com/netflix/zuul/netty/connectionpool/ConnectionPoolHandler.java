@@ -16,6 +16,10 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
+import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
+import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
+import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
+
 import com.netflix.spectator.api.Counter;
 import com.netflix.zuul.netty.ChannelUtils;
 import com.netflix.zuul.netty.SpectatorUtils;
@@ -24,139 +28,151 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteEvent;
-import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason;
-import static com.netflix.netty.common.HttpLifecycleChannelHandler.CompleteReason.SESSION_COMPLETE;
-
-/**
- * User: michaels@netflix.com
- * Date: 6/23/16
- * Time: 1:57 PM
- */
+/** User: michaels@netflix.com Date: 6/23/16 Time: 1:57 PM */
 @ChannelHandler.Sharable
-public class ConnectionPoolHandler extends ChannelDuplexHandler
-{
-    private static final Logger LOG = LoggerFactory.getLogger(ConnectionPoolHandler.class);
+public class ConnectionPoolHandler extends ChannelDuplexHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(ConnectionPoolHandler.class);
 
-    public static final String METRIC_PREFIX = "connectionpool";
-    
-    private final OriginName originName;
-    private final Counter idleCounter;
-    private final Counter inactiveCounter;
-    private final Counter errorCounter;
-    private final Counter headerCloseCounter;
+  public static final String METRIC_PREFIX = "connectionpool";
 
-    public ConnectionPoolHandler(OriginName originName) {
-        if (originName == null) {
-            throw new IllegalArgumentException("Null originName passed to constructor!");
-        }
-        this.originName = originName;
-        this.idleCounter = SpectatorUtils.newCounter(METRIC_PREFIX + "_idle", originName.getMetricId());
-        this.inactiveCounter = SpectatorUtils.newCounter(METRIC_PREFIX + "_inactive", originName.getMetricId());
-        this.errorCounter = SpectatorUtils.newCounter(METRIC_PREFIX + "_error", originName.getMetricId());
-        this.headerCloseCounter = SpectatorUtils.newCounter(METRIC_PREFIX + "_headerClose", originName.getMetricId());
+  private final OriginName originName;
+  private final Counter idleCounter;
+  private final Counter inactiveCounter;
+  private final Counter errorCounter;
+  private final Counter headerCloseCounter;
+
+  public ConnectionPoolHandler(OriginName originName) {
+    if (originName == null) {
+      throw new IllegalArgumentException("Null originName passed to constructor!");
     }
+    this.originName = originName;
+    this.idleCounter = SpectatorUtils.newCounter(METRIC_PREFIX + "_idle", originName.getMetricId());
+    this.inactiveCounter =
+        SpectatorUtils.newCounter(METRIC_PREFIX + "_inactive", originName.getMetricId());
+    this.errorCounter =
+        SpectatorUtils.newCounter(METRIC_PREFIX + "_error", originName.getMetricId());
+    this.headerCloseCounter =
+        SpectatorUtils.newCounter(METRIC_PREFIX + "_headerClose", originName.getMetricId());
+  }
 
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        // First let other handlers do their thing ...
-        // super.userEventTriggered(ctx, evt);
+  @Override
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    // First let other handlers do their thing ...
+    // super.userEventTriggered(ctx, evt);
 
-        if (evt instanceof IdleStateEvent) {
-            // Log some info about this.
-            idleCounter.increment();
-            final String msg = "Origin channel for origin - " + originName + " - idle timeout has fired. " + ChannelUtils.channelInfoForLogging(ctx.channel());
+    if (evt instanceof IdleStateEvent) {
+      // Log some info about this.
+      idleCounter.increment();
+      final String msg =
+          "Origin channel for origin - "
+              + originName
+              + " - idle timeout has fired. "
+              + ChannelUtils.channelInfoForLogging(ctx.channel());
+      closeConnection(ctx, msg);
+    } else if (evt instanceof CompleteEvent) {
+      // The HttpLifecycleChannelHandler instance will fire this event when either a response has
+      // finished being written, or
+      // the channel is no longer active or disconnected.
+      // Return the connection to pool.
+      CompleteEvent completeEvt = (CompleteEvent) evt;
+      final CompleteReason reason = completeEvt.getReason();
+      if (reason == SESSION_COMPLETE) {
+        final PooledConnection conn = PooledConnection.getFromChannel(ctx.channel());
+        if (conn != null) {
+          if ("close".equalsIgnoreCase(getConnectionHeader(completeEvt))) {
+            final String msg =
+                "Origin channel for origin - "
+                    + originName
+                    + " - completed because of expired keep-alive. "
+                    + ChannelUtils.channelInfoForLogging(ctx.channel());
+            headerCloseCounter.increment();
             closeConnection(ctx, msg);
+          } else {
+            conn.setConnectionState(PooledConnection.ConnectionState.WRITE_READY);
+            conn.release();
+          }
         }
-        else if (evt instanceof CompleteEvent) {
-            // The HttpLifecycleChannelHandler instance will fire this event when either a response has finished being written, or
-            // the channel is no longer active or disconnected.
-            // Return the connection to pool.
-            CompleteEvent completeEvt = (CompleteEvent) evt;
-            final CompleteReason reason = completeEvt.getReason();
-            if (reason == SESSION_COMPLETE) {
-                final PooledConnection conn = PooledConnection.getFromChannel(ctx.channel());
-                if (conn != null) {
-                    if ("close".equalsIgnoreCase(getConnectionHeader(completeEvt))) {
-                        final String msg = "Origin channel for origin - " + originName + " - completed because of expired keep-alive. "
-                                + ChannelUtils.channelInfoForLogging(ctx.channel());
-                        headerCloseCounter.increment();
-                        closeConnection(ctx, msg);
-                    } else {
-                        conn.setConnectionState(PooledConnection.ConnectionState.WRITE_READY);
-                        conn.release();
-                    }
-                }
-            } else {
-                final String msg = "Origin channel for origin - " + originName + " - completed with reason "
-                        + reason.name() + ", " + ChannelUtils.channelInfoForLogging(ctx.channel());
-                closeConnection(ctx, msg);
-            }
-        }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //super.exceptionCaught(ctx, cause);
-        errorCounter.increment();
-        final String mesg = "Exception on Origin channel for origin - " + originName + ". "
-                + ChannelUtils.channelInfoForLogging(ctx.channel()) + " - " +
-                cause.getClass().getCanonicalName() + ": " + cause.getMessage();
-        closeConnection(ctx, mesg);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(mesg, cause);
-        }
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        //super.channelInactive(ctx);
-        inactiveCounter.increment();
-        final String msg = "Client channel for origin - " + originName + " - inactive event has fired. "
+      } else {
+        final String msg =
+            "Origin channel for origin - "
+                + originName
+                + " - completed with reason "
+                + reason.name()
+                + ", "
                 + ChannelUtils.channelInfoForLogging(ctx.channel());
         closeConnection(ctx, msg);
+      }
+    }
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    // super.exceptionCaught(ctx, cause);
+    errorCounter.increment();
+    final String mesg =
+        "Exception on Origin channel for origin - "
+            + originName
+            + ". "
+            + ChannelUtils.channelInfoForLogging(ctx.channel())
+            + " - "
+            + cause.getClass().getCanonicalName()
+            + ": "
+            + cause.getMessage();
+    closeConnection(ctx, mesg);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(mesg, cause);
+    }
+  }
+
+  @Override
+  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    // super.channelInactive(ctx);
+    inactiveCounter.increment();
+    final String msg =
+        "Client channel for origin - "
+            + originName
+            + " - inactive event has fired. "
+            + ChannelUtils.channelInfoForLogging(ctx.channel());
+    closeConnection(ctx, msg);
+  }
+
+  private void closeConnection(ChannelHandlerContext ctx, String msg) {
+    PooledConnection conn = PooledConnection.getFromChannel(ctx.channel());
+    if (conn != null) {
+      if (LOG.isDebugEnabled()) {
+        msg = msg + " Closing the PooledConnection and releasing. conn={}";
+        LOG.debug(msg, conn);
+      }
+      flagCloseAndReleaseConnection(conn);
+    } else {
+      // If somehow we don't have a PooledConnection instance attached to this channel, then
+      // close the channel directly.
+      LOG.warn("{} But no PooledConnection attribute. So just closing Channel.", msg);
+      ctx.close();
+    }
+  }
+
+  private void flagCloseAndReleaseConnection(PooledConnection pooledConnection) {
+    if (pooledConnection.isInPool()) {
+      pooledConnection.closeAndRemoveFromPool();
+    } else {
+      pooledConnection.flagShouldClose();
+      pooledConnection.release();
+    }
+  }
+
+  private static String getConnectionHeader(CompleteEvent completeEvt) {
+    HttpResponse response = completeEvt.getResponse();
+    if (response != null) {
+      return response.headers().get(HttpHeaderNames.CONNECTION);
     }
 
-    private void closeConnection(ChannelHandlerContext ctx, String msg) {
-        PooledConnection conn = PooledConnection.getFromChannel(ctx.channel());
-        if (conn != null) {
-            if (LOG.isDebugEnabled()) {
-                msg = msg + " Closing the PooledConnection and releasing. conn={}";
-                LOG.debug(msg, conn);
-            }
-            flagCloseAndReleaseConnection(conn);
-        }
-        else {
-            // If somehow we don't have a PooledConnection instance attached to this channel, then
-            // close the channel directly.
-            LOG.warn("{} But no PooledConnection attribute. So just closing Channel.", msg);
-            ctx.close();
-        }
-    }
-
-    private void flagCloseAndReleaseConnection(PooledConnection pooledConnection) {
-        if (pooledConnection.isInPool()) {
-            pooledConnection.closeAndRemoveFromPool();
-        }
-        else {
-            pooledConnection.flagShouldClose();
-            pooledConnection.release();
-        }
-    }
-
-    private static String getConnectionHeader(CompleteEvent completeEvt) {
-        HttpResponse response = completeEvt.getResponse();
-        if (response != null) {
-            return response.headers().get(HttpHeaderNames.CONNECTION);
-        }
-
-        return null;
-    }
+    return null;
+  }
 }

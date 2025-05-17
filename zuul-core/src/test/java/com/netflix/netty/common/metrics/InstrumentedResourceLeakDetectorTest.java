@@ -27,22 +27,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class InstrumentedResourceLeakDetectorTest {
 
-    InstrumentedResourceLeakDetector<Object> leakDetector;
+  InstrumentedResourceLeakDetector<Object> leakDetector;
 
-    @BeforeEach
-    void setup() {
-        leakDetector = new InstrumentedResourceLeakDetector<>(ByteBuf.class, 1);
-    }
+  @BeforeEach
+  void setup() {
+    leakDetector = new InstrumentedResourceLeakDetector<>(ByteBuf.class, 1);
+  }
 
-    @Test
-    void test() {
-        leakDetector.reportTracedLeak("test", "test");
-        assertEquals(1, leakDetector.leakCounter.get());
+  @Test
+  void test() {
+    leakDetector.reportTracedLeak("test", "test");
+    assertEquals(1, leakDetector.leakCounter.get());
 
-        leakDetector.reportTracedLeak("test", "test");
-        assertEquals(2, leakDetector.leakCounter.get());
+    leakDetector.reportTracedLeak("test", "test");
+    assertEquals(2, leakDetector.leakCounter.get());
 
-        leakDetector.reportTracedLeak("test", "test");
-        assertEquals(3, leakDetector.leakCounter.get());
-    }
+    leakDetector.reportTracedLeak("test", "test");
+    assertEquals(3, leakDetector.leakCounter.get());
+  }
 }

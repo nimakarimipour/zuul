@@ -19,15 +19,11 @@ import com.netflix.zuul.filters.BaseSyncFilter;
 import com.netflix.zuul.filters.FilterType;
 import com.netflix.zuul.message.http.HttpRequestMessage;
 
-/**
- * User: michaels@netflix.com
- * Date: 5/29/15
- * Time: 3:22 PM
- */
-public abstract class HttpInboundSyncFilter extends BaseSyncFilter<HttpRequestMessage, HttpRequestMessage>
-{
-    @Override
-    public FilterType filterType() {
-        return FilterType.INBOUND;
-    }
+/** User: michaels@netflix.com Date: 5/29/15 Time: 3:22 PM */
+public abstract class HttpInboundSyncFilter
+    extends BaseSyncFilter<HttpRequestMessage, HttpRequestMessage> {
+  @Override
+  public FilterType filterType() {
+    return FilterType.INBOUND;
+  }
 }

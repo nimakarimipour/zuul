@@ -24,30 +24,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Unit tests for {@link ErrorStatsManager}.
- */
+/** Unit tests for {@link ErrorStatsManager}. */
 @ExtendWith(MockitoExtension.class)
 class ErrorStatsManagerTest {
 
-    @Test
-    void testPutStats() {
-        ErrorStatsManager sm = new ErrorStatsManager();
-        assertNotNull(sm);
-        sm.putStats("test", "cause");
-        assertNotNull(sm.routeMap.get("test"));
-        ConcurrentHashMap<String, ErrorStatsData> map = sm.routeMap.get("test");
-        ErrorStatsData sd = map.get("cause");
-        assertEquals(1, sd.getCount());
-        sm.putStats("test", "cause");
-        assertEquals(2, sd.getCount());
-    }
+  @Test
+  void testPutStats() {
+    ErrorStatsManager sm = new ErrorStatsManager();
+    assertNotNull(sm);
+    sm.putStats("test", "cause");
+    assertNotNull(sm.routeMap.get("test"));
+    ConcurrentHashMap<String, ErrorStatsData> map = sm.routeMap.get("test");
+    ErrorStatsData sd = map.get("cause");
+    assertEquals(1, sd.getCount());
+    sm.putStats("test", "cause");
+    assertEquals(2, sd.getCount());
+  }
 
-    @Test
-    void testGetStats() {
-        ErrorStatsManager sm = new ErrorStatsManager();
-        assertNotNull(sm);
-        sm.putStats("test", "cause");
-        assertNotNull(sm.getStats("test", "cause"));
-    }
+  @Test
+  void testGetStats() {
+    ErrorStatsManager sm = new ErrorStatsManager();
+    assertNotNull(sm);
+    sm.putStats("test", "cause");
+    assertNotNull(sm.getStats("test", "cause"));
+  }
 }

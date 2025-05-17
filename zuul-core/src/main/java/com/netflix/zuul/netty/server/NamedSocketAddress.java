@@ -22,49 +22,46 @@ import javax.annotation.CheckReturnValue;
 
 public final class NamedSocketAddress extends SocketAddress {
 
-    private final String name;
-    private final SocketAddress delegate;
+  private final String name;
+  private final SocketAddress delegate;
 
-    public NamedSocketAddress(String name, SocketAddress delegate) {
-        this.name = Objects.requireNonNull(name);
-        this.delegate = Objects.requireNonNull(delegate);
-    }
+  public NamedSocketAddress(String name, SocketAddress delegate) {
+    this.name = Objects.requireNonNull(name);
+    this.delegate = Objects.requireNonNull(delegate);
+  }
 
-    public String name() {
-        return name;
-    }
+  public String name() {
+    return name;
+  }
 
-    public SocketAddress unwrap() {
-        return delegate;
-    }
+  public SocketAddress unwrap() {
+    return delegate;
+  }
 
-    @CheckReturnValue
-    public NamedSocketAddress withNewSocket(SocketAddress delegate) {
-        return new NamedSocketAddress(this.name, delegate);
-    }
+  @CheckReturnValue
+  public NamedSocketAddress withNewSocket(SocketAddress delegate) {
+    return new NamedSocketAddress(this.name, delegate);
+  }
 
-    @Override
-    public String toString() {
-        return "NamedSocketAddress{" +
-                "name='" + name + '\'' +
-                ", delegate=" + delegate +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "NamedSocketAddress{" + "name='" + name + '\'' + ", delegate=" + delegate + '}';
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        NamedSocketAddress that = (NamedSocketAddress) o;
-        return Objects.equals(name, that.name) && Objects.equals(delegate, that.delegate);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    NamedSocketAddress that = (NamedSocketAddress) o;
+    return Objects.equals(name, that.name) && Objects.equals(delegate, that.delegate);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, delegate);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, delegate);
+  }
 }

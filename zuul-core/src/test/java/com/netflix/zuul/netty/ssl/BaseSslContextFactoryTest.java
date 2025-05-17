@@ -21,13 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.netty.handler.ssl.SslProvider;
 import org.junit.jupiter.api.Test;
 
-
-/**
- * Tests for {@link BaseSslContextFactory}.
- */
+/** Tests for {@link BaseSslContextFactory}. */
 class BaseSslContextFactoryTest {
-    @Test
-    void testDefaultSslProviderIsOpenSsl() {
-        assertEquals(SslProvider.OPENSSL, BaseSslContextFactory.chooseSslProvider());
-    }
+  @Test
+  void testDefaultSslProviderIsOpenSsl() {
+    assertEquals(SslProvider.OPENSSL, BaseSslContextFactory.chooseSslProvider());
+  }
 }

@@ -30,91 +30,100 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.message.http.HttpResponseMessageImpl;
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for {@link HttpUtils}.
- */
+/** Unit tests for {@link HttpUtils}. */
 class HttpUtilsTest {
 
-    @Test
-    void detectsGzip() {
-        assertTrue(HttpUtils.isCompressed("gzip"));
-    }
+  @Test
+  void detectsGzip() {
+    assertTrue(HttpUtils.isCompressed("gzip"));
+  }
 
-    @Test
-    void detectsDeflate() {
-        assertTrue(HttpUtils.isCompressed("deflate"));
-    }
+  @Test
+  void detectsDeflate() {
+    assertTrue(HttpUtils.isCompressed("deflate"));
+  }
 
-    @Test
-    void detectsCompress() {
-        assertTrue(HttpUtils.isCompressed("compress"));
-    }
+  @Test
+  void detectsCompress() {
+    assertTrue(HttpUtils.isCompressed("compress"));
+  }
 
-    @Test
-    void detectsBR() {
-        assertTrue(HttpUtils.isCompressed("br"));
-    }
+  @Test
+  void detectsBR() {
+    assertTrue(HttpUtils.isCompressed("br"));
+  }
 
-    @Test
-    void detectsNonGzip() {
-        assertFalse(HttpUtils.isCompressed("identity"));
-    }
+  @Test
+  void detectsNonGzip() {
+    assertFalse(HttpUtils.isCompressed("identity"));
+  }
 
-    @Test
-    void detectsGzipAmongOtherEncodings() {
-        assertTrue(HttpUtils.isCompressed("gzip, deflate"));
-    }
+  @Test
+  void detectsGzipAmongOtherEncodings() {
+    assertTrue(HttpUtils.isCompressed("gzip, deflate"));
+  }
 
-    @Test
-    void acceptsGzip() {
-        Headers headers = new Headers();
-        headers.add("Accept-Encoding", "gzip, deflate");
-        assertTrue(HttpUtils.acceptsGzip(headers));
-    }
+  @Test
+  void acceptsGzip() {
+    Headers headers = new Headers();
+    headers.add("Accept-Encoding", "gzip, deflate");
+    assertTrue(HttpUtils.acceptsGzip(headers));
+  }
 
-    @Test
-    void acceptsGzip_only() {
-        Headers headers = new Headers();
-        headers.add("Accept-Encoding", "deflate");
-        assertFalse(HttpUtils.acceptsGzip(headers));
-    }
+  @Test
+  void acceptsGzip_only() {
+    Headers headers = new Headers();
+    headers.add("Accept-Encoding", "deflate");
+    assertFalse(HttpUtils.acceptsGzip(headers));
+  }
 
-    @Test
-    void stripMaliciousHeaderChars() {
-        assertEquals("something", HttpUtils.stripMaliciousHeaderChars("some\r\nthing"));
-        assertEquals("some thing", HttpUtils.stripMaliciousHeaderChars("some thing"));
-        assertEquals("something", HttpUtils.stripMaliciousHeaderChars("\nsome\r\nthing\r"));
-        assertEquals("", HttpUtils.stripMaliciousHeaderChars("\r"));
-        assertEquals("", HttpUtils.stripMaliciousHeaderChars(""));
-        assertNull(HttpUtils.stripMaliciousHeaderChars(null));
-    }
+  @Test
+  void stripMaliciousHeaderChars() {
+    assertEquals("something", HttpUtils.stripMaliciousHeaderChars("some\r\nthing"));
+    assertEquals("some thing", HttpUtils.stripMaliciousHeaderChars("some thing"));
+    assertEquals("something", HttpUtils.stripMaliciousHeaderChars("\nsome\r\nthing\r"));
+    assertEquals("", HttpUtils.stripMaliciousHeaderChars("\r"));
+    assertEquals("", HttpUtils.stripMaliciousHeaderChars(""));
+    assertNull(HttpUtils.stripMaliciousHeaderChars(null));
+  }
 
-    @Test
-    void getBodySizeIfKnown_returnsContentLengthValue() {
-        SessionContext context = new SessionContext();
-        Headers headers = new Headers();
-        headers.add(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH, "23450");
-        ZuulMessage msg = new ZuulMessageImpl(context, headers);
-        assertThat(HttpUtils.getBodySizeIfKnown(msg)).isEqualTo(Integer.valueOf(23450));
-    }
+  @Test
+  void getBodySizeIfKnown_returnsContentLengthValue() {
+    SessionContext context = new SessionContext();
+    Headers headers = new Headers();
+    headers.add(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH, "23450");
+    ZuulMessage msg = new ZuulMessageImpl(context, headers);
+    assertThat(HttpUtils.getBodySizeIfKnown(msg)).isEqualTo(Integer.valueOf(23450));
+  }
 
-    @Test
-    void getBodySizeIfKnown_returnsResponseBodySize() {
-        SessionContext context = new SessionContext();
-        Headers headers = new Headers();
-        HttpQueryParams queryParams = new HttpQueryParams();
-        HttpRequestMessage request = new HttpRequestMessageImpl(context, "http", "GET", "/path", queryParams, headers, "127.0.0.1", "scheme", 6666, "server-name");
-        request.storeInboundRequest();
-        HttpResponseMessage response = new HttpResponseMessageImpl(context, request, 200);
-        response.setBodyAsText("Hello world");
-        assertThat(HttpUtils.getBodySizeIfKnown(response)).isEqualTo(Integer.valueOf(11));
-    }
+  @Test
+  void getBodySizeIfKnown_returnsResponseBodySize() {
+    SessionContext context = new SessionContext();
+    Headers headers = new Headers();
+    HttpQueryParams queryParams = new HttpQueryParams();
+    HttpRequestMessage request =
+        new HttpRequestMessageImpl(
+            context,
+            "http",
+            "GET",
+            "/path",
+            queryParams,
+            headers,
+            "127.0.0.1",
+            "scheme",
+            6666,
+            "server-name");
+    request.storeInboundRequest();
+    HttpResponseMessage response = new HttpResponseMessageImpl(context, request, 200);
+    response.setBodyAsText("Hello world");
+    assertThat(HttpUtils.getBodySizeIfKnown(response)).isEqualTo(Integer.valueOf(11));
+  }
 
-    @Test
-    void getBodySizeIfKnown_returnsNull() {
-        SessionContext context = new SessionContext();
-        Headers headers = new Headers();
-        ZuulMessage msg = new ZuulMessageImpl(context, headers);
-        assertThat(HttpUtils.getBodySizeIfKnown(msg)).isNull();
-    }
+  @Test
+  void getBodySizeIfKnown_returnsNull() {
+    SessionContext context = new SessionContext();
+    Headers headers = new Headers();
+    ZuulMessage msg = new ZuulMessageImpl(context, headers);
+    assertThat(HttpUtils.getBodySizeIfKnown(msg)).isNull();
+  }
 }

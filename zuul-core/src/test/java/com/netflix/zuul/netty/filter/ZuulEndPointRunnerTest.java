@@ -16,6 +16,15 @@
 
 package com.netflix.zuul.netty.filter;
 
+import static com.netflix.zuul.context.CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT;
+import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
+import static com.netflix.zuul.netty.filter.ZuulEndPointRunner.DEFAULT_ERROR_ENDPOINT;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.netflix.spectator.api.NoopRegistry;
 import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.Filter;
@@ -33,117 +42,118 @@ import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpRequestMessageImpl;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.message.http.HttpResponseMessageImpl;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ImmediateEventExecutor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import rx.Observable;
 
-import static com.netflix.zuul.context.CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT;
-import static com.netflix.zuul.context.CommonContextKeys.ZUUL_ENDPOINT;
-import static com.netflix.zuul.netty.filter.ZuulEndPointRunner.DEFAULT_ERROR_ENDPOINT;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 class ZuulEndPointRunnerTest {
-    private static final String BASIC_ENDPOINT = "basicEndpoint";
-    private ZuulEndPointRunner endpointRunner;
-    private FilterUsageNotifier usageNotifier;
-    private FilterLoader filterLoader;
-    private FilterRunner filterRunner;
-    private Registry registry;
-    private HttpRequestMessageImpl request;
+  private static final String BASIC_ENDPOINT = "basicEndpoint";
+  private ZuulEndPointRunner endpointRunner;
+  private FilterUsageNotifier usageNotifier;
+  private FilterLoader filterLoader;
+  private FilterRunner filterRunner;
+  private Registry registry;
+  private HttpRequestMessageImpl request;
 
-    @BeforeEach
-    void beforeEachTest() {
-        usageNotifier = mock(FilterUsageNotifier.class);
+  @BeforeEach
+  void beforeEachTest() {
+    usageNotifier = mock(FilterUsageNotifier.class);
 
-        filterLoader = mock(FilterLoader.class);
-        when(filterLoader.getFilterByNameAndType(DEFAULT_ERROR_ENDPOINT.get(), FilterType.ENDPOINT))
-                .thenReturn(new ErrorEndpoint());
-        when(filterLoader.getFilterByNameAndType(BASIC_ENDPOINT, FilterType.ENDPOINT))
-                .thenReturn(new BasicEndpoint());
+    filterLoader = mock(FilterLoader.class);
+    when(filterLoader.getFilterByNameAndType(DEFAULT_ERROR_ENDPOINT.get(), FilterType.ENDPOINT))
+        .thenReturn(new ErrorEndpoint());
+    when(filterLoader.getFilterByNameAndType(BASIC_ENDPOINT, FilterType.ENDPOINT))
+        .thenReturn(new BasicEndpoint());
 
-        filterRunner = mock(FilterRunner.class);
-        registry = new NoopRegistry();
-        endpointRunner = new ZuulEndPointRunner(usageNotifier, filterLoader, filterRunner, registry);
+    filterRunner = mock(FilterRunner.class);
+    registry = new NoopRegistry();
+    endpointRunner = new ZuulEndPointRunner(usageNotifier, filterLoader, filterRunner, registry);
 
-        SessionContext context = new SessionContext();
-        Headers headers = new Headers();
-        ChannelHandlerContext chc = mock(ChannelHandlerContext.class);
-        when(chc.executor()).thenReturn(ImmediateEventExecutor.INSTANCE);
-        context.put(NETTY_SERVER_CHANNEL_HANDLER_CONTEXT, chc);
-        request = new HttpRequestMessageImpl(context, "http", "GET", "/foo/bar", new HttpQueryParams(), headers, "127.0.0.1", "http", 8080, "server123");
-        request.storeInboundRequest();
+    SessionContext context = new SessionContext();
+    Headers headers = new Headers();
+    ChannelHandlerContext chc = mock(ChannelHandlerContext.class);
+    when(chc.executor()).thenReturn(ImmediateEventExecutor.INSTANCE);
+    context.put(NETTY_SERVER_CHANNEL_HANDLER_CONTEXT, chc);
+    request =
+        new HttpRequestMessageImpl(
+            context,
+            "http",
+            "GET",
+            "/foo/bar",
+            new HttpQueryParams(),
+            headers,
+            "127.0.0.1",
+            "http",
+            8080,
+            "server123");
+    request.storeInboundRequest();
+  }
+
+  @Test
+  void nonErrorEndpoint() {
+    request.getContext().setShouldSendErrorResponse(false);
+    request.getContext().setEndpoint(BASIC_ENDPOINT);
+    assertNull(request.getContext().get(ZUUL_ENDPOINT));
+    endpointRunner.filter(request);
+    final ZuulFilter<HttpRequestMessage, HttpResponseMessage> filter =
+        request.getContext().get(ZUUL_ENDPOINT);
+    assertTrue(filter instanceof BasicEndpoint);
+
+    ArgumentCaptor<HttpResponseMessage> captor = ArgumentCaptor.forClass(HttpResponseMessage.class);
+    verify(filterRunner, times(1)).filter(captor.capture());
+    final HttpResponseMessage capturedResponseMessage = captor.getValue();
+    assertEquals(capturedResponseMessage.getInboundRequest(), request.getInboundRequest());
+    assertEquals("basicEndpoint", capturedResponseMessage.getContext().getEndpoint());
+    assertFalse(capturedResponseMessage.getContext().errorResponseSent());
+  }
+
+  @Test
+  void errorEndpoint() {
+    request.getContext().setShouldSendErrorResponse(true);
+    assertNull(request.getContext().get(ZUUL_ENDPOINT));
+    endpointRunner.filter(request);
+    final ZuulFilter filter = request.getContext().get(ZUUL_ENDPOINT);
+    assertTrue(filter instanceof ErrorEndpoint);
+
+    ArgumentCaptor<HttpResponseMessage> captor = ArgumentCaptor.forClass(HttpResponseMessage.class);
+    verify(filterRunner, times(1)).filter(captor.capture());
+    final HttpResponseMessage capturedResponseMessage = captor.getValue();
+    assertEquals(capturedResponseMessage.getInboundRequest(), request.getInboundRequest());
+    assertNull(capturedResponseMessage.getContext().getEndpoint());
+    assertTrue(capturedResponseMessage.getContext().errorResponseSent());
+  }
+
+  @Filter(order = 10, type = FilterType.ENDPOINT)
+  static class ErrorEndpoint extends Endpoint {
+    @Override
+    public FilterCategory category() {
+      return super.category();
     }
 
-    @Test
-    void nonErrorEndpoint() {
-        request.getContext().setShouldSendErrorResponse(false);
-        request.getContext().setEndpoint(BASIC_ENDPOINT);
-        assertNull(request.getContext().get(ZUUL_ENDPOINT));
-        endpointRunner.filter(request);
-        final ZuulFilter<HttpRequestMessage, HttpResponseMessage> filter = request.getContext().get(ZUUL_ENDPOINT);
-        assertTrue(filter instanceof BasicEndpoint);
+    @Override
+    public Observable applyAsync(ZuulMessage input) {
+      return Observable.just(buildHttpResponseMessage(input));
+    }
+  }
 
-        ArgumentCaptor<HttpResponseMessage> captor = ArgumentCaptor.forClass(HttpResponseMessage.class);
-        verify(filterRunner, times(1)).filter(captor.capture());
-        final HttpResponseMessage capturedResponseMessage = captor.getValue();
-        assertEquals(capturedResponseMessage.getInboundRequest(), request.getInboundRequest());
-        assertEquals("basicEndpoint", capturedResponseMessage.getContext().getEndpoint());
-        assertFalse(capturedResponseMessage.getContext().errorResponseSent());
+  @Filter(order = 20, type = FilterType.ENDPOINT)
+  static class BasicEndpoint extends Endpoint {
+
+    @Override
+    public FilterCategory category() {
+      return super.category();
     }
 
-    @Test
-    void errorEndpoint() {
-        request.getContext().setShouldSendErrorResponse(true);
-        assertNull(request.getContext().get(ZUUL_ENDPOINT));
-        endpointRunner.filter(request);
-        final ZuulFilter filter = request.getContext().get(ZUUL_ENDPOINT);
-        assertTrue(filter instanceof ErrorEndpoint);
-
-        ArgumentCaptor<HttpResponseMessage> captor = ArgumentCaptor.forClass(HttpResponseMessage.class);
-        verify(filterRunner, times(1)).filter(captor.capture());
-        final HttpResponseMessage capturedResponseMessage = captor.getValue();
-        assertEquals(capturedResponseMessage.getInboundRequest(), request.getInboundRequest());
-        assertNull(capturedResponseMessage.getContext().getEndpoint());
-        assertTrue(capturedResponseMessage.getContext().errorResponseSent());
+    @Override
+    public Observable applyAsync(ZuulMessage input) {
+      return Observable.just(buildHttpResponseMessage(input));
     }
+  }
 
-    @Filter(order = 10, type = FilterType.ENDPOINT)
-    static class ErrorEndpoint extends Endpoint {
-        @Override
-        public FilterCategory category() {
-            return super.category();
-        }
-
-        @Override
-        public Observable applyAsync(ZuulMessage input) {
-            return Observable.just(buildHttpResponseMessage(input));
-        }
-    }
-
-    @Filter(order = 20, type = FilterType.ENDPOINT)
-    static class BasicEndpoint extends Endpoint {
-
-        @Override
-        public FilterCategory category() {
-            return super.category();
-        }
-
-        @Override
-        public Observable applyAsync(ZuulMessage input) {
-            return Observable.just(buildHttpResponseMessage(input));
-        }
-    }
-
-    private static HttpResponseMessage buildHttpResponseMessage(ZuulMessage request) {
-        return new HttpResponseMessageImpl(request.getContext(), (HttpRequestMessage) request, 200);
-    }
+  private static HttpResponseMessage buildHttpResponseMessage(ZuulMessage request) {
+    return new HttpResponseMessageImpl(request.getContext(), (HttpRequestMessage) request, 200);
+  }
 }

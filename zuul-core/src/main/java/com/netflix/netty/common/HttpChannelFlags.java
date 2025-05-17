@@ -21,51 +21,39 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
-/**
- * User: michaels@netflix.com
- * Date: 7/10/17
- * Time: 4:29 PM
- */
-public class HttpChannelFlags
-{
-    public static final Flag IN_BROWNOUT = new Flag("_brownout");
+/** User: michaels@netflix.com Date: 7/10/17 Time: 4:29 PM */
+public class HttpChannelFlags {
+  public static final Flag IN_BROWNOUT = new Flag("_brownout");
 
-    public static final Flag CLOSING = new Flag("_connection_closing");
+  public static final Flag CLOSING = new Flag("_connection_closing");
 
-    public static class Flag
-    {
-        private final AttributeKey<Boolean> attributeKey;
+  public static class Flag {
+    private final AttributeKey<Boolean> attributeKey;
 
-        public Flag(String name)
-        {
-            attributeKey = AttributeKey.newInstance(name);
-        }
-
-        public void set(Channel ch)
-        {
-            ch.attr(attributeKey).set(Boolean.TRUE);
-        }
-
-        public void remove(Channel ch)
-        {
-            ch.attr(attributeKey).set(null);
-        }
-
-        public void set(ChannelHandlerContext ctx)
-        {
-            set(ctx.channel());
-        }
-
-        public boolean get(Channel ch)
-        {
-            Attribute<Boolean> attr = ch.attr(attributeKey);
-            Boolean value = attr.get();
-            return (value == null) ? false : value.booleanValue();
-        }
-
-        public boolean get(ChannelHandlerContext ctx)
-        {
-            return get(ctx.channel());
-        }
+    public Flag(String name) {
+      attributeKey = AttributeKey.newInstance(name);
     }
+
+    public void set(Channel ch) {
+      ch.attr(attributeKey).set(Boolean.TRUE);
+    }
+
+    public void remove(Channel ch) {
+      ch.attr(attributeKey).set(null);
+    }
+
+    public void set(ChannelHandlerContext ctx) {
+      set(ctx.channel());
+    }
+
+    public boolean get(Channel ch) {
+      Attribute<Boolean> attr = ch.attr(attributeKey);
+      Boolean value = attr.get();
+      return (value == null) ? false : value.booleanValue();
+    }
+
+    public boolean get(ChannelHandlerContext ctx) {
+      return get(ctx.channel());
+    }
+  }
 }

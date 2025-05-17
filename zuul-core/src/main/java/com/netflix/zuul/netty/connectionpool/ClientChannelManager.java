@@ -16,48 +16,41 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
-
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.passport.CurrentPassport;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * User: michaels@netflix.com
- * Date: 7/8/16
- * Time: 12:36 PM
- */
-public interface ClientChannelManager
-{
-    void init();
+/** User: michaels@netflix.com Date: 7/8/16 Time: 12:36 PM */
+public interface ClientChannelManager {
+  void init();
 
-    boolean isAvailable();
+  boolean isAvailable();
 
-    int getInflightRequestsCount();
+  int getInflightRequestsCount();
 
-    void shutdown();
+  void shutdown();
 
-    boolean release(PooledConnection conn);
+  boolean release(PooledConnection conn);
 
-    Promise<PooledConnection> acquire(EventLoop eventLoop);
+  Promise<PooledConnection> acquire(EventLoop eventLoop);
 
-    Promise<PooledConnection> acquire(
-            EventLoop eventLoop,
-            Object key,
-            CurrentPassport passport,
-            AtomicReference<DiscoveryResult> selectedServer,
-            AtomicReference<? super InetAddress> selectedHostAddr);
+  Promise<PooledConnection> acquire(
+      EventLoop eventLoop,
+      Object key,
+      CurrentPassport passport,
+      AtomicReference<DiscoveryResult> selectedServer,
+      AtomicReference<? super InetAddress> selectedHostAddr);
 
-    boolean isCold();
+  boolean isCold();
 
-    boolean remove(PooledConnection conn);
+  boolean remove(PooledConnection conn);
 
-    int getConnsInPool();
+  int getConnsInPool();
 
-    int getConnsInUse();
+  int getConnsInUse();
 
-    ConnectionPoolConfig getConfig();
+  ConnectionPoolConfig getConfig();
 }

@@ -19,83 +19,77 @@ package com.netflix.netty.common;
 import com.netflix.netty.common.metrics.EventLoopGroupMetrics;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorChooserFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * User: michaels@netflix.com
- * Date: 2/7/17
- * Time: 2:44 PM
- */
-public class LeastConnsEventLoopChooserFactory implements EventExecutorChooserFactory
-{
-    private static final Logger LOG = LoggerFactory.getLogger(LeastConnsEventLoopChooserFactory.class);
+/** User: michaels@netflix.com Date: 2/7/17 Time: 2:44 PM */
+public class LeastConnsEventLoopChooserFactory implements EventExecutorChooserFactory {
+  private static final Logger LOG =
+      LoggerFactory.getLogger(LeastConnsEventLoopChooserFactory.class);
+  private final EventLoopGroupMetrics groupMetrics;
+
+  public LeastConnsEventLoopChooserFactory(EventLoopGroupMetrics groupMetrics) {
+    this.groupMetrics = groupMetrics;
+  }
+
+  @Override
+  public EventExecutorChooser newChooser(EventExecutor[] executors) {
+    return new LeastConnsEventExecutorChooser(executors, groupMetrics);
+  }
+
+  private static class LeastConnsEventExecutorChooser implements EventExecutorChooser {
+    private final List<EventExecutor> executors;
     private final EventLoopGroupMetrics groupMetrics;
 
-    public LeastConnsEventLoopChooserFactory(EventLoopGroupMetrics groupMetrics)
-    {
-        this.groupMetrics = groupMetrics;
+    public LeastConnsEventExecutorChooser(
+        EventExecutor[] executors, final EventLoopGroupMetrics groupMetrics) {
+      this.executors = Arrays.asList(executors);
+      this.groupMetrics = groupMetrics;
     }
 
     @Override
-    public EventExecutorChooser newChooser(EventExecutor[] executors)
-    {
-        return new LeastConnsEventExecutorChooser(executors, groupMetrics);
+    public EventExecutor next() {
+      return chooseWithLeastConns();
     }
 
-    private static class LeastConnsEventExecutorChooser implements EventExecutorChooser
-    {
-        private final List<EventExecutor> executors;
-        private final EventLoopGroupMetrics groupMetrics;
+    private EventExecutor chooseWithLeastConns() {
+      EventExecutor leastExec = null;
+      int leastValue = Integer.MAX_VALUE;
 
-        public LeastConnsEventExecutorChooser(EventExecutor[] executors, final EventLoopGroupMetrics groupMetrics)
-        {
-            this.executors = Arrays.asList(executors);
-            this.groupMetrics = groupMetrics;
+      Map<Thread, Integer> connsPer = groupMetrics.connectionsPerEventLoop();
+
+      // Shuffle the list of executors each time so that if they all have the same number of
+      // connections, then
+      // we don't favour the 1st one.
+      Collections.shuffle(executors, ThreadLocalRandom.current());
+
+      for (EventExecutor executor : executors) {
+        int value = connsPer.getOrDefault(executor, 0);
+        if (value < leastValue) {
+          leastValue = value;
+          leastExec = executor;
         }
+      }
 
-        @Override
-        public EventExecutor next()
-        {
-            return chooseWithLeastConns();
-        }
+      // If none chosen, then just use first.
+      if (leastExec == null) {
+        leastExec = executors.get(0);
+      }
 
-        private EventExecutor chooseWithLeastConns()
-        {
-            EventExecutor leastExec = null;
-            int leastValue = Integer.MAX_VALUE;
-            
-            Map<Thread, Integer> connsPer = groupMetrics.connectionsPerEventLoop();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(
+            "Chose eventloop: {}, leastValue={}, connsPer={}",
+            String.valueOf(leastExec),
+            leastValue,
+            String.valueOf(connsPer));
+      }
 
-            // Shuffle the list of executors each time so that if they all have the same number of connections, then
-            // we don't favour the 1st one.
-            Collections.shuffle(executors, ThreadLocalRandom.current());
-            
-            for (EventExecutor executor : executors)
-            {
-                int value = connsPer.getOrDefault(executor, 0);
-                if (value < leastValue) {
-                    leastValue = value;
-                    leastExec = executor;
-                }
-            }
-
-            // If none chosen, then just use first.
-            if (leastExec == null) {
-                leastExec = executors.get(0);
-            }
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Chose eventloop: {}, leastValue={}, connsPer={}", String.valueOf(leastExec), leastValue, String.valueOf(connsPer));
-            }
-
-            return leastExec;
-        }
+      return leastExec;
     }
+  }
 }

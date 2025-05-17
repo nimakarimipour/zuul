@@ -18,12 +18,7 @@ package com.netflix.zuul.netty.connectionpool;
 
 import io.netty.channel.Channel;
 
-/**
- * User: Mike Smith
- * Date: 7/9/16
- * Time: 2:25 PM
- */
-public interface PooledConnectionFactory
-{
-    PooledConnection create(Channel ch);
+/** User: Mike Smith Date: 7/9/16 Time: 2:25 PM */
+public interface PooledConnectionFactory {
+  PooledConnection create(Channel ch);
 }

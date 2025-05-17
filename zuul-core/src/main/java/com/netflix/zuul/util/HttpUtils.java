@@ -29,150 +29,142 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * User: Mike Smith
- * Date: 4/28/15
- * Time: 11:05 PM
- */
-public class HttpUtils
-{
-    private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
-    private static final char[] MALICIOUS_HEADER_CHARS = {'\r', '\n'};
+/** User: Mike Smith Date: 4/28/15 Time: 11:05 PM */
+public class HttpUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
+  private static final char[] MALICIOUS_HEADER_CHARS = {'\r', '\n'};
 
-    /**
-     * Get the IP address of client making the request.
-     *
-     * Uses the "x-forwarded-for" HTTP header if available, otherwise uses the remote
-     * IP of requester.
-     *
-     * @param request <code>HttpRequestMessage</code>
-     * @return <code>String</code> IP address
-     */
-    public static String getClientIP(HttpRequestInfo request)
-    {
-        final String xForwardedFor = request.getHeaders().getFirst(HttpHeaderNames.X_FORWARDED_FOR);
-        String clientIP;
-        if (xForwardedFor == null) {
-            clientIP = request.getClientIp();
-        } else {
-            clientIP = extractClientIpFromXForwardedFor(xForwardedFor);
-        }
-        return clientIP;
+  /**
+   * Get the IP address of client making the request.
+   *
+   * <p>Uses the "x-forwarded-for" HTTP header if available, otherwise uses the remote IP of
+   * requester.
+   *
+   * @param request <code>HttpRequestMessage</code>
+   * @return <code>String</code> IP address
+   */
+  public static String getClientIP(HttpRequestInfo request) {
+    final String xForwardedFor = request.getHeaders().getFirst(HttpHeaderNames.X_FORWARDED_FOR);
+    String clientIP;
+    if (xForwardedFor == null) {
+      clientIP = request.getClientIp();
+    } else {
+      clientIP = extractClientIpFromXForwardedFor(xForwardedFor);
     }
+    return clientIP;
+  }
 
-    /**
-     * Extract the client IP address from an x-forwarded-for header. Returns null if there is no x-forwarded-for header
-     *
-     * @param xForwardedFor a <code>String</code> value
-     * @return a <code>String</code> value
-     */
-    public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
-        if (xForwardedFor == null) {
-            return null;
-        }
-        xForwardedFor = xForwardedFor.trim();
-        String tokenized[] = xForwardedFor.split(",");
-        if (tokenized.length == 0) {
-            return null;
-        } else {
-            return tokenized[0].trim();
-        }
+  /**
+   * Extract the client IP address from an x-forwarded-for header. Returns null if there is no
+   * x-forwarded-for header
+   *
+   * @param xForwardedFor a <code>String</code> value
+   * @return a <code>String</code> value
+   */
+  public static String extractClientIpFromXForwardedFor(String xForwardedFor) {
+    if (xForwardedFor == null) {
+      return null;
     }
-
-    @VisibleForTesting
-    static boolean isCompressed(String contentEncoding) {
-        return contentEncoding.contains(HttpHeaderValues.GZIP.toString()) ||
-                contentEncoding.contains(HttpHeaderValues.DEFLATE.toString()) ||
-                contentEncoding.contains(HttpHeaderValues.BR.toString()) ||
-                contentEncoding.contains(HttpHeaderValues.COMPRESS.toString());
+    xForwardedFor = xForwardedFor.trim();
+    String tokenized[] = xForwardedFor.split(",");
+    if (tokenized.length == 0) {
+      return null;
+    } else {
+      return tokenized[0].trim();
     }
+  }
 
-    public static boolean isCompressed(Headers headers) {
-        String ce = headers.getFirst(HttpHeaderNames.CONTENT_ENCODING);
-        return ce != null && isCompressed(ce);
+  @VisibleForTesting
+  static boolean isCompressed(String contentEncoding) {
+    return contentEncoding.contains(HttpHeaderValues.GZIP.toString())
+        || contentEncoding.contains(HttpHeaderValues.DEFLATE.toString())
+        || contentEncoding.contains(HttpHeaderValues.BR.toString())
+        || contentEncoding.contains(HttpHeaderValues.COMPRESS.toString());
+  }
+
+  public static boolean isCompressed(Headers headers) {
+    String ce = headers.getFirst(HttpHeaderNames.CONTENT_ENCODING);
+    return ce != null && isCompressed(ce);
+  }
+
+  public static boolean acceptsGzip(Headers headers) {
+    String ae = headers.getFirst(HttpHeaderNames.ACCEPT_ENCODING);
+    return ae != null && ae.contains(HttpHeaderValues.GZIP.toString());
+  }
+
+  /**
+   * Ensure decoded new lines are not propagated in headers, in order to prevent XSS
+   *
+   * @param input - decoded header string
+   * @return - clean header string
+   */
+  public static String stripMaliciousHeaderChars( String input) {
+    if (input == null) {
+      return null;
     }
-
-    public static boolean acceptsGzip(Headers headers) {
-        String ae = headers.getFirst(HttpHeaderNames.ACCEPT_ENCODING);
-        return ae != null && ae.contains(HttpHeaderValues.GZIP.toString());
+    // TODO(carl-mastrangelo): implement this more efficiently.
+    for (char c : MALICIOUS_HEADER_CHARS) {
+      if (input.indexOf(c) != -1) {
+        input = input.replace(Character.toString(c), "");
+      }
     }
+    return input;
+  }
 
-    /**
-     * Ensure decoded new lines are not propagated in headers, in order to prevent XSS
-     *
-     * @param input - decoded header string
-     * @return - clean header string
-     */
-    public static String stripMaliciousHeaderChars(@Nullable String input) {
-        if (input == null) {
-            return null;
-        }
-        // TODO(carl-mastrangelo): implement this more efficiently.
-        for (char c : MALICIOUS_HEADER_CHARS) {
-            if (input.indexOf(c) != -1) {
-                input = input.replace(Character.toString(c), "");
-            }
-        }
-        return input;
+  public static boolean hasNonZeroContentLengthHeader(ZuulMessage msg) {
+    final Integer contentLengthVal = getContentLengthIfPresent(msg);
+    return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
+  }
+
+  public static Integer getContentLengthIfPresent(ZuulMessage msg) {
+    final String contentLengthValue =
+        msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
+    if (!Strings.isNullOrEmpty(contentLengthValue)) {
+      try {
+        return Integer.valueOf(contentLengthValue);
+      } catch (NumberFormatException e) {
+        LOG.info(
+            "Invalid Content-Length header value on request. " + "value = {}",
+            contentLengthValue,
+            e);
+      }
     }
+    return null;
+  }
 
-
-    public static boolean hasNonZeroContentLengthHeader(ZuulMessage msg)
-    {
-        final Integer contentLengthVal = getContentLengthIfPresent(msg);
-        return (contentLengthVal != null) && (contentLengthVal.intValue() > 0);
+  public static Integer getBodySizeIfKnown(ZuulMessage msg) {
+    final Integer bodySize = getContentLengthIfPresent(msg);
+    if (bodySize != null) {
+      return bodySize;
     }
-
-    public static Integer getContentLengthIfPresent(ZuulMessage msg)
-    {
-        final String contentLengthValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.CONTENT_LENGTH);
-        if (!Strings.isNullOrEmpty(contentLengthValue)) {
-            try {
-                return Integer.valueOf(contentLengthValue);
-            }
-            catch (NumberFormatException e) {
-                LOG.info("Invalid Content-Length header value on request. " +
-                        "value = {}", contentLengthValue, e);
-            }
-        }
-        return null;
+    if (msg.hasCompleteBody()) {
+      return msg.getBodyLength();
     }
+    return null;
+  }
 
-    public static Integer getBodySizeIfKnown(ZuulMessage msg) {
-        final Integer bodySize = getContentLengthIfPresent(msg);
-        if (bodySize != null) {
-            return bodySize;
-        }
-        if (msg.hasCompleteBody()) {
-            return msg.getBodyLength();
-        }
-        return null;
+  public static boolean hasChunkedTransferEncodingHeader(ZuulMessage msg) {
+    boolean isChunked = false;
+    String teValue =
+        msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.TRANSFER_ENCODING);
+    if (!Strings.isNullOrEmpty(teValue)) {
+      isChunked = "chunked".equals(teValue.toLowerCase());
     }
+    return isChunked;
+  }
 
-    public static boolean hasChunkedTransferEncodingHeader(ZuulMessage msg)
-    {
-        boolean isChunked = false;
-        String teValue = msg.getHeaders().getFirst(com.netflix.zuul.message.http.HttpHeaderNames.TRANSFER_ENCODING);
-        if (!Strings.isNullOrEmpty(teValue)) {
-            isChunked = "chunked".equals(teValue.toLowerCase());
-        }
-        return isChunked;
-    }
+  /**
+   * If http/1 then will always want to just use ChannelHandlerContext.channel(), but for http/2
+   * will want the parent channel (as the child channel is different for each h2 stream).
+   */
+  public static Channel getMainChannel(ChannelHandlerContext ctx) {
+    return getMainChannel(ctx.channel());
+  }
 
-    /**
-     * If http/1 then will always want to just use ChannelHandlerContext.channel(), but for http/2
-     * will want the parent channel (as the child channel is different for each h2 stream).
-     */
-    public static Channel getMainChannel(ChannelHandlerContext ctx)
-    {
-        return getMainChannel(ctx.channel());
+  public static Channel getMainChannel(Channel channel) {
+    if (channel instanceof Http2StreamChannel) {
+      return channel.parent();
     }
-
-    public static Channel getMainChannel(Channel channel)
-    {
-        if (channel instanceof Http2StreamChannel) {
-            return channel.parent();
-        }
-        return channel;
-    }
+    return channel;
+  }
 }

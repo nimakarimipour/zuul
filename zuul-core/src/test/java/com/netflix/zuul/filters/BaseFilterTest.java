@@ -25,52 +25,48 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
- * Tests for {@link BaseFilter}.   Currently named BaseFilter2Test as there is an existing
- * class named BaseFilterTest.
+ * Tests for {@link BaseFilter}. Currently named BaseFilter2Test as there is an existing class named
+ * BaseFilterTest.
  */
 class BaseFilterTest {
 
-    @Mock
-    private BaseFilter f1;
-    @Mock
-    private BaseFilter f2;
-    @Mock
-    private ZuulMessage req;
+  @Mock private BaseFilter f1;
+  @Mock private BaseFilter f2;
+  @Mock private ZuulMessage req;
 
-    @BeforeEach
-    void before() {
-        MockitoAnnotations.initMocks(this);
+  @BeforeEach
+  void before() {
+    MockitoAnnotations.initMocks(this);
+  }
+
+  @Test
+  void testShouldFilter() {
+    class TestZuulFilter extends BaseSyncFilter {
+      @Override
+      public int filterOrder() {
+        return 0;
+      }
+
+      @Override
+      public FilterType filterType() {
+        return FilterType.INBOUND;
+      }
+
+      @Override
+      public boolean shouldFilter(ZuulMessage req) {
+        return false;
+      }
+
+      @Override
+      public ZuulMessage apply(ZuulMessage req) {
+        return null;
+      }
     }
 
-    @Test
-    void testShouldFilter() {
-        class TestZuulFilter extends BaseSyncFilter
-        {
-            @Override
-            public int filterOrder() {
-                return 0;
-            }
+    TestZuulFilter tf1 = spy(new TestZuulFilter());
+    TestZuulFilter tf2 = spy(new TestZuulFilter());
 
-            @Override
-            public FilterType filterType() {
-                return FilterType.INBOUND;
-            }
-
-            @Override
-            public boolean shouldFilter(ZuulMessage req) {
-                return false;
-            }
-
-            @Override
-            public ZuulMessage apply(ZuulMessage req) {
-                return null;
-            }
-        }
-
-        TestZuulFilter tf1 = spy(new TestZuulFilter());
-        TestZuulFilter tf2 = spy(new TestZuulFilter());
-
-        when(tf1.shouldFilter(req)).thenReturn(true);
-        when(tf2.shouldFilter(req)).thenReturn(false);
-    }
+    when(tf1.shouldFilter(req)).thenReturn(true);
+    when(tf2.shouldFilter(req)).thenReturn(false);
+  }
 }

@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -52,168 +53,160 @@ import org.mockito.MockitoAnnotations;
  */
 class PushRegistrationHandlerTest {
 
-    private static ExecutorService EXECUTOR;
+  private static ExecutorService EXECUTOR;
 
-    @Captor
-    private ArgumentCaptor<Runnable> scheduledCaptor;
+  @Captor private ArgumentCaptor<Runnable> scheduledCaptor;
 
-    @Captor
-    private ArgumentCaptor<Object> writeCaptor;
+  @Captor private ArgumentCaptor<Object> writeCaptor;
 
-    @Mock
-    private ChannelHandlerContext context;
+  @Mock private ChannelHandlerContext context;
 
-    @Mock
-    private ChannelFuture channelFuture;
+  @Mock private ChannelFuture channelFuture;
 
-    @Mock
-    private ChannelPipeline pipelineMock;
+  @Mock private ChannelPipeline pipelineMock;
 
-    @Mock
-    private Channel channel;
+  @Mock private Channel channel;
 
-    private PushConnectionRegistry registry;
-    private PushRegistrationHandler handler;
-    private DefaultEventLoop eventLoopSpy;
-    private TestAuth successfulAuth;
+  private PushConnectionRegistry registry;
+  private PushRegistrationHandler handler;
+  private DefaultEventLoop eventLoopSpy;
+  private TestAuth successfulAuth;
 
-    @BeforeAll
-    static void classSetup() {
-        EXECUTOR = Executors.newSingleThreadExecutor();
+  @BeforeAll
+  static void classSetup() {
+    EXECUTOR = Executors.newSingleThreadExecutor();
+  }
+
+  @AfterAll
+  static void classCleanup() {
+    MoreExecutors.shutdownAndAwaitTermination(EXECUTOR, 5, TimeUnit.SECONDS);
+  }
+
+  @BeforeEach
+  void setup() {
+    MockitoAnnotations.openMocks(this);
+    registry = new PushConnectionRegistry();
+    handler = new PushRegistrationHandler(registry, PushProtocol.WEBSOCKET);
+    successfulAuth = new TestAuth(true);
+
+    eventLoopSpy = spy(new DefaultEventLoop(EXECUTOR));
+    doReturn(eventLoopSpy).when(context).executor();
+    doReturn(channelFuture).when(context).writeAndFlush(writeCaptor.capture());
+    doReturn(pipelineMock).when(context).pipeline();
+    doReturn(channel).when(context).channel();
+  }
+
+  @Test
+  void closeIfNotAuthenticated() throws Exception {
+    doHandshakeComplete();
+
+    Runnable scheduledTask = scheduledCaptor.getValue();
+    scheduledTask.run();
+
+    validateConnectionClosed(1000, "Server closed connection");
+  }
+
+  @Test
+  void authFailed() throws Exception {
+    doHandshakeComplete();
+    handler.userEventTriggered(context, new TestAuth(false));
+    validateConnectionClosed(1008, "Auth failed");
+  }
+
+  @Test
+  void authSuccess() throws Exception {
+    doHandshakeComplete();
+    authenticateChannel();
+  }
+
+  @Test
+  void requestClientToCloseInactiveConnection() throws Exception {
+    doHandshakeComplete();
+    Mockito.reset(eventLoopSpy);
+    authenticateChannel();
+    verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
+    Runnable requestClientToClose = scheduledCaptor.getValue();
+
+    requestClientToClose.run();
+    validateConnectionClosed(1000, "Server closed connection");
+  }
+
+  @Test
+  void requestClientToClose() throws Exception {
+    doHandshakeComplete();
+    Mockito.reset(eventLoopSpy);
+    authenticateChannel();
+    verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
+    Runnable requestClientToClose = scheduledCaptor.getValue();
+
+    int taskListSize = handler.getScheduledFutures().size();
+    doReturn(true).when(channel).isActive();
+    requestClientToClose.run();
+    assertEquals(taskListSize + 1, handler.getScheduledFutures().size());
+    Object capture = writeCaptor.getValue();
+    assertTrue(capture instanceof TextWebSocketFrame);
+    TextWebSocketFrame frame = (TextWebSocketFrame) capture;
+    assertEquals("_CLOSE_", frame.text());
+  }
+
+  @Test
+  void channelInactiveCancelsTasks() throws Exception {
+    doHandshakeComplete();
+    TestAuth testAuth = new TestAuth(true);
+    authenticateChannel();
+
+    List<ScheduledFuture<?>> copyOfFutures = new ArrayList<>(handler.getScheduledFutures());
+
+    handler.channelInactive(context);
+    assertNull(registry.get(testAuth.getClientIdentity()));
+    assertTrue(handler.getScheduledFutures().isEmpty());
+    copyOfFutures.forEach(f -> assertTrue(f.isCancelled()));
+    verify(context).close();
+  }
+
+  private void doHandshakeComplete() throws Exception {
+    handler.userEventTriggered(context, PushProtocol.WEBSOCKET.getHandshakeCompleteEvent());
+    assertNotNull(handler.getPushConnection());
+    verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
+  }
+
+  private void authenticateChannel() throws Exception {
+    handler.userEventTriggered(context, successfulAuth);
+    assertNotNull(registry.get(successfulAuth.getClientIdentity()));
+    assertEquals(2, handler.getScheduledFutures().size());
+    verify(pipelineMock).remove(PushAuthHandler.NAME);
+  }
+
+  private void validateConnectionClosed(int expected, String messaged) {
+    Object capture = writeCaptor.getValue();
+    assertTrue(capture instanceof CloseWebSocketFrame);
+    CloseWebSocketFrame closeFrame = (CloseWebSocketFrame) capture;
+    assertEquals(expected, closeFrame.statusCode());
+    assertEquals(messaged, closeFrame.reasonText());
+    verify(channelFuture).addListener(ChannelFutureListener.CLOSE);
+  }
+
+  private static class TestAuth implements PushUserAuth {
+
+    private final boolean success;
+
+    public TestAuth(boolean success) {
+      this.success = success;
     }
 
-    @AfterAll
-    static void classCleanup() {
-        MoreExecutors.shutdownAndAwaitTermination(EXECUTOR, 5, TimeUnit.SECONDS);
+    @Override
+    public boolean isSuccess() {
+      return success;
     }
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-        registry = new PushConnectionRegistry();
-        handler = new PushRegistrationHandler(registry, PushProtocol.WEBSOCKET);
-        successfulAuth = new TestAuth(true);
-
-        eventLoopSpy = spy(new DefaultEventLoop(EXECUTOR));
-        doReturn(eventLoopSpy).when(context).executor();
-        doReturn(channelFuture).when(context).writeAndFlush(writeCaptor.capture());
-        doReturn(pipelineMock).when(context).pipeline();
-        doReturn(channel).when(context).channel();
+    @Override
+    public int statusCode() {
+      return 0;
     }
 
-    @Test
-    void closeIfNotAuthenticated() throws Exception {
-        doHandshakeComplete();
-
-        Runnable scheduledTask = scheduledCaptor.getValue();
-        scheduledTask.run();
-
-        validateConnectionClosed(1000, "Server closed connection");
+    @Override
+    public String getClientIdentity() {
+      return "whatever";
     }
-
-    @Test
-    void authFailed() throws Exception {
-        doHandshakeComplete();
-        handler.userEventTriggered(context, new TestAuth(false));
-        validateConnectionClosed(1008, "Auth failed");
-    }
-
-    @Test
-    void authSuccess() throws Exception {
-        doHandshakeComplete();
-        authenticateChannel();
-    }
-
-    @Test
-    void requestClientToCloseInactiveConnection() throws Exception {
-        doHandshakeComplete();
-        Mockito.reset(eventLoopSpy);
-        authenticateChannel();
-        verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
-        Runnable requestClientToClose = scheduledCaptor.getValue();
-
-        requestClientToClose.run();
-        validateConnectionClosed(1000, "Server closed connection");
-    }
-
-    @Test
-    void requestClientToClose() throws Exception {
-        doHandshakeComplete();
-        Mockito.reset(eventLoopSpy);
-        authenticateChannel();
-        verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
-        Runnable requestClientToClose = scheduledCaptor.getValue();
-
-        int taskListSize = handler.getScheduledFutures().size();
-        doReturn(true).when(channel).isActive();
-        requestClientToClose.run();
-        assertEquals(taskListSize + 1, handler.getScheduledFutures().size());
-        Object capture = writeCaptor.getValue();
-        assertTrue(capture instanceof TextWebSocketFrame);
-        TextWebSocketFrame frame = (TextWebSocketFrame) capture;
-        assertEquals("_CLOSE_", frame.text());
-    }
-
-    @Test
-    void channelInactiveCancelsTasks() throws Exception {
-        doHandshakeComplete();
-        TestAuth testAuth = new TestAuth(true);
-        authenticateChannel();
-
-        List<ScheduledFuture<?>> copyOfFutures = new ArrayList<>(handler.getScheduledFutures());
-
-        handler.channelInactive(context);
-        assertNull(registry.get(testAuth.getClientIdentity()));
-        assertTrue(handler.getScheduledFutures().isEmpty());
-        copyOfFutures.forEach(f -> assertTrue(f.isCancelled()));
-        verify(context).close();
-    }
-
-    private void doHandshakeComplete() throws Exception {
-        handler.userEventTriggered(context, PushProtocol.WEBSOCKET.getHandshakeCompleteEvent());
-        assertNotNull(handler.getPushConnection());
-        verify(eventLoopSpy).schedule(scheduledCaptor.capture(), anyLong(), eq(TimeUnit.SECONDS));
-    }
-
-    private void authenticateChannel() throws Exception {
-        handler.userEventTriggered(context, successfulAuth);
-        assertNotNull(registry.get(successfulAuth.getClientIdentity()));
-        assertEquals(2, handler.getScheduledFutures().size());
-        verify(pipelineMock).remove(PushAuthHandler.NAME);
-    }
-
-    private void validateConnectionClosed(int expected, String messaged) {
-        Object capture = writeCaptor.getValue();
-        assertTrue(capture instanceof CloseWebSocketFrame);
-        CloseWebSocketFrame closeFrame = (CloseWebSocketFrame) capture;
-        assertEquals(expected, closeFrame.statusCode());
-        assertEquals(messaged, closeFrame.reasonText());
-        verify(channelFuture).addListener(ChannelFutureListener.CLOSE);
-    }
-
-
-    private static class TestAuth implements PushUserAuth {
-
-        private final boolean success;
-
-        public TestAuth(boolean success) {
-            this.success = success;
-        }
-
-        @Override
-        public boolean isSuccess() {
-            return success;
-        }
-
-        @Override
-        public int statusCode() {
-            return 0;
-        }
-
-        @Override
-        public String getClientIdentity() {
-            return "whatever";
-        }
-    }
-
+  }
 }

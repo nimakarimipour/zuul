@@ -23,63 +23,63 @@ import com.netflix.zuul.Attrs.Key;
 import org.junit.jupiter.api.Test;
 
 class AttrsTest {
-    @Test
-    void keysAreUnique() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key1 = Attrs.newKey("foo");
-        key1.put(attrs, "bar");
-        Key<String> key2 = Attrs.newKey("foo");
-        key2.put(attrs, "baz");
+  @Test
+  void keysAreUnique() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key1 = Attrs.newKey("foo");
+    key1.put(attrs, "bar");
+    Key<String> key2 = Attrs.newKey("foo");
+    key2.put(attrs, "baz");
 
-        Truth.assertThat(attrs.keySet()).containsExactly(key1, key2);
-    }
+    Truth.assertThat(attrs.keySet()).containsExactly(key1, key2);
+  }
 
-    @Test
-    void newKeyFailsOnNull() {
-        assertThrows(NullPointerException.class, () -> Attrs.newKey(null));
-    }
+  @Test
+  void newKeyFailsOnNull() {
+    assertThrows(NullPointerException.class, () -> Attrs.newKey(null));
+  }
 
-    @Test
-    void attrsPutFailsOnNull() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key = Attrs.newKey("foo");
+  @Test
+  void attrsPutFailsOnNull() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key = Attrs.newKey("foo");
 
-        assertThrows(NullPointerException.class, () -> key.put(attrs, null));
-    }
+    assertThrows(NullPointerException.class, () -> key.put(attrs, null));
+  }
 
-    @Test
-    void attrsPutReplacesOld() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key = Attrs.newKey("foo");
-        key.put(attrs, "bar");
-        key.put(attrs, "baz");
+  @Test
+  void attrsPutReplacesOld() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key = Attrs.newKey("foo");
+    key.put(attrs, "bar");
+    key.put(attrs, "baz");
 
-        assertEquals("baz", key.get(attrs));
-        Truth.assertThat(attrs.keySet()).containsExactly(key);
-    }
+    assertEquals("baz", key.get(attrs));
+    Truth.assertThat(attrs.keySet()).containsExactly(key);
+  }
 
-    @Test
-    void getReturnsNull() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key = Attrs.newKey("foo");
+  @Test
+  void getReturnsNull() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key = Attrs.newKey("foo");
 
-        assertNull(key.get(attrs));
-    }
+    assertNull(key.get(attrs));
+  }
 
-    @Test
-    void getOrDefault_picksDefault() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key = Attrs.newKey("foo");
+  @Test
+  void getOrDefault_picksDefault() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key = Attrs.newKey("foo");
 
-        assertEquals("bar", key.getOrDefault(attrs, "bar"));
-    }
+    assertEquals("bar", key.getOrDefault(attrs, "bar"));
+  }
 
-    @Test
-    void getOrDefault_failsOnNullDefault() {
-        Attrs attrs = Attrs.newInstance();
-        Key<String> key = Attrs.newKey("foo");
-        key.put(attrs, "bar");
+  @Test
+  void getOrDefault_failsOnNullDefault() {
+    Attrs attrs = Attrs.newInstance();
+    Key<String> key = Attrs.newKey("foo");
+    key.put(attrs, "bar");
 
-        assertThrows(NullPointerException.class, () -> key.getOrDefault(attrs, null));
-    }
+    assertThrows(NullPointerException.class, () -> key.getOrDefault(attrs, null));
+  }
 }

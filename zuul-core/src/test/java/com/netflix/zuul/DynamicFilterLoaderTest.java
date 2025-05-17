@@ -27,7 +27,6 @@ import com.netflix.zuul.filters.ZuulFilter;
 import com.netflix.zuul.message.ZuulMessage;
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,111 +34,107 @@ import org.mockito.MockitoAnnotations;
 
 class DynamicFilterLoaderTest {
 
-    @Mock
-    private File file;
+  @Mock private File file;
 
-    @Mock
-    private DynamicCodeCompiler compiler;
+  @Mock private DynamicCodeCompiler compiler;
 
-    private final FilterRegistry registry = new MutableFilterRegistry();
+  private final FilterRegistry registry = new MutableFilterRegistry();
 
-    private final FilterFactory filterFactory = new DefaultFilterFactory();
+  private final FilterFactory filterFactory = new DefaultFilterFactory();
 
-    private DynamicFilterLoader loader;
+  private DynamicFilterLoader loader;
 
-    private final TestZuulFilter filter = new TestZuulFilter();
+  private final TestZuulFilter filter = new TestZuulFilter();
 
-    @BeforeEach
-    void before() throws Exception
-    {
-        MockitoAnnotations.initMocks(this);
+  @BeforeEach
+  void before() throws Exception {
+    MockitoAnnotations.initMocks(this);
 
-        loader = new DynamicFilterLoader(registry, compiler, filterFactory);
+    loader = new DynamicFilterLoader(registry, compiler, filterFactory);
 
-        doReturn(TestZuulFilter.class).when(compiler).compile(file);
-        when(file.getAbsolutePath()).thenReturn("/filters/in/SomeFilter.groovy");
+    doReturn(TestZuulFilter.class).when(compiler).compile(file);
+    when(file.getAbsolutePath()).thenReturn("/filters/in/SomeFilter.groovy");
+  }
+
+  @Test
+  void testGetFilterFromFile() throws Exception {
+    assertTrue(loader.putFilter(file));
+
+    Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
+    assertEquals(1, filters.size());
+  }
+
+  @Test
+  void testPutFiltersForClasses() throws Exception {
+    loader.putFiltersForClasses(new String[] {TestZuulFilter.class.getName()});
+
+    Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
+    assertEquals(1, filters.size());
+  }
+
+  @Test
+  void testPutFiltersForClassesException() throws Exception {
+    Exception caught = null;
+    try {
+      loader.putFiltersForClasses(new String[] {"asdf"});
+    } catch (ClassNotFoundException e) {
+      caught = e;
+    }
+    assertTrue(caught != null);
+    Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
+    assertEquals(0, filters.size());
+  }
+
+  @Test
+  void testGetFiltersByType() throws Exception {
+    assertTrue(loader.putFilter(file));
+
+    Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
+    assertEquals(1, filters.size());
+
+    Collection<ZuulFilter<?, ?>> list = loader.getFiltersByType(FilterType.INBOUND);
+    assertTrue(list != null);
+    assertEquals(1, list.size());
+    ZuulFilter<?, ?> filter = list.iterator().next();
+    assertTrue(filter != null);
+    assertEquals(FilterType.INBOUND, filter.filterType());
+  }
+
+  @Test
+  void testGetFilterFromString() throws Exception {
+    String string = "";
+    doReturn(TestZuulFilter.class).when(compiler).compile(string, string);
+    ZuulFilter filter = loader.getFilter(string, string);
+
+    assertNotNull(filter);
+    assertEquals(TestZuulFilter.class, filter.getClass());
+    //            assertTrue(loader.filterInstanceMapSize() == 1);
+  }
+
+  private static final class TestZuulFilter extends BaseSyncFilter {
+
+    TestZuulFilter() {
+      super();
     }
 
-    @Test
-    void testGetFilterFromFile() throws Exception {
-        assertTrue(loader.putFilter(file));
-
-        Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
-        assertEquals(1, filters.size());
+    @Override
+    public FilterType filterType() {
+      return FilterType.INBOUND;
     }
 
-    @Test
-    void testPutFiltersForClasses() throws Exception {
-        loader.putFiltersForClasses(new String[]{TestZuulFilter.class.getName()});
-
-        Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
-        assertEquals(1, filters.size());
+    @Override
+    public int filterOrder() {
+      return 0;
     }
 
-    @Test
-    void testPutFiltersForClassesException() throws Exception {
-        Exception caught = null;
-        try {
-            loader.putFiltersForClasses(new String[]{"asdf"});
-        }
-        catch (ClassNotFoundException e) {
-            caught = e;
-        }
-        assertTrue(caught != null);
-        Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
-        assertEquals(0, filters.size());
+    @Override
+    public boolean shouldFilter(ZuulMessage msg) {
+      return false;
     }
 
-    @Test
-    void testGetFiltersByType() throws Exception {
-        assertTrue(loader.putFilter(file));
-
-        Collection<ZuulFilter<?, ?>> filters = registry.getAllFilters();
-        assertEquals(1, filters.size());
-
-        Collection<ZuulFilter<?, ?>> list = loader.getFiltersByType(FilterType.INBOUND);
-        assertTrue(list != null);
-        assertEquals(1, list.size());
-        ZuulFilter<?, ?> filter = list.iterator().next();
-        assertTrue(filter != null);
-        assertEquals(FilterType.INBOUND, filter.filterType());
+    @Override
+    public ZuulMessage apply(ZuulMessage msg) {
+      return null;
     }
-
-    @Test
-    void testGetFilterFromString() throws Exception {
-        String string = "";
-        doReturn(TestZuulFilter.class).when(compiler).compile(string, string);
-        ZuulFilter filter = loader.getFilter(string, string);
-
-        assertNotNull(filter);
-        assertEquals(TestZuulFilter.class, filter.getClass());
-//            assertTrue(loader.filterInstanceMapSize() == 1);
-    }
-
-    private static final class TestZuulFilter extends BaseSyncFilter {
-
-        TestZuulFilter() {
-            super();
-        }
-
-        @Override
-        public FilterType filterType() {
-            return FilterType.INBOUND;
-        }
-
-        @Override
-        public int filterOrder() {
-            return 0;
-        }
-
-        @Override
-        public boolean shouldFilter(ZuulMessage msg) {
-            return false;
-        }
-
-        @Override
-        public ZuulMessage apply(ZuulMessage msg) {
-            return null;
-        }
-    }
+  }
 }

@@ -17,14 +17,10 @@ package com.netflix.zuul.origins;
 
 import com.netflix.zuul.context.SessionContext;
 
-/**
- * User: michaels@netflix.com
- * Date: 5/11/15
- * Time: 3:15 PM
- */
+/** User: michaels@netflix.com Date: 5/11/15 Time: 3:15 PM */
 public interface OriginManager<T extends Origin> {
 
-    T getOrigin(OriginName originName, String uri, SessionContext ctx);
+  T getOrigin(OriginName originName, String uri, SessionContext ctx);
 
-    T createOrigin(OriginName originName, String uri, SessionContext ctx);
+  T createOrigin(OriginName originName, String uri, SessionContext ctx);
 }

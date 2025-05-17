@@ -16,12 +16,5 @@
 
 package com.netflix.zuul.netty.connectionpool;
 
-/**
- * User: Mike Smith
- * Date: 7/13/16
- * Time: 6:02 PM
- */
-public class ZuulNettyExceptionMapper
-{
-
-}
+/** User: Mike Smith Date: 7/13/16 Time: 6:02 PM */
+public class ZuulNettyExceptionMapper {}

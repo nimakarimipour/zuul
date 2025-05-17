@@ -16,8 +16,6 @@
 
 package com.netflix.netty.common;
 
-import static io.netty.util.ResourceLeakDetector.Level.ADVANCED;
-import static io.netty.util.ResourceLeakDetector.Level.PARANOID;
 import com.netflix.zuul.message.ZuulMessage;
 import io.netty.util.ReferenceCounted;
 import io.netty.util.ResourceLeakDetector;
@@ -30,19 +28,18 @@ import io.netty.util.ResourceLeakDetector;
  */
 public class ByteBufUtil {
 
-    private static final boolean isAdvancedLeakDetection =
-            ResourceLeakDetector.getLevel().ordinal() >= ResourceLeakDetector.Level.ADVANCED.ordinal();
+  private static final boolean isAdvancedLeakDetection =
+      ResourceLeakDetector.getLevel().ordinal() >= ResourceLeakDetector.Level.ADVANCED.ordinal();
 
-    public static void touch(ReferenceCounted byteBuf, String hint, ZuulMessage msg) {
-        if (isAdvancedLeakDetection) {
-            byteBuf.touch(hint + msg);
-        }
+  public static void touch(ReferenceCounted byteBuf, String hint, ZuulMessage msg) {
+    if (isAdvancedLeakDetection) {
+      byteBuf.touch(hint + msg);
     }
+  }
 
-    public static void touch(ReferenceCounted byteBuf, String hint) {
-        if (isAdvancedLeakDetection) {
-            byteBuf.touch(hint);
-        }
+  public static void touch(ReferenceCounted byteBuf, String hint) {
+    if (isAdvancedLeakDetection) {
+      byteBuf.touch(hint);
     }
-
+  }
 }

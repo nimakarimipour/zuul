@@ -28,71 +28,61 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-/**
- * Identifies a {@link ZuulFilter}.
- */
+/** Identifies a {@link ZuulFilter}. */
 @Target({TYPE})
 @Retention(RUNTIME)
 @Documented
 public @interface Filter {
 
-    /**
-     * The order in which to run.   See {@link ZuulFilter#filterOrder()}.
-     */
-    int order();
+  /** The order in which to run. See {@link ZuulFilter#filterOrder()}. */
+  int order();
 
-    /**
-     * Indicates the type of this filter.
-     */
-    FilterType type() default FilterType.INBOUND;
+  /** Indicates the type of this filter. */
+  FilterType type() default FilterType.INBOUND;
 
-    /**
-     * Category of the filter.
-     */
-    FilterCategory category() default FilterCategory.HTTP;
+  /** Category of the filter. */
+  FilterCategory category() default FilterCategory.HTTP;
 
-    /**
-     * Indicates if this is a synchronous filter.
-     */
-    FilterSyncType sync() default FilterSyncType.SYNC;
+  /** Indicates if this is a synchronous filter. */
+  FilterSyncType sync() default FilterSyncType.SYNC;
 
-    @Target({PACKAGE})
-    @Retention(CLASS)
-    @Documented
-    @interface FilterPackageName {
-        String value();
-    }
+  @Target({PACKAGE})
+  @Retention(CLASS)
+  @Documented
+  @interface FilterPackageName {
+    String value();
+  }
 
-    /**
-     * Indicates that the annotated filter should run after another filter in the chain, if the other filter is present.
-     * In the case of inbound filters, this implies that the annotated filter should have an order greater than the
-     * filters listed.  For outbound filters, the order of this filter should be less than the ones listed.  Usage of
-     * this annotation should be used on homogeneous filter types.  Additionally, this should not be applied to endpoint
-     * filters.
-     */
-    @Target({TYPE})
-    @Retention(RUNTIME)
-    @Documented
-    @interface ApplyAfter {
-        Class<? extends ZuulFilter<?, ?>>[] value();
-    }
+  /**
+   * Indicates that the annotated filter should run after another filter in the chain, if the other
+   * filter is present. In the case of inbound filters, this implies that the annotated filter
+   * should have an order greater than the filters listed. For outbound filters, the order of this
+   * filter should be less than the ones listed. Usage of this annotation should be used on
+   * homogeneous filter types. Additionally, this should not be applied to endpoint filters.
+   */
+  @Target({TYPE})
+  @Retention(RUNTIME)
+  @Documented
+  @interface ApplyAfter {
+    Class<? extends ZuulFilter<?, ?>>[] value();
+  }
 
-    /**
-     * Indicates that the annotated filter should run before another filter in the chain, if the other filter is present.
-     * In the case of inbound filters, this implies that the annotated filter should have an order less than the
-     * filters listed.  For outbound filters, the order of this filter should be greater than the ones listed.  Usage of
-     * this annotation should be used on homogeneous filter types.  Additionally, this should not be applied to endpoint
-     * filters.
-     *
-     * <p>Prefer to use this {@link ApplyAfter} instead.  This annotation is meant in case where it may be infeasible
-     * to use {@linkplain ApplyAfter}.  (such as due to dependency cycles)
-     *
-     * @see ApplyAfter
-     */
-    @Target({TYPE})
-    @Retention(RUNTIME)
-    @Documented
-    @interface ApplyBefore {
-        Class<? extends ZuulFilter<?, ?>>[] value();
-    }
+  /**
+   * Indicates that the annotated filter should run before another filter in the chain, if the other
+   * filter is present. In the case of inbound filters, this implies that the annotated filter
+   * should have an order less than the filters listed. For outbound filters, the order of this
+   * filter should be greater than the ones listed. Usage of this annotation should be used on
+   * homogeneous filter types. Additionally, this should not be applied to endpoint filters.
+   *
+   * <p>Prefer to use this {@link ApplyAfter} instead. This annotation is meant in case where it may
+   * be infeasible to use {@linkplain ApplyAfter}. (such as due to dependency cycles)
+   *
+   * @see ApplyAfter
+   */
+  @Target({TYPE})
+  @Retention(RUNTIME)
+  @Documented
+  @interface ApplyBefore {
+    Class<? extends ZuulFilter<?, ?>>[] value();
+  }
 }

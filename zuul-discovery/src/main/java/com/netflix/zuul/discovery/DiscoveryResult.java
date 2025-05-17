@@ -126,7 +126,7 @@ public final class DiscoveryResult implements ResolverResult {
         return new SimpleMetaInfo(server.getMetaInfo());
     }
 
-    @Nullable
+    
     public String getAvailabilityZone() {
         final InstanceInfo instanceInfo = server.getInstanceInfo();
         if (instanceInfo.getDataCenterInfo() instanceof AmazonInfo) {

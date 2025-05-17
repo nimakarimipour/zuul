@@ -18,28 +18,22 @@ package com.netflix.zuul.filters;
 import com.netflix.zuul.message.ZuulMessage;
 import rx.Observable;
 
-/**
- * User: michaels@netflix.com
- * Date: 5/8/15
- * Time: 2:46 PM
- */
-public abstract class BaseSyncFilter<I extends ZuulMessage, O extends ZuulMessage> extends BaseFilter<I,O> implements SyncZuulFilter<I, O>
-{
-    /**
-     * A wrapper implementation of applyAsync() that is intended just to aggregate a non-blocking apply() method
-     * in an Observable.
-     *
-     * A subclass filter should override this method if doing any IO.
-     */
-    @Override
-    public Observable<O> applyAsync(I input)
-    {
-        return Observable.just(this.apply(input));
-    }
+/** User: michaels@netflix.com Date: 5/8/15 Time: 2:46 PM */
+public abstract class BaseSyncFilter<I extends ZuulMessage, O extends ZuulMessage>
+    extends BaseFilter<I, O> implements SyncZuulFilter<I, O> {
+  /**
+   * A wrapper implementation of applyAsync() that is intended just to aggregate a non-blocking
+   * apply() method in an Observable.
+   *
+   * <p>A subclass filter should override this method if doing any IO.
+   */
+  @Override
+  public Observable<O> applyAsync(I input) {
+    return Observable.just(this.apply(input));
+  }
 
-    @Override
-    public FilterSyncType getSyncType()
-    {
-        return FilterSyncType.SYNC;
-    }
+  @Override
+  public FilterSyncType getSyncType() {
+    return FilterSyncType.SYNC;
+  }
 }

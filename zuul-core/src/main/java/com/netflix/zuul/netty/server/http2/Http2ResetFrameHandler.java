@@ -23,24 +23,17 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.util.ReferenceCountUtil;
 
-/**
- * User: michaels@netflix.com
- * Date: 4/13/17
- * Time: 6:02 PM
- */
+/** User: michaels@netflix.com Date: 4/13/17 Time: 6:02 PM */
 @ChannelHandler.Sharable
-public class Http2ResetFrameHandler extends ChannelInboundHandlerAdapter
-{
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
-    {
-        if (msg instanceof Http2ResetFrame) {
-            // Inform zuul to cancel the request.
-            ctx.fireUserEventTriggered(new RequestCancelledEvent());
-            ReferenceCountUtil.safeRelease(msg);
-        }
-        else {
-            super.channelRead(ctx, msg);
-        }
+public class Http2ResetFrameHandler extends ChannelInboundHandlerAdapter {
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    if (msg instanceof Http2ResetFrame) {
+      // Inform zuul to cancel the request.
+      ctx.fireUserEventTriggered(new RequestCancelledEvent());
+      ReferenceCountUtil.safeRelease(msg);
+    } else {
+      super.channelRead(ctx, msg);
     }
+  }
 }

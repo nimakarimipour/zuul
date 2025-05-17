@@ -16,7 +16,6 @@
 
 package com.netflix.zuul.message.http;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,122 +27,122 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class HttpQueryParamsTest {
 
-    @Test
-    void testMultiples() {
-        HttpQueryParams qp = new HttpQueryParams();
-        qp.add("k1", "v1");
-        qp.add("k1", "v2");
-        qp.add("k2", "v3");
+  @Test
+  void testMultiples() {
+    HttpQueryParams qp = new HttpQueryParams();
+    qp.add("k1", "v1");
+    qp.add("k1", "v2");
+    qp.add("k2", "v3");
 
-        assertEquals("k1=v1&k1=v2&k2=v3", qp.toEncodedString());
-    }
+    assertEquals("k1=v1&k1=v2&k2=v3", qp.toEncodedString());
+  }
 
-    @Test
-    void testToEncodedString() {
-        HttpQueryParams qp = new HttpQueryParams();
-        qp.add("k'1", "v1&");
-        assertEquals("k%271=v1%26", qp.toEncodedString());
+  @Test
+  void testToEncodedString() {
+    HttpQueryParams qp = new HttpQueryParams();
+    qp.add("k'1", "v1&");
+    assertEquals("k%271=v1%26", qp.toEncodedString());
 
-        qp = new HttpQueryParams();
-        qp.add("k+", "\n");
-        assertEquals("k%2B=%0A", qp.toEncodedString());
-    }
+    qp = new HttpQueryParams();
+    qp.add("k+", "\n");
+    assertEquals("k%2B=%0A", qp.toEncodedString());
+  }
 
-    @Test
-    void testToString() {
-        HttpQueryParams qp = new HttpQueryParams();
-        qp.add("k'1", "v1&");
-        assertEquals("k'1=v1&", qp.toString());
+  @Test
+  void testToString() {
+    HttpQueryParams qp = new HttpQueryParams();
+    qp.add("k'1", "v1&");
+    assertEquals("k'1=v1&", qp.toString());
 
-        qp = new HttpQueryParams();
-        qp.add("k+", "\n");
-        assertEquals("k+=\n", qp.toString());
-    }
+    qp = new HttpQueryParams();
+    qp.add("k+", "\n");
+    assertEquals("k+=\n", qp.toString());
+  }
 
-    @Test
-    void testEquals() {
-        HttpQueryParams qp1 = new HttpQueryParams();
-        qp1.add("k1", "v1");
-        qp1.add("k2", "v2");
-        HttpQueryParams qp2 = new HttpQueryParams();
-        qp2.add("k1", "v1");
-        qp2.add("k2", "v2");
+  @Test
+  void testEquals() {
+    HttpQueryParams qp1 = new HttpQueryParams();
+    qp1.add("k1", "v1");
+    qp1.add("k2", "v2");
+    HttpQueryParams qp2 = new HttpQueryParams();
+    qp2.add("k1", "v1");
+    qp2.add("k2", "v2");
 
-        assertEquals(qp1, qp2);
-    }
+    assertEquals(qp1, qp2);
+  }
 
-    @Test
-    void parseKeysWithoutValues() {
-        HttpQueryParams expected = new HttpQueryParams();
-        expected.add("k1", "");
-        expected.add("k2", "v2");
-        expected.add("k3", "");
+  @Test
+  void parseKeysWithoutValues() {
+    HttpQueryParams expected = new HttpQueryParams();
+    expected.add("k1", "");
+    expected.add("k2", "v2");
+    expected.add("k3", "");
 
-        HttpQueryParams actual = HttpQueryParams.parse("k1=&k2=v2&k3=");
+    HttpQueryParams actual = HttpQueryParams.parse("k1=&k2=v2&k3=");
 
-        assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
-        assertEquals("k1=&k2=v2&k3=", actual.toEncodedString());
-    }
+    assertEquals("k1=&k2=v2&k3=", actual.toEncodedString());
+  }
 
-    @Test
-    void parseKeyWithoutValueEquals() {
-        HttpQueryParams expected = new HttpQueryParams();
-        expected.add("k1", "");
+  @Test
+  void parseKeyWithoutValueEquals() {
+    HttpQueryParams expected = new HttpQueryParams();
+    expected.add("k1", "");
 
-        HttpQueryParams actual = HttpQueryParams.parse("k1=");
+    HttpQueryParams actual = HttpQueryParams.parse("k1=");
 
-        assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
-        assertEquals("k1=", actual.toEncodedString());
-    }
+    assertEquals("k1=", actual.toEncodedString());
+  }
 
-    @Test
-    void parseKeyWithoutValue() {
-        HttpQueryParams expected = new HttpQueryParams();
-        expected.add("k1", "");
+  @Test
+  void parseKeyWithoutValue() {
+    HttpQueryParams expected = new HttpQueryParams();
+    expected.add("k1", "");
 
-        HttpQueryParams actual = HttpQueryParams.parse("k1");
+    HttpQueryParams actual = HttpQueryParams.parse("k1");
 
-        assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
-        assertEquals("k1", actual.toEncodedString());
-    }
+    assertEquals("k1", actual.toEncodedString());
+  }
 
-    @Test
-    void parseKeyWithoutValueShort() {
-        HttpQueryParams expected = new HttpQueryParams();
-        expected.add("=", "");
+  @Test
+  void parseKeyWithoutValueShort() {
+    HttpQueryParams expected = new HttpQueryParams();
+    expected.add("=", "");
 
-        HttpQueryParams actual = HttpQueryParams.parse("=");
+    HttpQueryParams actual = HttpQueryParams.parse("=");
 
-        assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
-        assertEquals("%3D", actual.toEncodedString());
-    }
+    assertEquals("%3D", actual.toEncodedString());
+  }
 
-    @Test
-    void parseKeysWithoutValuesMixedTrailers() {
-        HttpQueryParams expected = new HttpQueryParams();
-        expected.add("k1", "");
-        expected.add("k2", "v2");
-        expected.add("k3", "");
-        expected.add("k4", "v4");
+  @Test
+  void parseKeysWithoutValuesMixedTrailers() {
+    HttpQueryParams expected = new HttpQueryParams();
+    expected.add("k1", "");
+    expected.add("k2", "v2");
+    expected.add("k3", "");
+    expected.add("k4", "v4");
 
-        HttpQueryParams actual = HttpQueryParams.parse("k1=&k2=v2&k3&k4=v4");
+    HttpQueryParams actual = HttpQueryParams.parse("k1=&k2=v2&k3&k4=v4");
 
-        assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
-        assertEquals("k1=&k2=v2&k3&k4=v4", actual.toEncodedString());
-    }
+    assertEquals("k1=&k2=v2&k3&k4=v4", actual.toEncodedString());
+  }
 
-    @Test
-    void parseKeysIgnoreCase() {
-        String camelCaseKey = "keyName";
-        HttpQueryParams queryParams = new HttpQueryParams();
-        queryParams.add("foo", "bar");
-        queryParams.add(camelCaseKey.toLowerCase(Locale.ROOT), "value");
+  @Test
+  void parseKeysIgnoreCase() {
+    String camelCaseKey = "keyName";
+    HttpQueryParams queryParams = new HttpQueryParams();
+    queryParams.add("foo", "bar");
+    queryParams.add(camelCaseKey.toLowerCase(Locale.ROOT), "value");
 
-        assertTrue(queryParams.containsIgnoreCase(camelCaseKey));
-    }
+    assertTrue(queryParams.containsIgnoreCase(camelCaseKey));
+  }
 }

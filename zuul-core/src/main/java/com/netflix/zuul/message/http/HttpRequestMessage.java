@@ -18,28 +18,23 @@ package com.netflix.zuul.message.http;
 
 import com.netflix.zuul.message.ZuulMessage;
 
-/**
- * User: Mike Smith
- * Date: 7/15/15
- * Time: 5:36 PM
- */
-public interface HttpRequestMessage extends HttpRequestInfo
-{
-    void setProtocol(String protocol);
+/** User: Mike Smith Date: 7/15/15 Time: 5:36 PM */
+public interface HttpRequestMessage extends HttpRequestInfo {
+  void setProtocol(String protocol);
 
-    void setMethod(String method);
+  void setMethod(String method);
 
-    void setPath(String path);
+  void setPath(String path);
 
-    void setScheme(String scheme);
+  void setScheme(String scheme);
 
-    void setServerName(String serverName);
+  void setServerName(String serverName);
 
-    ZuulMessage clone();
+  ZuulMessage clone();
 
-    void storeInboundRequest();
+  void storeInboundRequest();
 
-    HttpRequestInfo getInboundRequest();
+  HttpRequestInfo getInboundRequest();
 
-    void setQueryParams(HttpQueryParams queryParams);
+  void setQueryParams(HttpQueryParams queryParams);
 }

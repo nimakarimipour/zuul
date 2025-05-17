@@ -29,78 +29,79 @@ import io.netty.handler.codec.http2.Http2Error;
 import io.netty.util.ReferenceCountUtil;
 import java.util.List;
 
-/**
- * This class is only suitable for use on HTTP/2 child channels.
- */
+/** This class is only suitable for use on HTTP/2 child channels. */
 public final class Http2ContentLengthEnforcingHandler extends ChannelInboundHandlerAdapter {
-    private static final long UNSET_CONTENT_LENGTH = -1;
+  private static final long UNSET_CONTENT_LENGTH = -1;
 
-    private long expectedContentLength = UNSET_CONTENT_LENGTH;
+  private long expectedContentLength = UNSET_CONTENT_LENGTH;
 
-    private long seenContentLength;
+  private long seenContentLength;
 
-    /**
-     * This checks that the content length does what it says, preventing a client from causing Zuul to misinterpret the
-     * request.  Because this class is meant to work in an HTTP/2 setting, the content length and transfer encoding
-     * checks are more semantics.  In particular, this checks:
-     * <ul>
-     *     <li>No duplicate Content length</li>
-     *     <li>Content Length (if present) must always be greater than or equal to how much content has been seen</li>
-     *     <li>Content Length (if present) must always be equal to how much content has been seen by the end</li>
-     *     <li>Content Length cannot be present along with chunked transfer encoding.</li>
-     * </ul>
-     */
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof HttpRequest) {
-            HttpRequest req = (HttpRequest) msg;
-            List<String> lengthHeaders = req.headers().getAll(HttpHeaderNames.CONTENT_LENGTH);
-            if (lengthHeaders.size() > 1) {
-                ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
-                ReferenceCountUtil.safeRelease(msg);
-                return;
-            } else if (lengthHeaders.size() == 1) {
-                expectedContentLength = Long.parseLong(lengthHeaders.get(0));
-                if (expectedContentLength < 0) {
-                    // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
-                    ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
-                    ReferenceCountUtil.safeRelease(msg);
-                    return;
-                }
-            }
-            if (hasContentLength() && HttpUtil.isTransferEncodingChunked(req)) {
-                // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
-                ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
-                ReferenceCountUtil.safeRelease(msg);
-                return;
-            }
+  /**
+   * This checks that the content length does what it says, preventing a client from causing Zuul to
+   * misinterpret the request. Because this class is meant to work in an HTTP/2 setting, the content
+   * length and transfer encoding checks are more semantics. In particular, this checks:
+   *
+   * <ul>
+   *   <li>No duplicate Content length
+   *   <li>Content Length (if present) must always be greater than or equal to how much content has
+   *       been seen
+   *   <li>Content Length (if present) must always be equal to how much content has been seen by the
+   *       end
+   *   <li>Content Length cannot be present along with chunked transfer encoding.
+   * </ul>
+   */
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    if (msg instanceof HttpRequest) {
+      HttpRequest req = (HttpRequest) msg;
+      List<String> lengthHeaders = req.headers().getAll(HttpHeaderNames.CONTENT_LENGTH);
+      if (lengthHeaders.size() > 1) {
+        ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
+        ReferenceCountUtil.safeRelease(msg);
+        return;
+      } else if (lengthHeaders.size() == 1) {
+        expectedContentLength = Long.parseLong(lengthHeaders.get(0));
+        if (expectedContentLength < 0) {
+          // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
+          ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
+          ReferenceCountUtil.safeRelease(msg);
+          return;
         }
-        if (msg instanceof HttpContent) {
-            ByteBuf content = ((HttpContent) msg).content();
-            incrementSeenContent(content.readableBytes());
-            if (hasContentLength() && seenContentLength > expectedContentLength) {
-                // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
-                ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
-                ReferenceCountUtil.safeRelease(msg);
-                return;
-            }
-        }
-        if (msg instanceof LastHttpContent) {
-            if (hasContentLength() && seenContentLength != expectedContentLength) {
-                // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
-                ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
-                ReferenceCountUtil.safeRelease(msg);
-                return;
-            }
-        }
-        super.channelRead(ctx, msg);
+      }
+      if (hasContentLength() && HttpUtil.isTransferEncodingChunked(req)) {
+        // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
+        ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
+        ReferenceCountUtil.safeRelease(msg);
+        return;
+      }
     }
+    if (msg instanceof HttpContent) {
+      ByteBuf content = ((HttpContent) msg).content();
+      incrementSeenContent(content.readableBytes());
+      if (hasContentLength() && seenContentLength > expectedContentLength) {
+        // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
+        ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
+        ReferenceCountUtil.safeRelease(msg);
+        return;
+      }
+    }
+    if (msg instanceof LastHttpContent) {
+      if (hasContentLength() && seenContentLength != expectedContentLength) {
+        // TODO(carl-mastrangelo): this is not right, but meh.  Fix this to return a proper 400.
+        ctx.writeAndFlush(new DefaultHttp2ResetFrame(Http2Error.PROTOCOL_ERROR));
+        ReferenceCountUtil.safeRelease(msg);
+        return;
+      }
+    }
+    super.channelRead(ctx, msg);
+  }
 
-    private boolean hasContentLength() {
-        return expectedContentLength != UNSET_CONTENT_LENGTH;
-    }
+  private boolean hasContentLength() {
+    return expectedContentLength != UNSET_CONTENT_LENGTH;
+  }
 
-    private void incrementSeenContent(int length) {
-        seenContentLength = Math.addExact(seenContentLength, length);
-    }
+  private void incrementSeenContent(int length) {
+    seenContentLength = Math.addExact(seenContentLength, length);
+  }
 }

@@ -40,135 +40,136 @@ import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpRequestMessageImpl;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.message.http.HttpResponseMessageImpl;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import rx.Observable;
 
-
 class ZuulFilterChainRunnerTest {
-    private HttpRequestMessage request;
-    private HttpResponseMessage response;
+  private HttpRequestMessage request;
+  private HttpResponseMessage response;
 
-    @BeforeEach
-    void before() {
-        SessionContext context = new SessionContext();
-        Headers headers = new Headers();
-        ChannelHandlerContext chc = mock(ChannelHandlerContext.class);
-        when(chc.executor()).thenReturn(ImmediateEventExecutor.INSTANCE);
-        context.put(NETTY_SERVER_CHANNEL_HANDLER_CONTEXT, chc);
-        request = new HttpRequestMessageImpl(context, "http", "GET", "/foo/bar", new HttpQueryParams(), headers, "127.0.0.1", "http", 8080, "server123");
-        request.storeInboundRequest();
-        response = new HttpResponseMessageImpl(context, request, 200);
+  @BeforeEach
+  void before() {
+    SessionContext context = new SessionContext();
+    Headers headers = new Headers();
+    ChannelHandlerContext chc = mock(ChannelHandlerContext.class);
+    when(chc.executor()).thenReturn(ImmediateEventExecutor.INSTANCE);
+    context.put(NETTY_SERVER_CHANNEL_HANDLER_CONTEXT, chc);
+    request =
+        new HttpRequestMessageImpl(
+            context,
+            "http",
+            "GET",
+            "/foo/bar",
+            new HttpQueryParams(),
+            headers,
+            "127.0.0.1",
+            "http",
+            8080,
+            "server123");
+    request.storeInboundRequest();
+    response = new HttpResponseMessageImpl(context, request, 200);
+  }
+
+  @Test
+  void testInboundFilterChain() {
+    final SimpleInboundFilter inbound1 = spy(new SimpleInboundFilter(true));
+    final SimpleInboundFilter inbound2 = spy(new SimpleInboundFilter(false));
+
+    final ZuulFilter[] filters = new ZuulFilter[] {inbound1, inbound2};
+
+    final FilterUsageNotifier notifier = mock(FilterUsageNotifier.class);
+    final Registry registry = mock(Registry.class);
+
+    final ZuulFilterChainRunner runner = new ZuulFilterChainRunner(filters, notifier, registry);
+
+    runner.filter(request);
+
+    verify(inbound1, times(1)).applyAsync(eq(request));
+    verify(inbound2, never()).applyAsync(eq(request));
+
+    verify(notifier).notify(eq(inbound1), eq(ExecutionStatus.SUCCESS));
+    verify(notifier).notify(eq(inbound2), eq(ExecutionStatus.SKIPPED));
+    verifyNoMoreInteractions(notifier);
+  }
+
+  @Test
+  void testOutboundFilterChain() {
+    final SimpleOutboundFilter outbound1 = spy(new SimpleOutboundFilter(true));
+    final SimpleOutboundFilter outbound2 = spy(new SimpleOutboundFilter(false));
+
+    final ZuulFilter[] filters = new ZuulFilter[] {outbound1, outbound2};
+
+    final FilterUsageNotifier notifier = mock(FilterUsageNotifier.class);
+    final Registry registry = mock(Registry.class);
+
+    final ZuulFilterChainRunner runner = new ZuulFilterChainRunner(filters, notifier, registry);
+
+    runner.filter(response);
+
+    verify(outbound1, times(1)).applyAsync(any());
+    verify(outbound2, never()).applyAsync(any());
+
+    verify(notifier).notify(eq(outbound1), eq(ExecutionStatus.SUCCESS));
+    verify(notifier).notify(eq(outbound2), eq(ExecutionStatus.SKIPPED));
+    verifyNoMoreInteractions(notifier);
+  }
+
+  class SimpleInboundFilter extends HttpInboundFilter {
+    private final boolean shouldFilter;
+
+    public SimpleInboundFilter(final boolean shouldFilter) {
+      this.shouldFilter = shouldFilter;
     }
 
-    @Test
-    void testInboundFilterChain() {
-        final SimpleInboundFilter inbound1 = spy(new SimpleInboundFilter(true));
-        final SimpleInboundFilter inbound2 = spy(new SimpleInboundFilter(false));
-
-        final ZuulFilter[] filters = new ZuulFilter[]{inbound1, inbound2};
-
-        final FilterUsageNotifier notifier = mock(FilterUsageNotifier.class);
-        final Registry registry = mock(Registry.class);
-
-        final ZuulFilterChainRunner runner = new ZuulFilterChainRunner(
-                filters,
-                notifier,
-                registry);
-
-        runner.filter(request);
-
-        verify(inbound1, times(1)).applyAsync(eq(request));
-        verify(inbound2, never()).applyAsync(eq(request));
-
-        verify(notifier).notify(eq(inbound1), eq(ExecutionStatus.SUCCESS));
-        verify(notifier).notify(eq(inbound2), eq(ExecutionStatus.SKIPPED));
-        verifyNoMoreInteractions(notifier);
+    @Override
+    public int filterOrder() {
+      return 0;
     }
 
-    @Test
-    void testOutboundFilterChain() {
-        final SimpleOutboundFilter outbound1 = spy(new SimpleOutboundFilter(true));
-        final SimpleOutboundFilter outbound2 = spy(new SimpleOutboundFilter(false));
-
-        final ZuulFilter[] filters = new ZuulFilter[]{outbound1, outbound2};
-
-        final FilterUsageNotifier notifier = mock(FilterUsageNotifier.class);
-        final Registry registry = mock(Registry.class);
-
-        final ZuulFilterChainRunner runner = new ZuulFilterChainRunner(
-                filters,
-                notifier,
-                registry);
-
-        runner.filter(response);
-
-        verify(outbound1, times(1)).applyAsync(any());
-        verify(outbound2, never()).applyAsync(any());
-
-        verify(notifier).notify(eq(outbound1), eq(ExecutionStatus.SUCCESS));
-        verify(notifier).notify(eq(outbound2), eq(ExecutionStatus.SKIPPED));
-        verifyNoMoreInteractions(notifier);
+    @Override
+    public FilterType filterType() {
+      return FilterType.INBOUND;
     }
 
-    class SimpleInboundFilter extends HttpInboundFilter {
-        private final boolean shouldFilter;
-
-        public SimpleInboundFilter(final boolean shouldFilter) {
-            this.shouldFilter = shouldFilter;
-        }
-
-        @Override
-        public int filterOrder() {
-            return 0;
-        }
-
-        @Override
-        public FilterType filterType() {
-            return FilterType.INBOUND;
-        }
-
-        @Override
-        public Observable<HttpRequestMessage> applyAsync(HttpRequestMessage input) {
-            return Observable.just(input);
-        }
-
-        @Override
-        public boolean shouldFilter(HttpRequestMessage msg) {
-            return this.shouldFilter;
-        }
+    @Override
+    public Observable<HttpRequestMessage> applyAsync(HttpRequestMessage input) {
+      return Observable.just(input);
     }
 
-    class SimpleOutboundFilter extends HttpOutboundFilter {
-        private final boolean shouldFilter;
+    @Override
+    public boolean shouldFilter(HttpRequestMessage msg) {
+      return this.shouldFilter;
+    }
+  }
 
-        public SimpleOutboundFilter(final boolean shouldFilter) {
-            this.shouldFilter = shouldFilter;
-        }
+  class SimpleOutboundFilter extends HttpOutboundFilter {
+    private final boolean shouldFilter;
 
-        @Override
-        public int filterOrder() {
-            return 0;
-        }
-
-        @Override
-        public FilterType filterType() {
-            return FilterType.OUTBOUND;
-        }
-
-        @Override
-        public Observable<HttpResponseMessage> applyAsync(HttpResponseMessage input) {
-            return Observable.just(input);
-        }
-
-        @Override
-        public boolean shouldFilter(HttpResponseMessage msg) {
-            return this.shouldFilter;
-        }
+    public SimpleOutboundFilter(final boolean shouldFilter) {
+      this.shouldFilter = shouldFilter;
     }
 
+    @Override
+    public int filterOrder() {
+      return 0;
+    }
+
+    @Override
+    public FilterType filterType() {
+      return FilterType.OUTBOUND;
+    }
+
+    @Override
+    public Observable<HttpResponseMessage> applyAsync(HttpResponseMessage input) {
+      return Observable.just(input);
+    }
+
+    @Override
+    public boolean shouldFilter(HttpResponseMessage msg) {
+      return this.shouldFilter;
+    }
+  }
 }
-
