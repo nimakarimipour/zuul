@@ -20,6 +20,7 @@ import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.message.ZuulMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +32,7 @@ public class StatusCategoryUtils {
     return getStatusCategory(msg.getContext());
   }
 
-  public static StatusCategory getStatusCategory(SessionContext ctx) {
-    if (ctx == null) {
-      return null; // Or handle this situation accordingly
-    }
+  public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
     return ctx.get(CommonContextKeys.STATUS_CATGEORY);
   }
 
