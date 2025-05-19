@@ -477,11 +477,7 @@ class CountingCurrentPassport extends CurrentPassport {
     incrementStateCounter(state);
   }
 
-  private void incrementStateCounter(PassportState state) {
-    if (state == null) {
-      return;
-    }
-
+  private void incrementStateCounter(@Nullable PassportState state) {
     switch (state) {
       case IN_REQ_HEADERS_RECEIVED:
         IN_REQ_HEADERS_RECEIVED_CNT.increment();
