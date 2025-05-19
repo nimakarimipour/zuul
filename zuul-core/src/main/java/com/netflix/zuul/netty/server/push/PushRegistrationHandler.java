@@ -66,6 +66,10 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     this.pushProtocol = pushProtocol;
     this.destroyed = new AtomicBoolean();
     this.scheduledFutures = Collections.synchronizedList(new ArrayList<>());
+    this.ctx =
+        new DefaultChannelHandlerContext(); // Assuming DefaultChannelHandlerContext is a valid
+    // substitute. Please replace with actual instance as
+    // needed.
   }
 
   protected final boolean isAuthenticated() {
