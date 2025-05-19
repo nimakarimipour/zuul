@@ -45,31 +45,43 @@ public class ZuulSessionContextDecorator implements SessionContextDecorator {
     this.originManager = originManager;
   }
 
+  @Nullable
   @Override
-    public SessionContext decorate(SessionContext ctx) {
-      ChannelHandlerContext nettyCtx =
-          (ChannelHandlerContext) ctx.get(CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT);
-      if (nettyCtx == null) {
-        return ctx; // Return the original ctx to ensure @NonNull contract
-      }
-  
-      Channel channel = nettyCtx.channel();
-  
-      ctx.put(CommonContextKeys.ORIGIN_MANAGER, originManager);
-  
-      ctx.put(CommonContextKeys.REQUEST_ATTEMPTS, new RequestAttempts());
-  
-      ctx.put(
-          CommonContextKeys.REQ_BODY_SIZE_PROVIDER,
-          HttpBodySizeRecordingChannelHandler.getCurrentInboundBodySize(channel));
-      ctx.put(
-          CommonContextKeys.RESP_BODY_SIZE_PROVIDER,
-          HttpBodySizeRecordingChannelHandler.getCurrentOutboundBodySize(channel));
-  
-      CurrentPassport passport = CurrentPassport.fromChannel(channel);
-      ctx.put(CommonContextKeys.PASSPORT, passport);
-  
-      ctx.setUUID(UUID_FACTORY.generateRandomUuid().toString());
-  
-      return ctx;
+  public SessionContext decorate(SessionContext ctx) {
+    // TODO split out commons parts from BaseSessionContextDecorator
+
+    ChannelHandlerContext nettyCtx =
+        (ChannelHandlerContext) ctx.get(CommonContextKeys.NETTY_SERVER_CHANNEL_HANDLER_CONTEXT);
+    if (nettyCtx == null) {
+      return null;
+    }
+
+    Channel channel = nettyCtx.channel();
+
+    // set injected origin manager
+    ctx.put(CommonContextKeys.ORIGIN_MANAGER, originManager);
+
+    // TODO
+    /*        // The throttle result info.
+    ThrottleResult throttleResult = channel.attr(HttpRequestThrottleChannelHandler.ATTR_THROTTLE_RESULT).get();
+    ctx.set(CommonContextKeys.THROTTLE_RESULT, throttleResult);*/
+
+    // Add a container for request attempts info.
+    ctx.put(CommonContextKeys.REQUEST_ATTEMPTS, new RequestAttempts());
+
+    // Providers for getting the size of read/written request and response body sizes from channel.
+    ctx.put(
+        CommonContextKeys.REQ_BODY_SIZE_PROVIDER,
+        HttpBodySizeRecordingChannelHandler.getCurrentInboundBodySize(channel));
+    ctx.put(
+        CommonContextKeys.RESP_BODY_SIZE_PROVIDER,
+        HttpBodySizeRecordingChannelHandler.getCurrentOutboundBodySize(channel));
+
+    CurrentPassport passport = CurrentPassport.fromChannel(channel);
+    ctx.put(CommonContextKeys.PASSPORT, passport);
+
+    ctx.setUUID(UUID_FACTORY.generateRandomUuid().toString());
+
+    return ctx;
+  }
 }
