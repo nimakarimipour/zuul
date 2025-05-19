@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -366,7 +367,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
   @Override
   public Promise<PooledConnection> acquire(
       EventLoop eventLoop,
-      Object key,
+      @Nullable Object key,
       CurrentPassport passport,
       AtomicReference<DiscoveryResult> selectedServer,
       AtomicReference<? super InetAddress> selectedHostAddr) {
@@ -377,14 +378,11 @@ public class DefaultClientChannelManager implements ClientChannelManager {
       return promise;
     }
 
-    if (key == null) {
-      Promise<PooledConnection> promise = eventLoop.newPromise();
-      promise.setFailure(new IllegalArgumentException("Key cannot be null"));
-      return promise;
-    }
-
+    // Choose the next load-balanced server.
     final DiscoveryResult chosenServer = dynamicServerResolver.resolve(key);
 
+    // (argha-c): Always ensure the selected server is updated, since the call chain relies on this
+    // mutation.
     selectedServer.set(chosenServer);
     if (chosenServer == DiscoveryResult.EMPTY) {
       Promise<PooledConnection> promise = eventLoop.newPromise();
@@ -394,6 +392,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
       return promise;
     }
 
+    // Now get the connection-pool for this server.
     IConnectionPool pool =
         perServerPools.computeIfAbsent(
             chosenServer,
@@ -404,6 +403,7 @@ public class DefaultClientChannelManager implements ClientChannelManager {
                   createPooledConnectionFactory(
                       chosenServer, clientChannelMgr, closeConnCounter, closeWrtBusyConnCounter);
 
+              // Create a new pool for this server.
               return createConnectionPool(
                   chosenServer,
                   finalServerAddr,
