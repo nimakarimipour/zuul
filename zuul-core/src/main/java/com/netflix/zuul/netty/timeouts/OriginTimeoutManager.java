@@ -67,15 +67,14 @@ public class OriginTimeoutManager {
     long computedTimeout;
     if (originTimeout == null && requestTimeout == null) {
       computedTimeout = MAX_OUTBOUND_READ_TIMEOUT_MS.get();
-    } else if (originTimeout == null) {
-      computedTimeout =
-          requestTimeout != null ? requestTimeout : MAX_OUTBOUND_READ_TIMEOUT_MS.get();
-    } else if (requestTimeout == null) {
-      computedTimeout = originTimeout;
+    } else if (originTimeout == null || requestTimeout == null) {
+      computedTimeout = originTimeout == null ? requestTimeout : originTimeout;
     } else {
+      // return the stricter (i.e. lower) of the two timeouts
       computedTimeout = Math.min(originTimeout, requestTimeout);
     }
 
+    // enforce max timeout upperbound
     return Duration.ofMillis(Math.min(computedTimeout, MAX_OUTBOUND_READ_TIMEOUT_MS.get()));
   }
 
