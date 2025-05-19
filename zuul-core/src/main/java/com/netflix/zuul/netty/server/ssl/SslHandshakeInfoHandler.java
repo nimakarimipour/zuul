@@ -63,9 +63,9 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
   }
 
   @VisibleForTesting
-  SslHandshakeInfoHandler(Registry testRegistry) {
-    this.spectatorRegistry = checkNotNull(testRegistry);
-    this.isSSlFromIntermediary = false;
+  SslHandshakeInfoHandler() {
+    spectatorRegistry = null;
+    isSSlFromIntermediary = false;
   }
 
   @Override
