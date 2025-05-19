@@ -16,8 +16,6 @@
 
 package com.netflix.zuul.netty.server;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.config.DynamicBooleanProperty;
@@ -191,11 +189,18 @@ public class Server {
     this.registry = Objects.requireNonNull(registry);
     this.addressesToInitializers =
         Collections.unmodifiableMap(new LinkedHashMap<>(addressesToInitializers));
-    this.serverStatusManager = checkNotNull(serverStatusManager, "serverStatusManager");
+    this.serverStatusManager = Objects.requireNonNull(serverStatusManager, "serverStatusManager");
     this.clientConnectionsShutdown =
-        checkNotNull(clientConnectionsShutdown, "clientConnectionsShutdown");
-    this.eventLoopConfig = checkNotNull(eventLoopConfig, "eventLoopConfig");
-    this.eventLoopGroupMetrics = checkNotNull(eventLoopGroupMetrics, "eventLoopGroupMetrics");
+        Objects.requireNonNull(clientConnectionsShutdown, "clientConnectionsShutdown");
+    this.eventLoopConfig = Objects.requireNonNull(eventLoopConfig, "eventLoopConfig");
+    this.eventLoopGroupMetrics =
+        Objects.requireNonNull(eventLoopGroupMetrics, "eventLoopGroupMetrics");
+    this.serverGroup = Objects.requireNonNull(initializeServerGroup(), "serverGroup");
+  }
+
+  private ServerGroup initializeServerGroup() {
+    // Initialize your serverGroup here
+    return new ServerGroup(); // Replace with actual initialization logic
   }
 
   public void stop() {
