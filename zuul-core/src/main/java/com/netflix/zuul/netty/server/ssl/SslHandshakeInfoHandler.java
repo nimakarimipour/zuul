@@ -36,6 +36,7 @@ import io.netty.util.AttributeKey;
 import java.nio.channels.ClosedChannelException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import org.slf4j.Logger;
@@ -198,27 +199,19 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
   }
 
   private void incrementCounters(
-      SslHandshakeCompletionEvent sslHandshakeCompletionEvent, SslHandshakeInfo handshakeInfo) {
+      SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
+      @Nullable SslHandshakeInfo handshakeInfo) {
     if (spectatorRegistry == null) {
+      // May be null for testing.
       return;
     }
     try {
       if (sslHandshakeCompletionEvent.isSuccess()) {
         String proto =
-            (handshakeInfo != null
-                    && handshakeInfo.getProtocol() != null
-                    && handshakeInfo.getProtocol().length() > 0)
-                ? handshakeInfo.getProtocol()
-                : "unknown";
+            handshakeInfo.getProtocol().length() > 0 ? handshakeInfo.getProtocol() : "unknown";
         String ciphsuite =
-            (handshakeInfo != null
-                    && handshakeInfo.getCipherSuite() != null
-                    && handshakeInfo.getCipherSuite().length() > 0)
+            handshakeInfo.getCipherSuite().length() > 0
                 ? handshakeInfo.getCipherSuite()
-                : "unknown";
-        String clientAuthRequirement =
-            (handshakeInfo != null && handshakeInfo.getClientAuthRequirement() != null)
-                ? String.valueOf(handshakeInfo.getClientAuthRequirement())
                 : "unknown";
         spectatorRegistry
             .counter(
@@ -226,11 +219,11 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                 "success",
                 String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
                 "protocol",
-                proto,
+                String.valueOf(proto),
                 "ciphersuite",
-                ciphsuite,
+                String.valueOf(ciphsuite),
                 "clientauth",
-                clientAuthRequirement)
+                String.valueOf(handshakeInfo.getClientAuthRequirement()))
             .increment();
       } else {
         spectatorRegistry
@@ -243,7 +236,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
             .increment();
       }
     } catch (Exception e) {
-      logger.error("Error increasing counters for SSL handshake!", e);
+      logger.error("Error incrememting counters for SSL handshake!", e);
     }
   }
 }
