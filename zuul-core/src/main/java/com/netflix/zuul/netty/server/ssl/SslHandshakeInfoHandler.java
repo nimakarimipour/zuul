@@ -74,6 +74,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       try {
         SslHandshakeCompletionEvent sslEvent = (SslHandshakeCompletionEvent) evt;
         if (sslEvent.isSuccess()) {
+
           CurrentPassport.fromChannel(ctx.channel())
               .add(PassportState.SERVER_CH_SSL_HANDSHAKE_COMPLETE);
 
@@ -104,6 +105,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                   peerCert);
           ctx.channel().attr(ATTR_SSL_INFO).set(info);
 
+          // Metrics.
           incrementCounters(sslEvent, info);
 
           logger.debug("Successful SSL Handshake: {}", info);
@@ -116,33 +118,53 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
           if (cause instanceof ClosedChannelException
               && (PassportState.SERVER_CH_INACTIVE.equals(passportState)
                   || PassportState.SERVER_CH_IDLE_TIMEOUT.equals(passportState))) {
+            // Either client closed the connection without/before having completed a handshake, or
+            // the connection idle timed-out before handshake.
+            // NOTE: we were seeing a lot of these in prod and can repro by just telnetting to port
+            // and then closing terminal
+            // without sending anything.
+            // So don't treat these as SSL handshake failures.
             logger.debug(
                 "Client closed connection or it idle timed-out without doing an ssl handshake. , client_ip = {}, channel_info = {}",
                 clientIP,
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
-          } else if (cause instanceof SSLException) {
-            String message = cause.getMessage();
-            if (message != null && message.contains("handshake timed out")) {
-              logger.debug(
-                  "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
-                  clientIP,
-                  ChannelUtils.channelInfoForLogging(ctx.channel()));
-            } else if (message != null
-                && message.contains("failure when writing TLS control frames")) {
-              logger.debug(
-                  "Client terminated handshake early., client_ip = {}, channel_info = {}",
-                  clientIP,
-                  ChannelUtils.channelInfoForLogging(ctx.channel()));
-            } else {
-              logUnsuccessfulHandshake(clientIP, sslEvent, ctx, cause);
-            }
+          } else if (cause instanceof SSLException
+              && cause.getMessage().contains("handshake timed out")) {
+            logger.debug(
+                "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
+                clientIP,
+                ChannelUtils.channelInfoForLogging(ctx.channel()));
+          } else if (cause instanceof SSLException
+              && cause.getMessage().contains("failure when writing TLS control frames")) {
+            // This can happen if the ClientHello is sent followed  by a RST packet, before we can
+            // respond.
+            logger.debug(
+                "Client terminated handshake early., client_ip = {}, channel_info = {}",
+                clientIP,
+                ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else {
-            logUnsuccessfulHandshake(clientIP, sslEvent, ctx, cause);
+            String msg =
+                "Unsuccessful SSL Handshake: "
+                    + sslEvent
+                    + ", client_ip = "
+                    + clientIP
+                    + ", channel_info = "
+                    + ChannelUtils.channelInfoForLogging(ctx.channel())
+                    + ", error = "
+                    + cause;
+            if (cause instanceof ClosedChannelException) {
+              logger.debug(msg);
+            } else {
+              logger.debug(msg, cause);
+            }
+            incrementCounters(sslEvent, null);
           }
         }
       } catch (Throwable e) {
         logger.warn("Error getting the SSL handshake info.", e);
       } finally {
+        // Now remove this handler from the pipeline as no longer needed once the ssl handshake has
+        // completed.
         ctx.pipeline().remove(this);
       }
     } else if (evt instanceof SslCloseCompletionEvent) {
@@ -162,28 +184,6 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       }
     }
     super.userEventTriggered(ctx, evt);
-  }
-
-  private void logUnsuccessfulHandshake(
-      String clientIP,
-      SslHandshakeCompletionEvent sslEvent,
-      ChannelHandlerContext ctx,
-      Throwable cause) {
-    String msg =
-        "Unsuccessful SSL Handshake: "
-            + sslEvent
-            + ", client_ip = "
-            + clientIP
-            + ", channel_info = "
-            + ChannelUtils.channelInfoForLogging(ctx.channel())
-            + ", error = "
-            + cause;
-    if (cause instanceof ClosedChannelException) {
-      logger.debug(msg);
-    } else {
-      logger.debug(msg, cause);
-    }
-    incrementCounters(sslEvent, null);
   }
 
   private ClientAuth whichClientAuthEnum(SslHandler sslhandler) {
