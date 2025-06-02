@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents the context between client and origin server for the duration of the dedicated
@@ -121,7 +120,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
    *
    * <p>This method exists for static analysis.
    */
-  @Nullable
   @Override
   public Object get(Object key) {
     return super.get(key);
@@ -216,7 +214,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     return (SessionContext) super.clone();
   }
 
-  @Nullable
   public String getString(String key) {
     return (String) get(key);
   }
@@ -266,13 +263,11 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     set(KEY_STATIC_RESPONSE, response);
   }
 
-  @Nullable
   public HttpResponseMessage getStaticResponse() {
     return (HttpResponseMessage) get(KEY_STATIC_RESPONSE);
   }
 
   /** Gets the throwable that will be use in the Error endpoint. */
-  @Nullable
   public Throwable getError() {
     return (Throwable) get("_error");
   }
@@ -282,7 +277,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     put("_error", th);
   }
 
-  @Nullable
   public String getErrorEndpoint() {
     return (String) get("_error-endpoint");
   }
@@ -346,7 +340,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   /**
    * @return "routeHost" URL
    */
-  @Nullable
   public URL getRouteHost() {
     return (URL) get("routeHost");
   }
@@ -361,7 +354,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   /**
    * @return String that represents the filter execution history for the current request
    */
-  @Nullable
   public StringBuilder getFilterExecutionSummary() {
     return (StringBuilder) get(KEY_FILTER_EXECS);
   }
@@ -411,7 +403,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   }
 
   /** returns the routeVIP; that is the Eureka "vip" of registered instances */
-  @Nullable
   public String getRouteVIP() {
     return (String) get(KEY_VIP);
   }
@@ -425,7 +416,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     put(KEY_ENDPOINT, endpoint);
   }
 
-  @Nullable
   public String getEndpoint() {
     return (String) get(KEY_ENDPOINT);
   }
@@ -434,12 +424,10 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     getEventProperties().put(key, value);
   }
 
-  @Nullable
   public Map<String, Object> getEventProperties() {
     return (Map<String, Object>) this.get(KEY_EVENT_PROPS);
   }
 
-  @Nullable
   public List<FilterError> getFilterErrors() {
     return (List<FilterError>) get(KEY_FILTER_ERRORS);
   }
