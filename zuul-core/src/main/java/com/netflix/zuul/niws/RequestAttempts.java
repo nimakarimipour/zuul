@@ -45,7 +45,6 @@ public class RequestAttempts extends ArrayList<RequestAttempt> {
     }
   }
 
-  @Nullable
   public static RequestAttempts getFromSessionContext(SessionContext ctx) {
     return ctx.get(CommonContextKeys.REQUEST_ATTEMPTS);
   }
