@@ -296,10 +296,7 @@ public class RequestAttempt {
 
         final Throwable cause = t.getCause();
         if (cause != null) {
-          exceptionType =
-              NullabilityUtil.castToNonnull(t.getCause(), "checked cause existence")
-                  .getClass()
-                  .getSimpleName();
+          exceptionType = t.getCause().getClass().getSimpleName();
         } else {
           exceptionType = t.getClass().getSimpleName();
         }
