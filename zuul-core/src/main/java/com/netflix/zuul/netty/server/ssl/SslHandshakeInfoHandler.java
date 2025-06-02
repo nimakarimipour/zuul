@@ -74,7 +74,6 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       try {
         SslHandshakeCompletionEvent sslEvent = (SslHandshakeCompletionEvent) evt;
         if (sslEvent.isSuccess()) {
-
           CurrentPassport.fromChannel(ctx.channel())
               .add(PassportState.SERVER_CH_SSL_HANDSHAKE_COMPLETE);
 
@@ -120,24 +119,20 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                   || PassportState.SERVER_CH_IDLE_TIMEOUT.equals(passportState))) {
             // Either client closed the connection without/before having completed a handshake, or
             // the connection idle timed-out before handshake.
-            // NOTE: we were seeing a lot of these in prod and can repro by just telnetting to port
-            // and then closing terminal
-            // without sending anything.
-            // So don't treat these as SSL handshake failures.
             logger.debug(
                 "Client closed connection or it idle timed-out without doing an ssl handshake. , client_ip = {}, channel_info = {}",
                 clientIP,
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else if (cause instanceof SSLException
+              && cause.getMessage() != null
               && cause.getMessage().contains("handshake timed out")) {
             logger.debug(
                 "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
                 clientIP,
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else if (cause instanceof SSLException
+              && cause.getMessage() != null
               && cause.getMessage().contains("failure when writing TLS control frames")) {
-            // This can happen if the ClientHello is sent followed  by a RST packet, before we can
-            // respond.
             logger.debug(
                 "Client terminated handshake early., client_ip = {}, channel_info = {}",
                 clientIP,
@@ -163,12 +158,9 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       } catch (Throwable e) {
         logger.warn("Error getting the SSL handshake info.", e);
       } finally {
-        // Now remove this handler from the pipeline as no longer needed once the ssl handshake has
-        // completed.
         ctx.pipeline().remove(this);
       }
     } else if (evt instanceof SslCloseCompletionEvent) {
-      // TODO - increment a separate metric for this event?
     } else if (evt instanceof SniCompletionEvent) {
       logger.debug("SNI Parsing Complete: {}", evt);
 
