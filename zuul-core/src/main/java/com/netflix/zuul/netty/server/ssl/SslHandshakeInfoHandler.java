@@ -54,7 +54,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       AttributeKey.newInstance("_ssl_handshake_info");
   private static final Logger logger = LoggerFactory.getLogger(SslHandshakeInfoHandler.class);
 
-  private final Registry spectatorRegistry;
+  @Nullable private final Registry spectatorRegistry;
   private final boolean isSSlFromIntermediary;
 
   public SslHandshakeInfoHandler(Registry spectatorRegistry, boolean isSSlFromIntermediary) {
@@ -173,14 +173,16 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       logger.debug("SNI Parsing Complete: {}", evt);
 
       SniCompletionEvent sniCompletionEvent = (SniCompletionEvent) evt;
-      if (sniCompletionEvent.isSuccess()) {
-        spectatorRegistry.counter("zuul.sni.parse.success").increment();
-      } else {
-        Throwable cause = sniCompletionEvent.cause();
-        spectatorRegistry
-            .counter(
-                "zuul.sni.parse.failure", "cause", cause != null ? cause.getMessage() : "UNKNOWN")
-            .increment();
+      if (spectatorRegistry != null) {
+        if (sniCompletionEvent.isSuccess()) {
+          spectatorRegistry.counter("zuul.sni.parse.success").increment();
+        } else {
+          Throwable cause = sniCompletionEvent.cause();
+          spectatorRegistry
+              .counter(
+                  "zuul.sni.parse.failure", "cause", cause != null ? cause.getMessage() : "UNKNOWN")
+              .increment();
+        }
       }
     }
     super.userEventTriggered(ctx, evt);
