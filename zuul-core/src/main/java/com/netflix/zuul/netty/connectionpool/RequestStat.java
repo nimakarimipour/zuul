@@ -19,6 +19,7 @@ package com.netflix.zuul.netty.connectionpool;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.exception.ErrorType;
+import javax.annotation.Nullable;
 
 /**
  * Request Stat
@@ -34,6 +35,7 @@ public interface RequestStat {
     return stat;
   }
 
+  @Nullable
   static RequestStat getFromSessionContext(SessionContext context) {
     return (RequestStat) context.get(SESSION_CONTEXT_KEY);
   }
