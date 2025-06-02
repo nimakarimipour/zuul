@@ -32,6 +32,7 @@ public class StatusCategoryUtils {
     return getStatusCategory(msg.getContext());
   }
 
+  @Nullable
   public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
     return ctx.get(CommonContextKeys.STATUS_CATGEORY);
   }
@@ -40,6 +41,7 @@ public class StatusCategoryUtils {
     ctx.put(CommonContextKeys.STATUS_CATGEORY, statusCategory);
   }
 
+  @Nullable
   public static StatusCategory getOriginStatusCategory(SessionContext ctx) {
     return ctx.get(CommonContextKeys.ORIGIN_STATUS_CATEGORY);
   }
