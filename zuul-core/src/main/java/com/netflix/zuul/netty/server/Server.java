@@ -80,7 +80,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +120,7 @@ public class Server {
 
   private final Thread jvmShutdownHook = new Thread(this::stop, "Zuul-JVM-shutdown-hook");
   private final Registry registry;
-  @Nullable private ServerGroup serverGroup;
+  private ServerGroup serverGroup;
   private final ClientConnectionsShutdown clientConnectionsShutdown;
   private final ServerStatusManager serverStatusManager;
   private final Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addressesToInitializers;
@@ -201,9 +200,6 @@ public class Server {
 
   public void stop() {
     LOG.info("Shutting down Zuul.");
-    if (serverGroup == null) {
-      throw new IllegalStateException("Server has not been started or has already been stopped.");
-    }
     serverGroup.stop();
 
     // remove the shutdown hook that was added when the proxy was started, since it has now been
@@ -273,9 +269,6 @@ public class Server {
 
   @VisibleForTesting
   public void waitForEachEventLoop() throws InterruptedException, ExecutionException {
-    if (serverGroup == null) {
-      throw new IllegalStateException("Server has not been started");
-    }
     for (EventExecutor exec : serverGroup.clientToProxyWorkerPool) {
       exec.submit(
               () -> {
@@ -293,11 +286,6 @@ public class Server {
   private ChannelFuture setupServerBootstrap(
       NamedSocketAddress listenAddress, ChannelInitializer<?> channelInitializer)
       throws InterruptedException {
-    // Ensure serverGroup is not null
-    if (serverGroup == null) {
-      throw new IllegalStateException("ServerGroup has not been initialized");
-    }
-
     ServerBootstrap serverBootstrap =
         new ServerBootstrap()
             .group(serverGroup.clientToProxyBossPool, serverGroup.clientToProxyWorkerPool);
