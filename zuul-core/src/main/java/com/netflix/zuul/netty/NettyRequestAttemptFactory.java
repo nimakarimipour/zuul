@@ -57,8 +57,6 @@ public class NettyRequestAttemptFactory {
 
     if (t instanceof Errors.NativeIoException
         && Errors.ERRNO_ECONNRESET_NEGATIVE == ((Errors.NativeIoException) t).expectedErr()) {
-      // This is a "Connection reset by peer" which we see fairly often happening when Origin
-      // servers are overloaded.
       LOG.warn("ERRNO_ECONNRESET_NEGATIVE mapped to RESET_CONNECTION", t);
       return RESET_CONNECTION;
     }
@@ -68,9 +66,12 @@ public class NettyRequestAttemptFactory {
     }
 
     final Throwable cause = t.getCause();
-    if (cause instanceof IllegalStateException && cause.getMessage().contains("server")) {
-      LOG.warn("IllegalStateException mapped to NO_AVAILABLE_SERVERS", cause);
-      return NO_AVAILABLE_SERVERS;
+    if (cause instanceof IllegalStateException) {
+      String message = cause.getMessage();
+      if (message != null && message.contains("server")) {
+        LOG.warn("IllegalStateException mapped to NO_AVAILABLE_SERVERS", cause);
+        return NO_AVAILABLE_SERVERS;
+      }
     }
 
     return OTHER;
