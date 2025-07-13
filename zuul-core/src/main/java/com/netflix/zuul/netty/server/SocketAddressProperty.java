@@ -104,56 +104,58 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
     static final Decoder INSTANCE = new Decoder();
 
     @Override
-    public SocketAddress apply(String input) {
-      if (input == null || input.isEmpty()) {
-        throw new IllegalArgumentException("Invalid address");
-      }
-
-      int equalsPosition = input.indexOf('=');
-      if (equalsPosition == -1) {
-        throw new IllegalArgumentException("Invalid address " + input);
-      }
-      String rawBindType =
-          equalsPosition != 0 ? input.substring(0, equalsPosition) : BindType.ANY.name();
-      BindType bindType = BindType.valueOf(rawBindType.toUpperCase(Locale.ROOT));
-      String rawAddress = input.substring(equalsPosition + 1);
-      int port;
-      parsePort:
-      {
+      public SocketAddress apply(String input) {
+        if (input == null || input.isEmpty()) {
+          throw new IllegalArgumentException("Invalid address");
+        }
+    
+        int equalsPosition = input.indexOf('=');
+        if (equalsPosition == -1) {
+          throw new IllegalArgumentException("Invalid address " + input);
+        }
+        String rawBindType =
+            equalsPosition != 0 ? input.substring(0, equalsPosition) : BindType.ANY.name();
+        BindType bindType = BindType.valueOf(rawBindType.toUpperCase(Locale.ROOT));
+        String rawAddress = input.substring(equalsPosition + 1);
+        int port;
+        parsePort: {
+          switch (bindType) {
+            case ANY: // fallthrough
+            case IPV4_ANY: // fallthrough
+            case IPV6_ANY: // fallthrough
+            case ANY_LOCAL: // fallthrough
+            case IPV4_LOCAL: // fallthrough
+            case IPV6_LOCAL: // fallthrough
+              try {
+                port = Integer.parseInt(rawAddress);
+              } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid Port " + input, e);
+              }
+              break parsePort;
+            case UDS:
+              port = -1;
+              break parsePort;
+          }
+          throw new AssertionError("Missed case: " + bindType);
+        }
+    
         switch (bindType) {
-          case ANY: // fallthrough
+          case ANY:
+            return new InetSocketAddress(port);
           case IPV4_ANY: // fallthrough
           case IPV6_ANY: // fallthrough
           case ANY_LOCAL: // fallthrough
           case IPV4_LOCAL: // fallthrough
           case IPV6_LOCAL: // fallthrough
-            try {
-              port = Integer.parseInt(rawAddress);
-            } catch (NumberFormatException e) {
-              throw new IllegalArgumentException("Invalid Port " + input, e);
+            if (bindType.addressSupplier == null) {
+              throw new NullPointerException("Address supplier is null for bind type: " + bindType);
             }
-            break parsePort;
+            return new InetSocketAddress(bindType.addressSupplier.get(), port);
           case UDS:
-            port = -1;
-            break parsePort;
+            return new DomainSocketAddress(rawAddress);
         }
-        throw new AssertionError("Missed cased: " + bindType);
+        throw new AssertionError("Missed case: " + bindType);
       }
-
-      switch (bindType) {
-        case ANY:
-          return new InetSocketAddress(port);
-        case IPV4_ANY: // fallthrough
-        case IPV6_ANY: // fallthrough
-        case ANY_LOCAL: // fallthrough
-        case IPV4_LOCAL: // fallthrough
-        case IPV6_LOCAL: // fallthrough
-          return new InetSocketAddress(bindType.addressSupplier.get(), port);
-        case UDS:
-          return new DomainSocketAddress(rawAddress);
-      }
-      throw new AssertionError("Missed cased: " + bindType);
-    }
 
     @Override
     public boolean equals(Object object) {
