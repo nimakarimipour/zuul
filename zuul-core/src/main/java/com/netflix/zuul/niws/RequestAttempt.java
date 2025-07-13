@@ -28,7 +28,6 @@ import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.discovery.SimpleMetaInfo;
 import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.netty.connectionpool.OriginConnectException;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.handler.timeout.ReadTimeoutException;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLHandshakeException;
@@ -297,10 +296,7 @@ public class RequestAttempt {
 
         final Throwable cause = t.getCause();
         if (cause != null) {
-          exceptionType =
-              Nullability.castToNonnull(t.getCause(), "cause checked nonnull")
-                  .getClass()
-                  .getSimpleName();
+          exceptionType = t.getCause().getClass().getSimpleName();
         } else {
           exceptionType = t.getClass().getSimpleName();
         }
