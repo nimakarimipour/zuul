@@ -202,16 +202,25 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
       @Nullable SslHandshakeInfo handshakeInfo) {
     if (spectatorRegistry == null) {
-      // May be null for testing.
       return;
     }
     try {
       if (sslHandshakeCompletionEvent.isSuccess()) {
         String proto =
-            handshakeInfo.getProtocol().length() > 0 ? handshakeInfo.getProtocol() : "unknown";
+            (handshakeInfo != null
+                    && handshakeInfo.getProtocol() != null
+                    && handshakeInfo.getProtocol().length() > 0)
+                ? handshakeInfo.getProtocol()
+                : "unknown";
         String ciphsuite =
-            handshakeInfo.getCipherSuite().length() > 0
+            (handshakeInfo != null
+                    && handshakeInfo.getCipherSuite() != null
+                    && handshakeInfo.getCipherSuite().length() > 0)
                 ? handshakeInfo.getCipherSuite()
+                : "unknown";
+        String clientAuthRequirement =
+            (handshakeInfo != null && handshakeInfo.getClientAuthRequirement() != null)
+                ? String.valueOf(handshakeInfo.getClientAuthRequirement())
                 : "unknown";
         spectatorRegistry
             .counter(
@@ -219,11 +228,11 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                 "success",
                 String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
                 "protocol",
-                String.valueOf(proto),
+                proto,
                 "ciphersuite",
-                String.valueOf(ciphsuite),
+                ciphsuite,
                 "clientauth",
-                String.valueOf(handshakeInfo.getClientAuthRequirement()))
+                clientAuthRequirement)
             .increment();
       } else {
         spectatorRegistry
@@ -236,7 +245,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
             .increment();
       }
     } catch (Exception e) {
-      logger.error("Error incrememting counters for SSL handshake!", e);
+      logger.error("Error increasing counters for SSL handshake!", e);
     }
   }
 }
