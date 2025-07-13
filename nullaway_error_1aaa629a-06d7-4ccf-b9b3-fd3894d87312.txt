@@ -1,0 +1,4 @@
+/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/context/SessionContext.java:126: error: [NullAway] returning @Nullable expression from method with @NonNull return type
+    return super.get(key);
+    ^
+    (see http://t.uber.com/nullaway )

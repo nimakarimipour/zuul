@@ -1,5 +1,4 @@
 class	path
-com.netflix.NullUnmarked	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/NullUnmarked.java
 com.netflix.netty.common.Http2ConnectionExpiryHandler	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/netty/common/Http2ConnectionExpiryHandler.java
 com.netflix.netty.common.AbstrHttpConnectionExpiryHandler	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/netty/common/AbstrHttpConnectionExpiryHandler.java
 com.netflix.netty.common.ConnectionCloseType	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/netty/common/ConnectionCloseType.java
@@ -300,5 +299,4 @@ com.netflix.zuul.passport.CurrentPassport$Unlocker	/home/nima/Developer/nullness
 com.netflix.zuul.passport.CurrentPassport$IntrospectiveReentrantLock	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/passport/CurrentPassport.java
 com.netflix.zuul.passport.CurrentPassport$MockTicker	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/passport/CurrentPassport.java
 com.netflix.zuul.passport.CountingCurrentPassport	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/passport/CurrentPassport.java
-com.netflix.Initializer	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/Initializer.java
 com.netflix.config.PatternListStringProperty	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/config/PatternListStringProperty.java
