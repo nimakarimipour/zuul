@@ -38,6 +38,7 @@ import com.netflix.zuul.netty.RequestCancelledEvent;
 import com.netflix.zuul.netty.SpectatorUtils;
 import com.netflix.zuul.stats.status.StatusCategory;
 import com.netflix.zuul.stats.status.StatusCategoryUtils;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.unix.Errors;
@@ -144,14 +145,13 @@ public class ZuulFilterChainHandler extends ChannelInboundHandlerAdapter {
   }
 
   private void finishResponseFilters(ChannelHandlerContext ctx) {
-    // check if there are any response filters awaiting a buffered body
     if (zuulRequest != null && responseFilterChain.isFilterAwaitingBody(zuulRequest.getContext())) {
       HttpResponseMessage zuulResponse = ctx.channel().attr(ATTR_ZUUL_RESP).get();
       if (zuulResponse != null) {
-        // fire a last content into the filter chain to unblock any filters awaiting a buffered body
         responseFilterChain.filter(zuulResponse, new DefaultLastHttpContent());
         SpectatorUtils.newCounter(
-                "zuul.filterChain.bodyBuffer.hanging", zuulRequest.getContext().getRouteVIP())
+                "zuul.filterChain.bodyBuffer.hanging",
+                Nullability.castToNonnull(zuulRequest.getContext().getRouteVIP()))
             .increment();
       }
     }

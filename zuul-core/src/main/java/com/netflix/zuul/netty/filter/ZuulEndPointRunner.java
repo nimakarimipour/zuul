@@ -169,6 +169,7 @@ public class ZuulEndPointRunner
     }
   }
 
+  @Nullable
   protected String getEndPointName(final SessionContext zuulCtx) {
     if (zuulCtx.shouldSendErrorResponse()) {
       zuulCtx.setShouldSendErrorResponse(false);
@@ -234,7 +235,9 @@ public class ZuulEndPointRunner
             @Override
             public HttpResponseMessage apply(HttpRequestMessage request) {
               final HttpResponseMessage resp = request.getContext().getStaticResponse();
-              resp.finishBufferedBodyIfIncomplete();
+              if (resp != null) {
+                resp.finishBufferedBodyIfIncomplete();
+              }
               return resp;
             }
 

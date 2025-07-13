@@ -202,21 +202,25 @@ public class ClientResponseWriter extends ChannelInboundHandlerAdapter {
 
     final HttpRequest nativeReq =
         (HttpRequest) zuulResp.getContext().get(CommonContextKeys.NETTY_HTTP_REQUEST);
-    if (!closeConnection && HttpUtil.isKeepAlive(nativeReq)) {
-      HttpUtil.setKeepAlive(nativeResponse, true);
-    } else {
-      // Send a Connection: close response header (only needed for HTTP/1.0 but no harm in doing for
-      // 1.1 too).
-      nativeResponse.headers().set("Connection", "close");
-    }
 
-    // TODO - temp hack for http/2 handling.
-    if (nativeReq.headers().contains(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text())) {
-      String streamId =
-          nativeReq.headers().get(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
-      nativeResponse
-          .headers()
-          .set(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text(), streamId);
+    if (nativeReq != null) {
+      if (!closeConnection && HttpUtil.isKeepAlive(nativeReq)) {
+        HttpUtil.setKeepAlive(nativeResponse, true);
+      } else {
+        // Send a Connection: close response header (only needed for HTTP/1.0 but no harm in doing
+        // for
+        // 1.1 too).
+        nativeResponse.headers().set("Connection", "close");
+      }
+
+      // TODO - temp hack for http/2 handling.
+      if (nativeReq.headers().contains(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text())) {
+        String streamId =
+            nativeReq.headers().get(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
+        nativeResponse
+            .headers()
+            .set(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text(), streamId);
+      }
     }
 
     return nativeResponse;
