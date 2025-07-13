@@ -296,7 +296,7 @@ public class RequestAttempt {
 
         final Throwable cause = t.getCause();
         if (cause != null) {
-          exceptionType = cause.getClass().getSimpleName();
+          exceptionType = t.getCause().getClass().getSimpleName();
         } else {
           exceptionType = t.getClass().getSimpleName();
         }
@@ -307,7 +307,7 @@ public class RequestAttempt {
       } else if (t instanceof SSLHandshakeException) {
         error = t.getMessage();
         exceptionType = t.getClass().getSimpleName();
-        cause = t.getCause() != null ? t.getCause().getMessage() : null;
+        cause = t.getCause().getMessage();
       } else {
         error = t.getMessage();
         exceptionType = t.getClass().getSimpleName();
