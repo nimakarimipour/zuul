@@ -52,8 +52,8 @@ public interface FilterLoader {
   ZuulFilter<?, ?> putFilterForClassName(String className) throws Exception;
 
   /** Returns a sorted set of filters by the filterType specified. */
-  @Nullable
-  SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType);
+  
+  @Nullable SortedSet<ZuulFilter<?, ?>> getFiltersByType(FilterType filterType);
 
   @Nullable
   ZuulFilter<?, ?> getFilterByNameAndType(String name, FilterType type);
