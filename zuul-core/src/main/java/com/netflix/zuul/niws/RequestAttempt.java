@@ -282,39 +282,39 @@ public class RequestAttempt {
   }
 
   public void setException(Throwable t) {
-    if (t != null) {
-      if (t instanceof ReadTimeoutException) {
-        error = "READ_TIMEOUT";
-        exceptionType = t.getClass().getSimpleName();
-      } else if (t instanceof OriginConnectException) {
-        OriginConnectException oce = (OriginConnectException) t;
-        if (oce.getErrorType() != null) {
-          error = oce.getErrorType().toString();
-        } else {
-          error = "ORIGIN_CONNECT_ERROR";
-        }
-
-        final Throwable cause = t.getCause();
-        if (cause != null) {
-          exceptionType = t.getCause().getClass().getSimpleName();
-        } else {
+      if (t != null) {
+        if (t instanceof ReadTimeoutException) {
+          error = "READ_TIMEOUT";
           exceptionType = t.getClass().getSimpleName();
+        } else if (t instanceof OriginConnectException) {
+          OriginConnectException oce = (OriginConnectException) t;
+          if (oce.getErrorType() != null) {
+            error = oce.getErrorType().toString();
+          } else {
+            error = "ORIGIN_CONNECT_ERROR";
+          }
+  
+          final Throwable cause = t.getCause();
+          if (cause != null) {
+            exceptionType = cause.getClass().getSimpleName();
+          } else {
+            exceptionType = t.getClass().getSimpleName();
+          }
+        } else if (t instanceof OutboundException) {
+          OutboundException obe = (OutboundException) t;
+          error = obe.getOutboundErrorType().toString();
+          exceptionType = OutboundException.class.getSimpleName();
+        } else if (t instanceof SSLHandshakeException) {
+          error = t.getMessage();
+          exceptionType = t.getClass().getSimpleName();
+          cause = t.getCause() != null ? t.getCause().getMessage() : null;
+        } else {
+          error = t.getMessage();
+          exceptionType = t.getClass().getSimpleName();
+          cause = Throwables.getStackTraceAsString(t);
         }
-      } else if (t instanceof OutboundException) {
-        OutboundException obe = (OutboundException) t;
-        error = obe.getOutboundErrorType().toString();
-        exceptionType = OutboundException.class.getSimpleName();
-      } else if (t instanceof SSLHandshakeException) {
-        error = t.getMessage();
-        exceptionType = t.getClass().getSimpleName();
-        cause = t.getCause().getMessage();
-      } else {
-        error = t.getMessage();
-        exceptionType = t.getClass().getSimpleName();
-        cause = Throwables.getStackTraceAsString(t);
       }
     }
-  }
 
   public void setMaxRetries(int maxRetries) {
     this.maxRetries = maxRetries;
