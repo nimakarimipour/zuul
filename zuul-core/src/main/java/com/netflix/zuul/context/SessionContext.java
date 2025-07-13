@@ -128,7 +128,9 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   /** Returns the value in the context, or {@code null} if absent. */
   @SuppressWarnings("unchecked")
   public <T> T get(Key<T> key) {
-    return (T) typedMap.get(Objects.requireNonNull(key, "key"));
+    return Optional.ofNullable((T) typedMap.get(Objects.requireNonNull(key, "key")))
+        .orElseThrow(
+            () -> new IllegalStateException("Return value is null for a @NonNull return type"));
   }
 
   /** Returns the value in the context, or {@code defaultValue} if absent. */
