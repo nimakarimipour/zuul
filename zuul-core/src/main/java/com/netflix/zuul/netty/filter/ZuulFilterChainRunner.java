@@ -33,6 +33,7 @@ import io.perfmark.TaskCloseable;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.annotation.Nullable;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 /**
  * This class is supposed to be thread safe and hence should not have any non final member variables
@@ -53,8 +54,8 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
   }
 
   public ZuulFilterChainRunner(
-      ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
-    this(zuulFilters, usageNotifier, null, registry);
+        ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
+      this(zuulFilters, usageNotifier, Nullability.castToNonnull(null), registry);
   }
 
   @Override
