@@ -137,7 +137,7 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
             port = -1;
             break parsePort;
         }
-        throw new AssertionError("Missed cased: " + bindType);
+        throw new AssertionError("Missed case: " + bindType);
       }
 
       switch (bindType) {
@@ -148,11 +148,14 @@ public final class SocketAddressProperty extends StringDerivedProperty<SocketAdd
         case ANY_LOCAL: // fallthrough
         case IPV4_LOCAL: // fallthrough
         case IPV6_LOCAL: // fallthrough
+          if (bindType.addressSupplier == null) {
+            throw new NullPointerException("Address supplier is null for bind type: " + bindType);
+          }
           return new InetSocketAddress(bindType.addressSupplier.get(), port);
         case UDS:
           return new DomainSocketAddress(rawAddress);
       }
-      throw new AssertionError("Missed cased: " + bindType);
+      throw new AssertionError("Missed case: " + bindType);
     }
 
     @Override
