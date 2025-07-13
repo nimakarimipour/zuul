@@ -26,7 +26,6 @@ import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.util.ReferenceCountUtil;
 import io.perfmark.PerfMark;
@@ -54,7 +53,7 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
 
   public ZuulFilterChainRunner(
       ZuulFilter<T, T>[] zuulFilters, FilterUsageNotifier usageNotifier, Registry registry) {
-    this(zuulFilters, usageNotifier, Nullability.castToNonnull(null), registry);
+    this(zuulFilters, usageNotifier, null, registry);
   }
 
   @Override
