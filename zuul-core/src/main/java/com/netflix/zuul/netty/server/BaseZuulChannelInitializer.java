@@ -367,16 +367,17 @@ public abstract class BaseZuulChannelInitializer extends ChannelInitializer<Chan
     return new ZuulFilterChainRunner<>(filters, filterUsageNotifier, filterRunner, registry);
   }
 
-  @SuppressWarnings("unchecked") // For the conversion from getFiltersByType.  It's not safe, sorry.
   public <T extends ZuulMessage> ZuulFilter<T, T>[] getFilters(
       ZuulFilter<T, T> start, ZuulFilter<T, T> stop) {
     final SortedSet<ZuulFilter<?, ?>> zuulFilters =
         filterLoader.getFiltersByType(start.filterType());
+    if (zuulFilters == null) {
+      throw new IllegalStateException("zuulFilters is null");
+    }
     final ZuulFilter<T, T>[] filters = new ZuulFilter[zuulFilters.size() + 2];
     filters[0] = start;
     int i = 1;
     for (ZuulFilter<?, ?> filter : zuulFilters) {
-      // TODO(carl-mastrangelo): find some way to make this cast not needed.
       filters[i++] = (ZuulFilter<T, T>) filter;
     }
     filters[filters.length - 1] = stop;
