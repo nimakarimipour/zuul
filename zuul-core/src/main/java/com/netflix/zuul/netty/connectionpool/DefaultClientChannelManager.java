@@ -34,6 +34,7 @@ import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.resolver.Resolver;
 import com.netflix.zuul.resolver.ResolverListener;
 import com.uber.nullaway.annotations.Initializer;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -379,7 +380,8 @@ public class DefaultClientChannelManager implements ClientChannelManager {
     }
 
     // Choose the next load-balanced server.
-    final DiscoveryResult chosenServer = dynamicServerResolver.resolve(key);
+    final DiscoveryResult chosenServer =
+        dynamicServerResolver.resolve(Nullability.castToNonnull(key));
 
     // (argha-c): Always ensure the selected server is updated, since the call chain relies on this
     // mutation.
