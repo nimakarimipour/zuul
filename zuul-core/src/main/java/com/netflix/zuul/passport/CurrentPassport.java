@@ -24,7 +24,6 @@ import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Spectator;
 import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import java.util.ArrayList;
@@ -479,7 +478,7 @@ class CountingCurrentPassport extends CurrentPassport {
   }
 
   private void incrementStateCounter(@Nullable PassportState state) {
-    switch (Nullability.castToNonnull(state)) {
+    switch (state) {
       case IN_REQ_HEADERS_RECEIVED:
         IN_REQ_HEADERS_RECEIVED_CNT.increment();
         break;
