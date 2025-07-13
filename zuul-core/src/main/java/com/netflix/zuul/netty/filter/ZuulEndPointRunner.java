@@ -37,6 +37,7 @@ import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.message.http.HttpResponseMessageImpl;
 import com.netflix.zuul.netty.server.MethodBinding;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.util.ReferenceCountUtil;
 import io.perfmark.PerfMark;
@@ -160,7 +161,7 @@ public class ZuulEndPointRunner
           // whole body has arrived, resume filter chain
           ByteBufUtil.touch(
               newChunk, "Endpoint body complete, resume chain, ZuulMessage: ", zuulReq);
-          invokeNextStage(filter(endpoint, zuulReq));
+          invokeNextStage(Nullability.castToNonnull(filter(endpoint, zuulReq)));
         }
       }
     } catch (Exception ex) {
