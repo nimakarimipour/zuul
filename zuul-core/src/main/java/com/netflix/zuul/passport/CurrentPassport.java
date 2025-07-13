@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 public class CurrentPassport {
   private static final Logger logger = LoggerFactory.getLogger(CurrentPassport.class);
@@ -477,32 +478,32 @@ class CountingCurrentPassport extends CurrentPassport {
     incrementStateCounter(state);
   }
 
-  private void incrementStateCounter(@Nullable PassportState state) {
-    switch (state) {
-      case IN_REQ_HEADERS_RECEIVED:
-        IN_REQ_HEADERS_RECEIVED_CNT.increment();
-        break;
-      case IN_REQ_LAST_CONTENT_RECEIVED:
-        IN_REQ_LAST_CONTENT_RECEIVED_CNT.increment();
-        break;
-      case OUT_REQ_HEADERS_SENT:
-        OUT_REQ_HEADERS_SENT_CNT.increment();
-        break;
-      case OUT_REQ_LAST_CONTENT_SENT:
-        OUT_REQ_LAST_CONTENT_SENT_CNT.increment();
-        break;
-      case IN_RESP_HEADERS_RECEIVED:
-        IN_RESP_HEADERS_RECEIVED_CNT.increment();
-        break;
-      case IN_RESP_LAST_CONTENT_RECEIVED:
-        IN_RESP_LAST_CONTENT_RECEIVED_CNT.increment();
-        break;
-      case OUT_RESP_HEADERS_SENT:
-        OUT_RESP_HEADERS_SENT_CNT.increment();
-        break;
-      case OUT_RESP_LAST_CONTENT_SENT:
-        OUT_RESP_LAST_CONTENT_SENT_CNT.increment();
-        break;
-    }
+  private void incrementStateCounter( @Nullable PassportState state) {
+      switch (Nullability.castToNonnull(state)) {
+        case IN_REQ_HEADERS_RECEIVED:
+          IN_REQ_HEADERS_RECEIVED_CNT.increment();
+          break;
+        case IN_REQ_LAST_CONTENT_RECEIVED:
+          IN_REQ_LAST_CONTENT_RECEIVED_CNT.increment();
+          break;
+        case OUT_REQ_HEADERS_SENT:
+          OUT_REQ_HEADERS_SENT_CNT.increment();
+          break;
+        case OUT_REQ_LAST_CONTENT_SENT:
+          OUT_REQ_LAST_CONTENT_SENT_CNT.increment();
+          break;
+        case IN_RESP_HEADERS_RECEIVED:
+          IN_RESP_HEADERS_RECEIVED_CNT.increment();
+          break;
+        case IN_RESP_LAST_CONTENT_RECEIVED:
+          IN_RESP_LAST_CONTENT_RECEIVED_CNT.increment();
+          break;
+        case OUT_RESP_HEADERS_SENT:
+          OUT_RESP_HEADERS_SENT_CNT.increment();
+          break;
+        case OUT_RESP_LAST_CONTENT_SENT:
+          OUT_RESP_LAST_CONTENT_SENT_CNT.increment();
+          break;
+      }
   }
 }
