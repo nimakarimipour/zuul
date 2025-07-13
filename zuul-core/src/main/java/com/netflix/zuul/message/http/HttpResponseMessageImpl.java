@@ -156,11 +156,7 @@ public class HttpResponseMessageImpl implements HttpResponseMessage {
   @Nullable
   @Override
   public HttpRequestInfo getInboundRequest() {
-    HttpRequestInfo inboundRequest = outboundRequest.getInboundRequest();
-    if (inboundRequest == null) {
-      throw new NullPointerException("getInboundRequest() returned a null value");
-    }
-    return inboundRequest;
+    return outboundRequest.getInboundRequest();
   }
 
   @Override
