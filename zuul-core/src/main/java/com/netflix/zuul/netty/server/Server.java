@@ -82,6 +82,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 /**
  * NOTE: Shout-out to <a href="https://github.com/adamfisk/LittleProxy">LittleProxy</a> which was
@@ -120,7 +122,7 @@ public class Server {
 
   private final Thread jvmShutdownHook = new Thread(this::stop, "Zuul-JVM-shutdown-hook");
   private final Registry registry;
-  private ServerGroup serverGroup;
+  @Nullable private ServerGroup serverGroup;
   private final ClientConnectionsShutdown clientConnectionsShutdown;
   private final ServerStatusManager serverStatusManager;
   private final Map<NamedSocketAddress, ? extends ChannelInitializer<?>> addressesToInitializers;
@@ -199,18 +201,18 @@ public class Server {
   }
 
   public void stop() {
-    LOG.info("Shutting down Zuul.");
-    serverGroup.stop();
-
-    // remove the shutdown hook that was added when the proxy was started, since it has now been
-    // stopped
-    try {
-      Runtime.getRuntime().removeShutdownHook(jvmShutdownHook);
-    } catch (IllegalStateException e) {
-      // This can happen if the VM is already shutting down
-      LOG.debug("Failed to remove shutdown hook", e);
-    }
-    LOG.info("Completed zuul shutdown.");
+          LOG.info("Shutting down Zuul.");
+          if (serverGroup == null) {
+              throw new IllegalStateException("Server has not been started or has already been stopped.");
+          }
+          Nullability.castToNonnull(serverGroup, "checked for null above").stop();
+    
+          try {
+            Runtime.getRuntime().removeShutdownHook(jvmShutdownHook);
+          } catch (IllegalStateException e) {
+            LOG.debug("Failed to remove shutdown hook", e);
+          }
+          LOG.info("Completed zuul shutdown.");
   }
 
   public void start() {
@@ -268,15 +270,18 @@ public class Server {
   }
 
   @VisibleForTesting
-  public void waitForEachEventLoop() throws InterruptedException, ExecutionException {
-    for (EventExecutor exec : serverGroup.clientToProxyWorkerPool) {
-      exec.submit(
-              () -> {
-                // Do nothing.
-              })
-          .get();
+    public void waitForEachEventLoop() throws InterruptedException, ExecutionException {
+        if (serverGroup == null) {
+            throw new IllegalStateException("Server has not been started");
+        }
+        for (EventExecutor exec : serverGroup.clientToProxyWorkerPool) {
+            exec.submit(
+                    () -> {
+                        // Do nothing.
+                    })
+                .get();
+        }
     }
-  }
 
   @VisibleForTesting
   public void gracefullyShutdownConnections() {
@@ -284,57 +289,53 @@ public class Server {
   }
 
   private ChannelFuture setupServerBootstrap(
-      NamedSocketAddress listenAddress, ChannelInitializer<?> channelInitializer)
-      throws InterruptedException {
-    ServerBootstrap serverBootstrap =
-        new ServerBootstrap()
-            .group(serverGroup.clientToProxyBossPool, serverGroup.clientToProxyWorkerPool);
-
-    // Choose socket options.
-    Map<ChannelOption<?>, Object> channelOptions = new HashMap<>();
-    channelOptions.put(ChannelOption.SO_BACKLOG, 128);
-    channelOptions.put(ChannelOption.SO_LINGER, -1);
-    channelOptions.put(ChannelOption.TCP_NODELAY, true);
-    channelOptions.put(ChannelOption.SO_KEEPALIVE, true);
-
-    LOG.info("Proxy listening with {}", serverGroup.channelType);
-    serverBootstrap.channel(serverGroup.channelType);
-
-    // Apply socket options.
-    for (Map.Entry<ChannelOption<?>, ?> optionEntry : channelOptions.entrySet()) {
-      serverBootstrap =
-          serverBootstrap.option((ChannelOption) optionEntry.getKey(), optionEntry.getValue());
+          NamedSocketAddress listenAddress, ChannelInitializer<?> channelInitializer)
+          throws InterruptedException {
+        if (serverGroup == null) {
+          throw new IllegalStateException("ServerGroup has not been initialized");
+        }
+    
+        ServerBootstrap serverBootstrap =
+            new ServerBootstrap()
+                .group(Nullability.castToNonnull(serverGroup, "explicitly checked for null").clientToProxyBossPool, serverGroup.clientToProxyWorkerPool);
+    
+        Map<ChannelOption<?>, Object> channelOptions = new HashMap<>();
+        channelOptions.put(ChannelOption.SO_BACKLOG, 128);
+        channelOptions.put(ChannelOption.SO_LINGER, -1);
+        channelOptions.put(ChannelOption.TCP_NODELAY, true);
+        channelOptions.put(ChannelOption.SO_KEEPALIVE, true);
+    
+        LOG.info("Proxy listening with {}", serverGroup.channelType);
+        serverBootstrap.channel(serverGroup.channelType);
+    
+        for (Map.Entry<ChannelOption<?>, ?> optionEntry : channelOptions.entrySet()) {
+          serverBootstrap =
+              serverBootstrap.option((ChannelOption) optionEntry.getKey(), optionEntry.getValue());
+        }
+        for (Map.Entry<ChannelOption<?>, ?> optionEntry :
+            serverGroup.transportChannelOptions.entrySet()) {
+          serverBootstrap =
+              serverBootstrap.option((ChannelOption) optionEntry.getKey(), optionEntry.getValue());
+        }
+    
+        serverBootstrap.handler(new NewConnHandler());
+        serverBootstrap.childHandler(channelInitializer);
+        serverBootstrap.validate();
+    
+        LOG.info("Binding to : {}", listenAddress);
+    
+        if (MANUAL_DISCOVERY_STATUS.get()) {
+          serverStatusManager.localStatus(InstanceInfo.InstanceStatus.UP);
+        }
+    
+        ChannelFuture bindFuture = serverBootstrap.bind(listenAddress.unwrap());
+    
+        try {
+          return bindFuture.sync();
+        } catch (Exception e) {
+          throw new RuntimeException("Failed to bind on addr " + listenAddress, e);
+        }
     }
-    // Apply transport specific socket options.
-    for (Map.Entry<ChannelOption<?>, ?> optionEntry :
-        serverGroup.transportChannelOptions.entrySet()) {
-      serverBootstrap =
-          serverBootstrap.option((ChannelOption) optionEntry.getKey(), optionEntry.getValue());
-    }
-
-    serverBootstrap.handler(new NewConnHandler());
-    serverBootstrap.childHandler(channelInitializer);
-    serverBootstrap.validate();
-
-    LOG.info("Binding to : {}", listenAddress);
-
-    if (MANUAL_DISCOVERY_STATUS.get()) {
-      // Flag status as UP just before binding to the port.
-      serverStatusManager.localStatus(InstanceInfo.InstanceStatus.UP);
-    }
-
-    // Bind and start to accept incoming connections.
-    ChannelFuture bindFuture = serverBootstrap.bind(listenAddress.unwrap());
-
-    try {
-      return bindFuture.sync();
-    } catch (Exception e) {
-      // sync() sneakily throws a checked Exception, but doesn't declare it. This can happen if
-      // there is a bind
-      // failure, which is typically an IOException.  Just chain it and rethrow.
-      throw new RuntimeException("Failed to bind on addr " + listenAddress, e);
-    }
-  }
 
   /**
    * Override for metrics or informational purposes

@@ -32,6 +32,7 @@ import io.perfmark.PerfMark;
 import io.perfmark.TaskCloseable;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.Nullable;
 
 /**
  * This class is supposed to be thread safe and hence should not have any non final member variables

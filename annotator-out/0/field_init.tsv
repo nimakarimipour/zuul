@@ -19,7 +19,6 @@ METHOD	com.netflix.zuul.netty.server.push.PushRegistrationHandler	userEventTrigg
 METHOD	com.netflix.zuul.netty.server.BaseServerStartup	init()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/BaseServerStartup.java	clientConnectionsShutdown
 METHOD	com.netflix.zuul.netty.server.BaseServerStartup	init()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/BaseServerStartup.java	addrsToChannelInitializers
 METHOD	com.netflix.zuul.netty.server.BaseServerStartup	init()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/BaseServerStartup.java	server
-METHOD	com.netflix.zuul.netty.server.Server	start()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/Server.java	serverGroup
 METHOD	com.netflix.zuul.netty.server.Server$ServerGroup	initializeTransport()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/Server.java	channelType
 METHOD	com.netflix.zuul.netty.server.Server$ServerGroup	initializeTransport()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/Server.java	clientToProxyBossPool
 METHOD	com.netflix.zuul.netty.server.Server$ServerGroup	initializeTransport()	null	null	/home/nima/Developer/nullness-benchmarks/zuul/zuul-core/src/main/java/com/netflix/zuul/netty/server/Server.java	clientToProxyWorkerPool
