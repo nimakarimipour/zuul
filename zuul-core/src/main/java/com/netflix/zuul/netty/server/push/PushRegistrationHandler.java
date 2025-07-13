@@ -16,7 +16,6 @@ package com.netflix.zuul.netty.server.push;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.config.CachedDynamicBooleanProperty;
 import com.netflix.config.CachedDynamicIntProperty;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -42,7 +41,7 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
 
   /* state */
   protected final AtomicBoolean destroyed;
-  @Nullable private ChannelHandlerContext ctx;
+  private ChannelHandlerContext ctx;
   @Nullable private volatile PushConnection pushConnection;
   private final List<ScheduledFuture<?>> scheduledFutures;
 
@@ -104,8 +103,8 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     ctx.close();
   }
 
-  protected final void forceCloseConnectionFromServerSide(ChannelHandlerContext ctx) {
-    if (!destroyed.get() && ctx != null) {
+  protected final void forceCloseConnectionFromServerSide() {
+    if (!destroyed.get()) {
       logger.debug("server forcing close connection");
       pushProtocol.sendErrorAndClose(ctx, 1000, "Server closed connection");
     }
@@ -120,8 +119,8 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
     }
   }
 
-  private void requestClientToCloseConnection(ChannelHandlerContext ctx) {
-    if (ctx != null && ctx.channel().isActive()) {
+  private void requestClientToCloseConnection() {
+    if (ctx.channel().isActive()) {
       // Application level protocol for asking client to close connection
       ctx.writeAndFlush(pushProtocol.goAwayMessage());
       // Force close connection if client doesn't close in reasonable time after we made request
@@ -137,8 +136,8 @@ public class PushRegistrationHandler extends ChannelInboundHandlerAdapter {
   }
 
   protected void keepAlive() {
-    if (ctx != null && KEEP_ALIVE_ENABLED.get()) {
-      Nullability.castToNonnull(ctx, "checked for nullity").writeAndFlush(new PingWebSocketFrame());
+    if (KEEP_ALIVE_ENABLED.get()) {
+      ctx.writeAndFlush(new PingWebSocketFrame());
     }
   }
 
