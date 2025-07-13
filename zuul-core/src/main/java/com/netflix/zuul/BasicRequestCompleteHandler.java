@@ -20,6 +20,7 @@ import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.message.http.HttpRequestInfo;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.stats.RequestMetricsPublisher;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -30,9 +31,8 @@ public class BasicRequestCompleteHandler implements RequestCompleteHandler {
   @Override
   public void handle(
       @Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response) {
-    SessionContext context = inboundRequest.getContext();
+    SessionContext context = Nullability.castToNonnull(inboundRequest).getContext();
 
-    // Publish request-level metrics.
     if (requestMetricsPublisher != null) {
       requestMetricsPublisher.collectAndPublish(context);
     }
