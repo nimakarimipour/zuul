@@ -28,7 +28,6 @@ import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import com.netflix.zuul.niws.RequestAttempts;
 import com.netflix.zuul.origins.OriginConcurrencyExceededException;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.timeout.ReadTimeoutException;
 import java.nio.channels.ClosedChannelException;
@@ -87,8 +86,8 @@ public class NettyRequestAttemptFactory {
     final ErrorType errorType = mapNettyToOutboundErrorType(t);
     final RequestAttempts attempts = RequestAttempts.getFromSessionContext(context);
     if (errorType == OTHER) {
-      return new OutboundException(errorType, Nullability.castToNonnull(attempts), t);
+      return new OutboundException(errorType, attempts, t);
     }
-    return new OutboundException(errorType, Nullability.castToNonnull(attempts));
+    return new OutboundException(errorType, attempts);
   }
 }

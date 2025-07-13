@@ -26,7 +26,6 @@ import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.util.ReferenceCountUtil;
 import io.perfmark.PerfMark;
@@ -145,21 +144,17 @@ public class ZuulFilterChainRunner<T extends ZuulMessage> extends BaseZuulFilter
         // Record passport states for start and end of buffering bodies.
         if (isAwaitingBody) {
           CurrentPassport passport = CurrentPassport.fromSessionContext(inMesg.getContext());
-          if (passport != null) { // Added null check for passport
-            if (inMesg.hasCompleteBody()) {
-              if (inMesg instanceof HttpRequestMessage) {
-                passport.addIfNotAlready(PassportState.FILTERS_INBOUND_BUF_END);
-              } else if (inMesg instanceof HttpResponseMessage) {
-                passport.addIfNotAlready(PassportState.FILTERS_OUTBOUND_BUF_END);
-              }
-            } else {
-              if (inMesg instanceof HttpRequestMessage) {
-                Nullability.castToNonnull(passport, "Added null check")
-                    .addIfNotAlready(PassportState.FILTERS_INBOUND_BUF_START);
-              } else if (inMesg instanceof HttpResponseMessage) {
-                Nullability.castToNonnull(passport, "Added null check")
-                    .addIfNotAlready(PassportState.FILTERS_OUTBOUND_BUF_START);
-              }
+          if (inMesg.hasCompleteBody()) {
+            if (inMesg instanceof HttpRequestMessage) {
+              passport.addIfNotAlready(PassportState.FILTERS_INBOUND_BUF_END);
+            } else if (inMesg instanceof HttpResponseMessage) {
+              passport.addIfNotAlready(PassportState.FILTERS_OUTBOUND_BUF_END);
+            }
+          } else {
+            if (inMesg instanceof HttpRequestMessage) {
+              passport.addIfNotAlready(PassportState.FILTERS_INBOUND_BUF_START);
+            } else if (inMesg instanceof HttpResponseMessage) {
+              passport.addIfNotAlready(PassportState.FILTERS_OUTBOUND_BUF_START);
             }
           }
         }

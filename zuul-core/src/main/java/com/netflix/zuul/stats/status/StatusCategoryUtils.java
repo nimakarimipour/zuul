@@ -20,7 +20,6 @@ import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.context.SessionContext;
 import com.netflix.zuul.message.ZuulMessage;
 import com.netflix.zuul.message.http.HttpResponseMessage;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +28,12 @@ import org.slf4j.LoggerFactory;
 public class StatusCategoryUtils {
   private static final Logger LOG = LoggerFactory.getLogger(StatusCategoryUtils.class);
 
-  @Nullable
   public static StatusCategory getStatusCategory(ZuulMessage msg) {
     return getStatusCategory(msg.getContext());
   }
 
   public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
-    return Nullability.castToNonnull(ctx).get(CommonContextKeys.STATUS_CATGEORY);
+    return ctx.get(CommonContextKeys.STATUS_CATGEORY);
   }
 
   public static void setStatusCategory(SessionContext ctx, StatusCategory statusCategory) {
