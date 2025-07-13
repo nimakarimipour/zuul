@@ -123,6 +123,7 @@ public class CurrentPassport {
     return new CurrentPassport();
   }
 
+  @Nullable
   public static CurrentPassport fromSessionContext(SessionContext ctx) {
     return ctx.get(CommonContextKeys.PASSPORT);
   }
