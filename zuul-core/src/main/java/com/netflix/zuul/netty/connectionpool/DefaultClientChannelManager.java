@@ -378,11 +378,14 @@ public class DefaultClientChannelManager implements ClientChannelManager {
       return promise;
     }
 
-    // Choose the next load-balanced server.
+    if (key == null) {
+      Promise<PooledConnection> promise = eventLoop.newPromise();
+      promise.setFailure(new IllegalArgumentException("Key cannot be null"));
+      return promise;
+    }
+
     final DiscoveryResult chosenServer = dynamicServerResolver.resolve(key);
 
-    // (argha-c): Always ensure the selected server is updated, since the call chain relies on this
-    // mutation.
     selectedServer.set(chosenServer);
     if (chosenServer == DiscoveryResult.EMPTY) {
       Promise<PooledConnection> promise = eventLoop.newPromise();
@@ -392,7 +395,6 @@ public class DefaultClientChannelManager implements ClientChannelManager {
       return promise;
     }
 
-    // Now get the connection-pool for this server.
     IConnectionPool pool =
         perServerPools.computeIfAbsent(
             chosenServer,
@@ -403,7 +405,6 @@ public class DefaultClientChannelManager implements ClientChannelManager {
                   createPooledConnectionFactory(
                       chosenServer, clientChannelMgr, closeConnCounter, closeWrtBusyConnCounter);
 
-              // Create a new pool for this server.
               return createConnectionPool(
                   chosenServer,
                   finalServerAddr,
