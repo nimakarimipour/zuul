@@ -287,24 +287,26 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
   }
 
   private void handleExpect100Continue(ChannelHandlerContext ctx, HttpRequest req) {
-    if (HttpUtil.is100ContinueExpected(req)) {
-      PerfMark.event("CRR.handleExpect100Continue");
-      final ChannelFuture f =
-          ctx.writeAndFlush(
-              new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
-      f.addListener(
-          (s) -> {
-            if (!s.isSuccess()) {
-              throw new ZuulException(
-                  s.cause(), "Failed while writing 100-continue response", true);
-            }
-          });
-      // Remove the Expect: 100-Continue header from request as we don't want to proxy it
-      // downstream.
-      req.headers().remove(HttpHeaderNames.EXPECT);
-      zuulRequest.getHeaders().remove(HttpHeaderNames.EXPECT.toString());
+      if (HttpUtil.is100ContinueExpected(req)) {
+        PerfMark.event("CRR.handleExpect100Continue");
+        final ChannelFuture f =
+            ctx.writeAndFlush(
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
+        f.addListener(
+            (s) -> {
+              if (!s.isSuccess()) {
+                throw new ZuulException(
+                    s.cause(), "Failed while writing 100-continue response", true);
+              }
+            });
+        // Remove the Expect: 100-Continue header from request as we don't want to proxy it
+        // downstream.
+        req.headers().remove(HttpHeaderNames.EXPECT);
+        if (zuulRequest != null) {
+          zuulRequest.getHeaders().remove(HttpHeaderNames.EXPECT.toString());
+        }
+      }
     }
-  }
 
   // Build a ZuulMessage from the netty request.
   private HttpRequestMessage buildZuulHttpRequest(
