@@ -33,9 +33,6 @@ public class StatusCategoryUtils {
   }
 
   public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
-    if (ctx == null) {
-      return null; // Or handle this situation accordingly
-    }
     return ctx.get(CommonContextKeys.STATUS_CATGEORY);
   }
 
