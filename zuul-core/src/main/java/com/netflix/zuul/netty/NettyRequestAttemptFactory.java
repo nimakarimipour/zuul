@@ -33,47 +33,46 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import java.nio.channels.ClosedChannelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 public class NettyRequestAttemptFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(NettyRequestAttemptFactory.class);
 
   public ErrorType mapNettyToOutboundErrorType(final Throwable t) {
-    if (t instanceof ReadTimeoutException) {
-      return READ_TIMEOUT;
-    }
-
-    if (t instanceof OriginConcurrencyExceededException) {
-      return ORIGIN_CONCURRENCY_EXCEEDED;
-    }
-
-    if (t instanceof OriginConnectException) {
-      return ((OriginConnectException) t).getErrorType();
-    }
-
-    if (t instanceof OutboundException) {
-      return ((OutboundException) t).getOutboundErrorType();
-    }
-
-    if (t instanceof Errors.NativeIoException
-        && Errors.ERRNO_ECONNRESET_NEGATIVE == ((Errors.NativeIoException) t).expectedErr()) {
-      // This is a "Connection reset by peer" which we see fairly often happening when Origin
-      // servers are overloaded.
-      LOG.warn("ERRNO_ECONNRESET_NEGATIVE mapped to RESET_CONNECTION", t);
-      return RESET_CONNECTION;
-    }
-
-    if (t instanceof ClosedChannelException) {
-      return RESET_CONNECTION;
-    }
-
-    final Throwable cause = t.getCause();
-    if (cause instanceof IllegalStateException && cause.getMessage().contains("server")) {
-      LOG.warn("IllegalStateException mapped to NO_AVAILABLE_SERVERS", cause);
-      return NO_AVAILABLE_SERVERS;
-    }
-
-    return OTHER;
+      if (t instanceof ReadTimeoutException) {
+        return READ_TIMEOUT;
+      }
+  
+      if (t instanceof OriginConcurrencyExceededException) {
+        return ORIGIN_CONCURRENCY_EXCEEDED;
+      }
+  
+      if (t instanceof OriginConnectException) {
+        return ((OriginConnectException) t).getErrorType();
+      }
+  
+      if (t instanceof OutboundException) {
+        return ((OutboundException) t).getOutboundErrorType();
+      }
+  
+      if (t instanceof Errors.NativeIoException
+          && Errors.ERRNO_ECONNRESET_NEGATIVE == ((Errors.NativeIoException) t).expectedErr()) {
+        LOG.warn("ERRNO_ECONNRESET_NEGATIVE mapped to RESET_CONNECTION", t);
+        return RESET_CONNECTION;
+      }
+  
+      if (t instanceof ClosedChannelException) {
+        return RESET_CONNECTION;
+      }
+  
+      final Throwable cause = t.getCause();
+      if (cause instanceof IllegalStateException && Nullability.castToNonnull(cause.getMessage(), "cause not null").contains("server")) {
+        LOG.warn("IllegalStateException mapped to NO_AVAILABLE_SERVERS", cause);
+        return NO_AVAILABLE_SERVERS;
+      }
+  
+      return OTHER;
   }
 
   public OutboundException mapNettyToOutboundException(
