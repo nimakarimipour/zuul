@@ -28,6 +28,7 @@ import com.netflix.zuul.discovery.DiscoveryResult;
 import com.netflix.zuul.discovery.SimpleMetaInfo;
 import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.netty.connectionpool.OriginConnectException;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.handler.timeout.ReadTimeoutException;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLHandshakeException;
@@ -307,7 +308,7 @@ public class RequestAttempt {
       } else if (t instanceof SSLHandshakeException) {
         error = t.getMessage();
         exceptionType = t.getClass().getSimpleName();
-        cause = t.getCause().getMessage();
+        cause = Nullability.castToNonnull(t.getCause()).getMessage();
       } else {
         error = t.getMessage();
         exceptionType = t.getClass().getSimpleName();
