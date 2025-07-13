@@ -69,122 +69,114 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
     }
 
   @Override
-  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-    if (evt instanceof SslHandshakeCompletionEvent) {
-      try {
-        SslHandshakeCompletionEvent sslEvent = (SslHandshakeCompletionEvent) evt;
-        if (sslEvent.isSuccess()) {
-
-          CurrentPassport.fromChannel(ctx.channel())
-              .add(PassportState.SERVER_CH_SSL_HANDSHAKE_COMPLETE);
-
-          SslHandler sslhandler = ctx.channel().pipeline().get(SslHandler.class);
-          SSLSession session = sslhandler.engine().getSession();
-
-          ClientAuth clientAuth = whichClientAuthEnum(sslhandler);
-
-          Certificate serverCert = null;
-          X509Certificate peerCert = null;
-
-          if ((clientAuth == ClientAuth.REQUIRE || clientAuth == ClientAuth.OPTIONAL)
-              && session.getPeerCertificates() != null
-              && session.getPeerCertificates().length > 0) {
-            peerCert = (X509Certificate) session.getPeerCertificates()[0];
-          }
-          if (session.getLocalCertificates() != null && session.getLocalCertificates().length > 0) {
-            serverCert = session.getLocalCertificates()[0];
-          }
-
-          SslHandshakeInfo info =
-              new SslHandshakeInfo(
-                  isSSlFromIntermediary,
-                  session.getProtocol(),
-                  session.getCipherSuite(),
-                  clientAuth,
-                  serverCert,
-                  peerCert);
-          ctx.channel().attr(ATTR_SSL_INFO).set(info);
-
-          // Metrics.
-          incrementCounters(sslEvent, info);
-
-          logger.debug("Successful SSL Handshake: {}", info);
-        } else {
-          String clientIP =
-              ctx.channel().attr(SourceAddressChannelHandler.ATTR_SOURCE_ADDRESS).get();
-          Throwable cause = sslEvent.cause();
-
-          PassportState passportState = CurrentPassport.fromChannel(ctx.channel()).getState();
-          if (cause instanceof ClosedChannelException
-              && (PassportState.SERVER_CH_INACTIVE.equals(passportState)
-                  || PassportState.SERVER_CH_IDLE_TIMEOUT.equals(passportState))) {
-            // Either client closed the connection without/before having completed a handshake, or
-            // the connection idle timed-out before handshake.
-            // NOTE: we were seeing a lot of these in prod and can repro by just telnetting to port
-            // and then closing terminal
-            // without sending anything.
-            // So don't treat these as SSL handshake failures.
-            logger.debug(
-                "Client closed connection or it idle timed-out without doing an ssl handshake. , client_ip = {}, channel_info = {}",
-                clientIP,
-                ChannelUtils.channelInfoForLogging(ctx.channel()));
-          } else if (cause instanceof SSLException
-              && cause.getMessage().contains("handshake timed out")) {
-            logger.debug(
-                "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
-                clientIP,
-                ChannelUtils.channelInfoForLogging(ctx.channel()));
-          } else if (cause instanceof SSLException
-              && cause.getMessage().contains("failure when writing TLS control frames")) {
-            // This can happen if the ClientHello is sent followed  by a RST packet, before we can
-            // respond.
-            logger.debug(
-                "Client terminated handshake early., client_ip = {}, channel_info = {}",
-                clientIP,
-                ChannelUtils.channelInfoForLogging(ctx.channel()));
-          } else {
-            String msg =
-                "Unsuccessful SSL Handshake: "
-                    + sslEvent
-                    + ", client_ip = "
-                    + clientIP
-                    + ", channel_info = "
-                    + ChannelUtils.channelInfoForLogging(ctx.channel())
-                    + ", error = "
-                    + cause;
-            if (cause instanceof ClosedChannelException) {
-              logger.debug(msg);
-            } else {
-              logger.debug(msg, cause);
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+      if (evt instanceof SslHandshakeCompletionEvent) {
+        try {
+          SslHandshakeCompletionEvent sslEvent = (SslHandshakeCompletionEvent) evt;
+          if (sslEvent.isSuccess()) {
+            CurrentPassport.fromChannel(ctx.channel())
+                .add(PassportState.SERVER_CH_SSL_HANDSHAKE_COMPLETE);
+  
+            SslHandler sslhandler = ctx.channel().pipeline().get(SslHandler.class);
+            SSLSession session = sslhandler.engine().getSession();
+  
+            ClientAuth clientAuth = whichClientAuthEnum(sslhandler);
+  
+            Certificate serverCert = null;
+            X509Certificate peerCert = null;
+  
+            if ((clientAuth == ClientAuth.REQUIRE || clientAuth == ClientAuth.OPTIONAL)
+                && session.getPeerCertificates() != null
+                && session.getPeerCertificates().length > 0) {
+              peerCert = (X509Certificate) session.getPeerCertificates()[0];
             }
-            incrementCounters(sslEvent, null);
+            if (session.getLocalCertificates() != null && session.getLocalCertificates().length > 0) {
+              serverCert = session.getLocalCertificates()[0];
+            }
+  
+            SslHandshakeInfo info =
+                new SslHandshakeInfo(
+                    isSSlFromIntermediary,
+                    session.getProtocol(),
+                    session.getCipherSuite(),
+                    clientAuth,
+                    serverCert,
+                    peerCert);
+            ctx.channel().attr(ATTR_SSL_INFO).set(info);
+  
+            // Metrics.
+            incrementCounters(sslEvent, info);
+  
+            logger.debug("Successful SSL Handshake: {}", info);
+          } else {
+            String clientIP =
+                ctx.channel().attr(SourceAddressChannelHandler.ATTR_SOURCE_ADDRESS).get();
+            Throwable cause = sslEvent.cause();
+  
+            PassportState passportState = CurrentPassport.fromChannel(ctx.channel()).getState();
+            if (cause instanceof ClosedChannelException
+                && (PassportState.SERVER_CH_INACTIVE.equals(passportState)
+                    || PassportState.SERVER_CH_IDLE_TIMEOUT.equals(passportState))) {
+              // Either client closed the connection without/before having completed a handshake, or
+              // the connection idle timed-out before handshake.
+              logger.debug(
+                  "Client closed connection or it idle timed-out without doing an ssl handshake. , client_ip = {}, channel_info = {}",
+                  clientIP,
+                  ChannelUtils.channelInfoForLogging(ctx.channel()));
+            } else if (cause instanceof SSLException
+                && cause.getMessage() != null
+                && cause.getMessage().contains("handshake timed out")) {
+              logger.debug(
+                  "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
+                  clientIP,
+                  ChannelUtils.channelInfoForLogging(ctx.channel()));
+            } else if (cause instanceof SSLException
+                && cause.getMessage() != null
+                && cause.getMessage().contains("failure when writing TLS control frames")) {
+              logger.debug(
+                  "Client terminated handshake early., client_ip = {}, channel_info = {}",
+                  clientIP,
+                  ChannelUtils.channelInfoForLogging(ctx.channel()));
+            } else {
+              String msg =
+                  "Unsuccessful SSL Handshake: "
+                      + sslEvent
+                      + ", client_ip = "
+                      + clientIP
+                      + ", channel_info = "
+                      + ChannelUtils.channelInfoForLogging(ctx.channel())
+                      + ", error = "
+                      + cause;
+              if (cause instanceof ClosedChannelException) {
+                logger.debug(msg);
+              } else {
+                logger.debug(msg, cause);
+              }
+              incrementCounters(sslEvent, null);
+            }
           }
+        } catch (Throwable e) {
+          logger.warn("Error getting the SSL handshake info.", e);
+        } finally {
+          ctx.pipeline().remove(this);
         }
-      } catch (Throwable e) {
-        logger.warn("Error getting the SSL handshake info.", e);
-      } finally {
-        // Now remove this handler from the pipeline as no longer needed once the ssl handshake has
-        // completed.
-        ctx.pipeline().remove(this);
+      } else if (evt instanceof SslCloseCompletionEvent) {
+      } else if (evt instanceof SniCompletionEvent) {
+        logger.debug("SNI Parsing Complete: {}", evt);
+  
+        SniCompletionEvent sniCompletionEvent = (SniCompletionEvent) evt;
+        if (sniCompletionEvent.isSuccess()) {
+          spectatorRegistry.counter("zuul.sni.parse.success").increment();
+        } else {
+          Throwable cause = sniCompletionEvent.cause();
+          spectatorRegistry
+              .counter(
+                  "zuul.sni.parse.failure", "cause", cause != null ? cause.getMessage() : "UNKNOWN")
+              .increment();
+        }
       }
-    } else if (evt instanceof SslCloseCompletionEvent) {
-      // TODO - increment a separate metric for this event?
-    } else if (evt instanceof SniCompletionEvent) {
-      logger.debug("SNI Parsing Complete: {}", evt);
-
-      SniCompletionEvent sniCompletionEvent = (SniCompletionEvent) evt;
-      if (sniCompletionEvent.isSuccess()) {
-        spectatorRegistry.counter("zuul.sni.parse.success").increment();
-      } else {
-        Throwable cause = sniCompletionEvent.cause();
-        spectatorRegistry
-            .counter(
-                "zuul.sni.parse.failure", "cause", cause != null ? cause.getMessage() : "UNKNOWN")
-            .increment();
-      }
+      super.userEventTriggered(ctx, evt);
     }
-    super.userEventTriggered(ctx, evt);
-  }
 
   private ClientAuth whichClientAuthEnum(SslHandler sslhandler) {
     ClientAuth clientAuth;
