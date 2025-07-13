@@ -28,13 +28,15 @@ public class BasicRequestCompleteHandler implements RequestCompleteHandler {
   @Inject private RequestMetricsPublisher requestMetricsPublisher;
 
   @Override
-  public void handle(
-      @Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response) {
-    SessionContext context = inboundRequest.getContext();
-
-    // Publish request-level metrics.
-    if (requestMetricsPublisher != null) {
-      requestMetricsPublisher.collectAndPublish(context);
+    public void handle(
+         @Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response) {
+      if (inboundRequest != null) {
+        SessionContext context = inboundRequest.getContext();
+  
+        // Publish request-level metrics.
+        if (requestMetricsPublisher != null) {
+          requestMetricsPublisher.collectAndPublish(context);
+        }
+      }
     }
-  }
 }
