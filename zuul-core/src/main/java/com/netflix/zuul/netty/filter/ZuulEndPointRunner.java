@@ -146,10 +146,8 @@ public class ZuulEndPointRunner
       final HttpContent newChunk = endpoint.processContentChunk(zuulReq, chunk);
       if (newChunk != null) {
         ByteBufUtil.touch(newChunk, "Endpoint buffering newChunk, ZuulMessage: ", zuulReq);
-        // Endpoints do not directly forward content chunks to next stage in the filter chain.
         zuulReq.bufferBodyContents(newChunk);
 
-        // deallocate original chunk if necessary
         if (newChunk != chunk) {
           chunk.release();
         }
@@ -157,10 +155,11 @@ public class ZuulEndPointRunner
         if (isFilterAwaitingBody(zuulReq.getContext())
             && zuulReq.hasCompleteBody()
             && !(endpoint instanceof ProxyEndpoint)) {
-          // whole body has arrived, resume filter chain
           ByteBufUtil.touch(
               newChunk, "Endpoint body complete, resume chain, ZuulMessage: ", zuulReq);
-          invokeNextStage(filter(endpoint, zuulReq));
+          HttpRequestMessage filteredReq =
+              Preconditions.checkNotNull(filter(endpoint, zuulReq), "filteredReq");
+          invokeNextStage(filteredReq);
         }
       }
     } catch (Exception ex) {
