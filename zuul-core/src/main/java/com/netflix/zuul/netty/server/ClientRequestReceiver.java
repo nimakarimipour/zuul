@@ -302,9 +302,7 @@ public class ClientRequestReceiver extends ChannelDuplexHandler {
       // Remove the Expect: 100-Continue header from request as we don't want to proxy it
       // downstream.
       req.headers().remove(HttpHeaderNames.EXPECT);
-      if (zuulRequest != null) {
-        zuulRequest.getHeaders().remove(HttpHeaderNames.EXPECT.toString());
-      }
+      zuulRequest.getHeaders().remove(HttpHeaderNames.EXPECT.toString());
     }
   }
 
