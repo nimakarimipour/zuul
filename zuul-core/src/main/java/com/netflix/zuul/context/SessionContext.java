@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents the context between client and origin server for the duration of the dedicated
@@ -121,7 +120,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
    *
    * <p>This method exists for static analysis.
    */
-  @Nullable
   @Override
   public Object get(Object key) {
     return super.get(key);
@@ -253,7 +251,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     else remove(key);
   }
 
-  @Nullable
   public String getUUID() {
     return getString(KEY_UUID);
   }
@@ -266,7 +263,6 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
     set(KEY_STATIC_RESPONSE, response);
   }
 
-  @Nullable
   public HttpResponseMessage getStaticResponse() {
     return (HttpResponseMessage) get(KEY_STATIC_RESPONSE);
   }
@@ -351,16 +347,13 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   /** appends filter name and status to the filter execution history for the current request */
   public void addFilterExecutionSummary(String name, String status, long time) {
     StringBuilder sb = getFilterExecutionSummary();
-    if (sb != null && sb.length() > 0) sb.append(", ");
-    if (sb != null) {
-      sb.append(name).append('[').append(status).append(']').append('[').append(time).append("ms]");
-    }
+    if (sb.length() > 0) sb.append(", ");
+    sb.append(name).append('[').append(status).append(']').append('[').append(time).append("ms]");
   }
 
   /**
    * @return String that represents the filter execution history for the current request
    */
-  @Nullable
   public StringBuilder getFilterExecutionSummary() {
     return (StringBuilder) get(KEY_FILTER_EXECS);
   }
@@ -428,20 +421,13 @@ public final class SessionContext extends HashMap<String, Object> implements Clo
   }
 
   public void setEventProperty(String key, Object value) {
-    Map<String, Object> eventProps = getEventProperties();
-    if (eventProps == null) {
-      eventProps = new HashMap<>();
-      // You might want to set this new map back to the context or the appropriate place if needed.
-    }
-    eventProps.put(key, value);
+    getEventProperties().put(key, value);
   }
 
-  @Nullable
   public Map<String, Object> getEventProperties() {
     return (Map<String, Object>) this.get(KEY_EVENT_PROPS);
   }
 
-  @Nullable
   public List<FilterError> getFilterErrors() {
     return (List<FilterError>) get(KEY_FILTER_ERRORS);
   }

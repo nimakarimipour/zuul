@@ -357,12 +357,10 @@ public abstract class BaseZuulFilterRunner<I extends ZuulMessage, O extends Zuul
     // Store this filter error for possible future use. But we still continue with next filter in
     // the chain.
     final SessionContext zuulCtx = inMesg.getContext();
-    if (zuulCtx != null && zuulCtx.getFilterErrors() != null) {
-      zuulCtx
-          .getFilterErrors()
-          .add(new FilterError(filter.filterName(), filter.filterType().toString(), t));
-    }
-    if (zuulCtx != null && zuulCtx.debugRouting()) {
+    zuulCtx
+        .getFilterErrors()
+        .add(new FilterError(filter.filterName(), filter.filterType().toString(), t));
+    if (zuulCtx.debugRouting()) {
       Debug.addRoutingDebug(
           zuulCtx,
           "Running Filter failed "
