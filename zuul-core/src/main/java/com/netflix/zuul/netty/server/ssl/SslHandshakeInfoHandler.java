@@ -199,44 +199,49 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
   }
 
   private void incrementCounters(
-      SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
-      @Nullable SslHandshakeInfo handshakeInfo) {
-    if (spectatorRegistry == null) {
-      // May be null for testing.
-      return;
-    }
-    try {
-      if (sslHandshakeCompletionEvent.isSuccess()) {
-        String proto =
-            handshakeInfo.getProtocol().length() > 0 ? handshakeInfo.getProtocol() : "unknown";
-        String ciphsuite =
-            handshakeInfo.getCipherSuite().length() > 0
-                ? handshakeInfo.getCipherSuite()
-                : "unknown";
-        spectatorRegistry
-            .counter(
-                "server.ssl.handshake",
-                "success",
-                String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
-                "protocol",
-                String.valueOf(proto),
-                "ciphersuite",
-                String.valueOf(ciphsuite),
-                "clientauth",
-                String.valueOf(handshakeInfo.getClientAuthRequirement()))
-            .increment();
-      } else {
-        spectatorRegistry
-            .counter(
-                "server.ssl.handshake",
-                "success",
-                String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
-                "failure_cause",
-                String.valueOf(sslHandshakeCompletionEvent.cause()))
-            .increment();
+        SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
+        @Nullable SslHandshakeInfo handshakeInfo) {
+      if (spectatorRegistry == null) {
+        return;
       }
-    } catch (Exception e) {
-      logger.error("Error incrememting counters for SSL handshake!", e);
+      try {
+        if (sslHandshakeCompletionEvent.isSuccess()) {
+          String proto =
+              (handshakeInfo != null && handshakeInfo.getProtocol() != null && handshakeInfo.getProtocol().length() > 0)
+                  ? handshakeInfo.getProtocol()
+                  : "unknown";
+          String ciphsuite =
+              (handshakeInfo != null && handshakeInfo.getCipherSuite() != null && handshakeInfo.getCipherSuite().length() > 0)
+                  ? handshakeInfo.getCipherSuite()
+                  : "unknown";
+          String clientAuthRequirement =
+              (handshakeInfo != null && handshakeInfo.getClientAuthRequirement() != null)
+                  ? String.valueOf(handshakeInfo.getClientAuthRequirement())
+                  : "unknown";
+          spectatorRegistry
+              .counter(
+                  "server.ssl.handshake",
+                  "success",
+                  String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
+                  "protocol",
+                  proto,
+                  "ciphersuite",
+                  ciphsuite,
+                  "clientauth",
+                  clientAuthRequirement)
+              .increment();
+        } else {
+          spectatorRegistry
+              .counter(
+                  "server.ssl.handshake",
+                  "success",
+                  String.valueOf(sslHandshakeCompletionEvent.isSuccess()),
+                  "failure_cause",
+                  String.valueOf(sslHandshakeCompletionEvent.cause()))
+              .increment();
+        }
+      } catch (Exception e) {
+        logger.error("Error increasing counters for SSL handshake!", e);
+      }
     }
-  }
 }
