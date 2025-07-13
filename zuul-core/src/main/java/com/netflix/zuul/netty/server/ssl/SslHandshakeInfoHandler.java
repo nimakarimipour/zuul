@@ -25,7 +25,6 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.netty.ChannelUtils;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.ClientAuth;
@@ -203,14 +202,13 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       SslHandshakeCompletionEvent sslHandshakeCompletionEvent,
       @Nullable SslHandshakeInfo handshakeInfo) {
     if (spectatorRegistry == null) {
+      // May be null for testing.
       return;
     }
     try {
       if (sslHandshakeCompletionEvent.isSuccess()) {
         String proto =
-            Nullability.castToNonnull(handshakeInfo.getProtocol()).length() > 0
-                ? handshakeInfo.getProtocol()
-                : "unknown";
+            handshakeInfo.getProtocol().length() > 0 ? handshakeInfo.getProtocol() : "unknown";
         String ciphsuite =
             handshakeInfo.getCipherSuite().length() > 0
                 ? handshakeInfo.getCipherSuite()
