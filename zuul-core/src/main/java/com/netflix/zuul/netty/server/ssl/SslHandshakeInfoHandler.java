@@ -25,6 +25,7 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.netty.ChannelUtils;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.ClientAuth;
@@ -54,7 +55,7 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       AttributeKey.newInstance("_ssl_handshake_info");
   private static final Logger logger = LoggerFactory.getLogger(SslHandshakeInfoHandler.class);
 
-  private final Registry spectatorRegistry;
+  @Nullable private final Registry spectatorRegistry;
   private final boolean isSSlFromIntermediary;
 
   public SslHandshakeInfoHandler(Registry spectatorRegistry, boolean isSSlFromIntermediary) {
@@ -120,10 +121,6 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                   || PassportState.SERVER_CH_IDLE_TIMEOUT.equals(passportState))) {
             // Either client closed the connection without/before having completed a handshake, or
             // the connection idle timed-out before handshake.
-            // NOTE: we were seeing a lot of these in prod and can repro by just telnetting to port
-            // and then closing terminal
-            // without sending anything.
-            // So don't treat these as SSL handshake failures.
             logger.debug(
                 "Client closed connection or it idle timed-out without doing an ssl handshake. , client_ip = {}, channel_info = {}",
                 clientIP,
@@ -136,8 +133,6 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else if (cause instanceof SSLException
               && cause.getMessage().contains("failure when writing TLS control frames")) {
-            // This can happen if the ClientHello is sent followed  by a RST packet, before we can
-            // respond.
             logger.debug(
                 "Client terminated handshake early., client_ip = {}, channel_info = {}",
                 clientIP,
@@ -173,11 +168,17 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
       logger.debug("SNI Parsing Complete: {}", evt);
 
       SniCompletionEvent sniCompletionEvent = (SniCompletionEvent) evt;
+      if (spectatorRegistry == null) {
+        return;
+      }
+
       if (sniCompletionEvent.isSuccess()) {
-        spectatorRegistry.counter("zuul.sni.parse.success").increment();
+        Nullability.castToNonnull(spectatorRegistry, "checked before if block")
+            .counter("zuul.sni.parse.success")
+            .increment();
       } else {
         Throwable cause = sniCompletionEvent.cause();
-        spectatorRegistry
+        Nullability.castToNonnull(spectatorRegistry, "checked before if block")
             .counter(
                 "zuul.sni.parse.failure", "cause", cause != null ? cause.getMessage() : "UNKNOWN")
             .increment();
