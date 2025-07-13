@@ -28,7 +28,6 @@ import com.netflix.zuul.exception.OutboundException;
 import com.netflix.zuul.netty.connectionpool.OriginConnectException;
 import com.netflix.zuul.niws.RequestAttempts;
 import com.netflix.zuul.origins.OriginConcurrencyExceededException;
-import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.timeout.ReadTimeoutException;
 import java.nio.channels.ClosedChannelException;
@@ -58,6 +57,8 @@ public class NettyRequestAttemptFactory {
 
     if (t instanceof Errors.NativeIoException
         && Errors.ERRNO_ECONNRESET_NEGATIVE == ((Errors.NativeIoException) t).expectedErr()) {
+      // This is a "Connection reset by peer" which we see fairly often happening when Origin
+      // servers are overloaded.
       LOG.warn("ERRNO_ECONNRESET_NEGATIVE mapped to RESET_CONNECTION", t);
       return RESET_CONNECTION;
     }
@@ -67,8 +68,7 @@ public class NettyRequestAttemptFactory {
     }
 
     final Throwable cause = t.getCause();
-    if (cause instanceof IllegalStateException
-        && Nullability.castToNonnull(cause.getMessage(), "cause not null").contains("server")) {
+    if (cause instanceof IllegalStateException && cause.getMessage().contains("server")) {
       LOG.warn("IllegalStateException mapped to NO_AVAILABLE_SERVERS", cause);
       return NO_AVAILABLE_SERVERS;
     }
