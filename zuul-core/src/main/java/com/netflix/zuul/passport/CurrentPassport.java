@@ -478,31 +478,35 @@ class CountingCurrentPassport extends CurrentPassport {
   }
 
   private void incrementStateCounter(@Nullable PassportState state) {
-    switch (state) {
-      case IN_REQ_HEADERS_RECEIVED:
-        IN_REQ_HEADERS_RECEIVED_CNT.increment();
-        break;
-      case IN_REQ_LAST_CONTENT_RECEIVED:
-        IN_REQ_LAST_CONTENT_RECEIVED_CNT.increment();
-        break;
-      case OUT_REQ_HEADERS_SENT:
-        OUT_REQ_HEADERS_SENT_CNT.increment();
-        break;
-      case OUT_REQ_LAST_CONTENT_SENT:
-        OUT_REQ_LAST_CONTENT_SENT_CNT.increment();
-        break;
-      case IN_RESP_HEADERS_RECEIVED:
-        IN_RESP_HEADERS_RECEIVED_CNT.increment();
-        break;
-      case IN_RESP_LAST_CONTENT_RECEIVED:
-        IN_RESP_LAST_CONTENT_RECEIVED_CNT.increment();
-        break;
-      case OUT_RESP_HEADERS_SENT:
-        OUT_RESP_HEADERS_SENT_CNT.increment();
-        break;
-      case OUT_RESP_LAST_CONTENT_SENT:
-        OUT_RESP_LAST_CONTENT_SENT_CNT.increment();
-        break;
+      if (state == null) {
+        return;
+      }
+      
+      switch (state) {
+        case IN_REQ_HEADERS_RECEIVED:
+          IN_REQ_HEADERS_RECEIVED_CNT.increment();
+          break;
+        case IN_REQ_LAST_CONTENT_RECEIVED:
+          IN_REQ_LAST_CONTENT_RECEIVED_CNT.increment();
+          break;
+        case OUT_REQ_HEADERS_SENT:
+          OUT_REQ_HEADERS_SENT_CNT.increment();
+          break;
+        case OUT_REQ_LAST_CONTENT_SENT:
+          OUT_REQ_LAST_CONTENT_SENT_CNT.increment();
+          break;
+        case IN_RESP_HEADERS_RECEIVED:
+          IN_RESP_HEADERS_RECEIVED_CNT.increment();
+          break;
+        case IN_RESP_LAST_CONTENT_RECEIVED:
+          IN_RESP_LAST_CONTENT_RECEIVED_CNT.increment();
+          break;
+        case OUT_RESP_HEADERS_SENT:
+          OUT_RESP_HEADERS_SENT_CNT.increment();
+          break;
+        case OUT_RESP_LAST_CONTENT_SENT:
+          OUT_RESP_LAST_CONTENT_SENT_CNT.increment();
+          break;
+      }
     }
-  }
 }
