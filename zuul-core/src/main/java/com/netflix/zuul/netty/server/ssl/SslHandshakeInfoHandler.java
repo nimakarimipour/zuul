@@ -25,6 +25,7 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.zuul.netty.ChannelUtils;
 import com.netflix.zuul.passport.CurrentPassport;
 import com.netflix.zuul.passport.PassportState;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.ClientAuth;
@@ -129,13 +130,14 @@ public class SslHandshakeInfoHandler extends ChannelInboundHandlerAdapter {
                 clientIP,
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else if (cause instanceof SSLException
-              && cause.getMessage().contains("handshake timed out")) {
+              && Nullability.castToNonnull(cause.getMessage()).contains("handshake timed out")) {
             logger.debug(
                 "Client timed-out doing the ssl handshake. , client_ip = {}, channel_info = {}",
                 clientIP,
                 ChannelUtils.channelInfoForLogging(ctx.channel()));
           } else if (cause instanceof SSLException
-              && cause.getMessage().contains("failure when writing TLS control frames")) {
+              && Nullability.castToNonnull(cause.getMessage())
+                  .contains("failure when writing TLS control frames")) {
             // This can happen if the ClientHello is sent followed  by a RST packet, before we can
             // respond.
             logger.debug(
