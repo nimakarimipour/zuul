@@ -24,6 +24,7 @@ import com.netflix.config.DynamicLongProperty;
 import com.netflix.zuul.context.CommonContextKeys;
 import com.netflix.zuul.message.http.HttpRequestMessage;
 import com.netflix.zuul.origins.NettyOrigin;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,13 +69,12 @@ public class OriginTimeoutManager {
     if (originTimeout == null && requestTimeout == null) {
       computedTimeout = MAX_OUTBOUND_READ_TIMEOUT_MS.get();
     } else if (originTimeout == null || requestTimeout == null) {
-      computedTimeout = originTimeout == null ? requestTimeout : originTimeout;
+      computedTimeout =
+          Nullability.castToNonnull(originTimeout == null ? requestTimeout : originTimeout);
     } else {
-      // return the stricter (i.e. lower) of the two timeouts
       computedTimeout = Math.min(originTimeout, requestTimeout);
     }
 
-    // enforce max timeout upperbound
     return Duration.ofMillis(Math.min(computedTimeout, MAX_OUTBOUND_READ_TIMEOUT_MS.get()));
   }
 
