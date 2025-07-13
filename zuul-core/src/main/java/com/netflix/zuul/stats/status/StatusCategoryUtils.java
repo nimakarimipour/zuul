@@ -23,6 +23,7 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 /** User: michaels@netflix.com Date: 6/9/15 Time: 2:48 PM */
 public class StatusCategoryUtils {
@@ -33,8 +34,8 @@ public class StatusCategoryUtils {
   }
 
   public static StatusCategory getStatusCategory(@Nullable SessionContext ctx) {
-    return ctx.get(CommonContextKeys.STATUS_CATGEORY);
-  }
+        return Nullability.castToNonnull(ctx).get(CommonContextKeys.STATUS_CATGEORY);
+    }
 
   public static void setStatusCategory(SessionContext ctx, StatusCategory statusCategory) {
     ctx.put(CommonContextKeys.STATUS_CATGEORY, statusCategory);
