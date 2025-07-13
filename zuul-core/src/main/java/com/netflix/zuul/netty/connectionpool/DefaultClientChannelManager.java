@@ -365,67 +365,68 @@ public class DefaultClientChannelManager implements ClientChannelManager {
   }
 
   @Override
-  public Promise<PooledConnection> acquire(
-      EventLoop eventLoop,
-      @Nullable Object key,
-      CurrentPassport passport,
-      AtomicReference<DiscoveryResult> selectedServer,
-      AtomicReference<? super InetAddress> selectedHostAddr) {
-
-    if (shuttingDown) {
-      Promise<PooledConnection> promise = eventLoop.newPromise();
-      promise.setFailure(SHUTTING_DOWN_ERR);
-      return promise;
+    public Promise<PooledConnection> acquire(
+        EventLoop eventLoop,
+        @Nullable Object key,
+        CurrentPassport passport,
+        AtomicReference<DiscoveryResult> selectedServer,
+        AtomicReference<? super InetAddress> selectedHostAddr) {
+  
+      if (shuttingDown) {
+        Promise<PooledConnection> promise = eventLoop.newPromise();
+        promise.setFailure(SHUTTING_DOWN_ERR);
+        return promise;
+      }
+  
+      if (key == null) {
+        Promise<PooledConnection> promise = eventLoop.newPromise();
+        promise.setFailure(new IllegalArgumentException("Key cannot be null"));
+        return promise;
+      }
+  
+      final DiscoveryResult chosenServer = dynamicServerResolver.resolve(key);
+  
+      selectedServer.set(chosenServer);
+      if (chosenServer == DiscoveryResult.EMPTY) {
+        Promise<PooledConnection> promise = eventLoop.newPromise();
+        promise.setFailure(
+            new OriginConnectException(
+                "No servers available", OutboundErrorType.NO_AVAILABLE_SERVERS));
+        return promise;
+      }
+  
+      IConnectionPool pool =
+          perServerPools.computeIfAbsent(
+              chosenServer,
+              s -> {
+                SocketAddress finalServerAddr = pickAddress(chosenServer);
+                final ClientChannelManager clientChannelMgr = this;
+                PooledConnectionFactory pcf =
+                    createPooledConnectionFactory(
+                        chosenServer, clientChannelMgr, closeConnCounter, closeWrtBusyConnCounter);
+  
+                return createConnectionPool(
+                    chosenServer,
+                    finalServerAddr,
+                    clientConnFactory,
+                    pcf,
+                    connPoolConfig,
+                    clientConfig,
+                    createNewConnCounter,
+                    createConnSucceededCounter,
+                    createConnFailedCounter,
+                    requestConnCounter,
+                    reuseConnCounter,
+                    connTakenFromPoolIsNotOpen,
+                    closeAbovePoolHighWaterMarkCounter,
+                    maxConnsPerHostExceededCounter,
+                    connEstablishTimer,
+                    connsInPool,
+                    connsInUse);
+              });
+  
+      return pool.acquire(eventLoop, passport, selectedHostAddr);
     }
-
-    // Choose the next load-balanced server.
-    final DiscoveryResult chosenServer = dynamicServerResolver.resolve(key);
-
-    // (argha-c): Always ensure the selected server is updated, since the call chain relies on this
-    // mutation.
-    selectedServer.set(chosenServer);
-    if (chosenServer == DiscoveryResult.EMPTY) {
-      Promise<PooledConnection> promise = eventLoop.newPromise();
-      promise.setFailure(
-          new OriginConnectException(
-              "No servers available", OutboundErrorType.NO_AVAILABLE_SERVERS));
-      return promise;
-    }
-
-    // Now get the connection-pool for this server.
-    IConnectionPool pool =
-        perServerPools.computeIfAbsent(
-            chosenServer,
-            s -> {
-              SocketAddress finalServerAddr = pickAddress(chosenServer);
-              final ClientChannelManager clientChannelMgr = this;
-              PooledConnectionFactory pcf =
-                  createPooledConnectionFactory(
-                      chosenServer, clientChannelMgr, closeConnCounter, closeWrtBusyConnCounter);
-
-              // Create a new pool for this server.
-              return createConnectionPool(
-                  chosenServer,
-                  finalServerAddr,
-                  clientConnFactory,
-                  pcf,
-                  connPoolConfig,
-                  clientConfig,
-                  createNewConnCounter,
-                  createConnSucceededCounter,
-                  createConnFailedCounter,
-                  requestConnCounter,
-                  reuseConnCounter,
-                  connTakenFromPoolIsNotOpen,
-                  closeAbovePoolHighWaterMarkCounter,
-                  maxConnsPerHostExceededCounter,
-                  connEstablishTimer,
-                  connsInPool,
-                  connsInUse);
-            });
-
-    return pool.acquire(eventLoop, passport, selectedHostAddr);
-  }
 
   protected PooledConnectionFactory createPooledConnectionFactory(
       DiscoveryResult chosenServer,
