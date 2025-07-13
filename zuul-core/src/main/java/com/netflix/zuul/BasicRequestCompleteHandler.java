@@ -22,19 +22,19 @@ import com.netflix.zuul.message.http.HttpResponseMessage;
 import com.netflix.zuul.stats.RequestMetricsPublisher;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import edu.ucr.cs.riple.annotator.util.Nullability;
 
 /** User: michaels@netflix.com Date: 6/4/15 Time: 4:26 PM */
 public class BasicRequestCompleteHandler implements RequestCompleteHandler {
   @Inject private RequestMetricsPublisher requestMetricsPublisher;
 
   @Override
-  public void handle(
-      @Nullable HttpRequestInfo inboundRequest, @Nullable HttpResponseMessage response) {
-    SessionContext context = inboundRequest.getContext();
-
-    // Publish request-level metrics.
-    if (requestMetricsPublisher != null) {
-      requestMetricsPublisher.collectAndPublish(context);
+    public void handle(
+         @Nullable HttpRequestInfo inboundRequest,  @Nullable HttpResponseMessage response) {
+      SessionContext context = Nullability.castToNonnull(inboundRequest).getContext();
+  
+      if (requestMetricsPublisher != null) {
+        requestMetricsPublisher.collectAndPublish(context);
+      }
     }
-  }
 }
